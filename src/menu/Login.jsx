@@ -155,7 +155,7 @@ const Login = () => {
   const [isCompanyUser, setIsCompanyUser] = useState(false);
 
   const handleLogin = () => {
-    if (id.length < 5) {
+    if (id.length >= 5) {
       if (password.length >= 8) {
         setError(null);
         const route = isCompanyUser ? "/company" : "/user";
