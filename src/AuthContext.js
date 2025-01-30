@@ -1,43 +1,24 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext } from "react";
+import { useCookies } from "react-cookie";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isCompanyUser, setIsCompanyUser] = useState(false);
+  const [_, setCookies] = useCookies(["access_token"]);
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      const email = localStorage.getItem("userEmail");
-      const id = localStorage.getItem("userId");
-      setUser({ email, id, accessToken });
-    } else {
-      setUser(null);
-    }
-  }, []);
-
-  const login = (data, isCompanyUser) => {
-    const accessToken = data.accessToken;
-    const email = data.user.email;
-    const id = data.user._id;
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("userId", id);
-    setUser({ email, id, accessToken });
-    setIsCompanyUser(isCompanyUser);
+  const login = (data) => {
+    setCookies("access_token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
   };
 
   const logout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userId");
-    setUser(null);
-    setIsCompanyUser(false);
+    localStorage.removeItem("user");
   };
 
+  const user = () => JSON.parse(localStorage.getItem("user"));
+
   return (
-    <AuthContext.Provider value={{ login, logout, user, isCompanyUser }}>
+    <AuthContext.Provider value={{ login, logout, user }}>
       {children}
     </AuthContext.Provider>
   );

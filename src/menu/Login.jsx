@@ -147,22 +147,21 @@ const StyledLogin = styled.div`
 `;
 
 const Login = () => {
-  const [email, setEmail] = useState();
+  const [id, setId] = useState();
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const { login } = useAuth();
   const [isCompanyUser, setIsCompanyUser] = useState(false);
 
   const handleLogin = () => {
-    if (emailRegex.test(email)) {
+    if (id.length < 5) {
       if (password.length >= 8) {
         setError(null);
         const route = isCompanyUser ? "/company" : "/user";
         customAxios
           .post(`${route}/login`, {
-            email,
+            id,
             password,
           })
           .then((res) => {
@@ -180,7 +179,7 @@ const Login = () => {
         setError("패스워드는 8자 이상이어야 합니다.");
       }
     } else {
-      setError("이메일 형식이 맞지 않습니다.");
+      setError("아이디는 5자 이상이어야 합니다.");
     }
   };
 
@@ -212,12 +211,12 @@ const Login = () => {
           </form>
           <div>
             <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="이메일"
+              id="id"
+              name="id"
+              type="id"
+              placeholder="아이디"
               required
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setId(e.target.value)}
             />
           </div>
           <div>

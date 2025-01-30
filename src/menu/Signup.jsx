@@ -181,6 +181,7 @@ const StyledSignup = styled.div`
 `;
 
 const Signup = () => {
+  const [id, setId] = useState();
   const [name, setName] = useState();
   const [dOfB, setDOfB] = useState();
   const [cName, setCName] = useState();
@@ -192,66 +193,81 @@ const Signup = () => {
   const [isCompanyUser, setIsCompanyUser] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const dOfBRegex = /^\d{4}\/\d{2}\/\d{2}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const signup = () => {
-    if (emailRegex.test(email)) {
-      if (password.length >= 8) {
-        if (password === password2) {
-          setError(null);
-          const route = isCompanyUser ? "/company" : "/user";
-          let obj;
-          if (isCompanyUser) {
-            obj = {
-              name: cName,
-              dateOfFoundation: dOfF,
-              email,
-              password,
-            };
-          } else {
-            obj = {
-              name,
-              dateOfBirth: dOfB,
-              email,
-              password,
-            };
-          }
-          customAxios
-            .post(`${route}/signup`, obj)
-            .then((res) => {
-              console.log(res);
-              if (res.status === 200) {
-                toast(
-                  isCompanyUser
-                    ? "기업 유저"
-                    : "일반 유저" + " 회원가입에 성공하였습니다."
-                );
-                customAxios
-                  .post(`${route}/login`, {
+    if (id.length >= 5) {
+      if (name.length >= 2) {
+        if (dOfBRegex.test(dOfB)) {
+          if (emailRegex.test(email)) {
+            if (password.length >= 8) {
+              if (password === password2) {
+                setError(null);
+                const route = isCompanyUser ? "/company" : "/user";
+                let obj;
+                if (isCompanyUser) {
+                  obj = {
+                    id,
+                    name: cName,
+                    dateOfFoundation: dOfF,
                     email,
                     password,
-                  })
+                  };
+                } else {
+                  obj = {
+                    id,
+                    name,
+                    dateOfBirth: dOfB,
+                    email,
+                    password,
+                  };
+                }
+                customAxios
+                  .post(`${route}/signup`, obj)
                   .then((res) => {
                     console.log(res);
                     if (res.status === 200) {
-                      login(res.data);
-                      navigate("/");
+                      toast(
+                        isCompanyUser
+                          ? "기업 유저"
+                          : "일반 유저" + " 회원가입에 성공하였습니다."
+                      );
+                      customAxios
+                        .post(`${route}/login`, {
+                          email,
+                          password,
+                        })
+                        .then((res) => {
+                          console.log(res);
+                          if (res.status === 200) {
+                            login(res.data);
+                            navigate("/");
+                          }
+                        });
                     }
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    setError(err.response.data.error);
                   });
+              } else {
+                setError("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
               }
-            })
-            .catch((err) => {
-              console.log(err);
-              setError(err.response.data.error);
-            });
+            } else {
+              setError("패스워드는 8자 이상이어야 합니다.");
+            }
+          } else {
+            setError("이메일 형식이 올바르지 않습니다.");
+          }
         } else {
-          setError("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+          setError("생년월일 형식이 올바르지 않습니다.");
         }
       } else {
-        setError("패스워드는 8자 이상이어야 합니다.");
+        setError("이름은 두 글자 이상이어야 합니다.");
       }
     } else {
-      setError("이메일 형식이 맞지 않습니다.");
+      setError("아이디는 5자 이상이어야 합니다.");
     }
   };
 
@@ -281,6 +297,16 @@ const Signup = () => {
               <p>기업 회원</p>
             </label>
           </form>
+          <div>
+            <label>아이디</label>
+            <input
+              name="id"
+              type="id"
+              placeholder="아이디"
+              required
+              onChange={(e) => setId(e.target.value)}
+            />
+          </div>
           {isCompanyUser ? (
             <>
               <div>
