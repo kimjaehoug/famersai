@@ -55,8 +55,7 @@ const MainContainer = styled.div`
 `;
 
 const MainTitle = styled.p`
-  font: 400 35px "arial";
-  color: #2b2b2b;
+  font-size: 40px;
   margin: 0;
   padding: 0;
   margin: 60px 0 30px 0;
@@ -66,7 +65,7 @@ const MainTitle = styled.p`
 `;
 
 const MainContent = styled.p`
-  font: 500 13px "arial";
+  font-size: 20px;
   margin-bottom: 40px;
   @media screen and (min-width: 768px) {
     margin: 0;
@@ -101,7 +100,7 @@ const SubWrapper = styled.div`
 `;
 
 const SubTitle = styled.p`
-  font: bold 22px "arial";
+  font: bold 22px inherit;
   color: #2b2b2b;
   margin: 40px 0 60px 0;
   padding: 0;
@@ -112,7 +111,7 @@ const SubTitle = styled.p`
 `;
 
 const Content = styled.p`
-  font: 500 13px "arial";
+  font: 500 13px inherit;
   margin-bottom: 40px;
   @media screen and (min-width: 768px) {
     margin: 0;

@@ -17,19 +17,20 @@ const StyledPostElement = styled.div`
     align-items: center;
     width: 100%;
     padding: 0 20px;
-    font-family: "Arial", sans-serif;
-    font-size: 14px;
-    color: #333333;
+    font-size: 16px;
+    color: ${({ theme }) => theme.colors.MAIN};
   }
 `;
 
-const PostElement = ({ title, author, date }) => {
+const PostElement = ({ title, jobType, author, date }) => {
   return (
     <StyledPostElement>
       <div className="inner">
-        <div className="title">{title}</div>
+        <div className="title">
+          [{jobType}] {title}
+        </div>
         <div className="date">
-          작성자: {author?.email} | {date.split("T").join(" ").split(".")[0]}
+          {author?.email} | {date.split("T").join(" ").split(".")[0]}
         </div>
       </div>
     </StyledPostElement>

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom"; // useNavigate 추가
 import { customAxios } from "../customAxios";
 import CommentElement from "./CommentElement";
-import WriteCommentElement from "./WriteCommentElement";
 import { useAuth } from "../AuthContext";
 
 const StyledPost = styled.div`
@@ -74,7 +73,7 @@ const StyledPost = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #7db249;
+      background-color: ${({ theme }) => theme.colors.MAIN};
       color: white;
       border: none;
       border-radius: 12px;
@@ -87,27 +86,42 @@ const StyledPost = styled.div`
     }
 
     button:hover {
-      background-color: #d2ff7c;
+      background-color: ${({ theme }) => theme.colors.SIDE};
     }
 
     button:active {
-      background-color: #d2ff7c;
+      background-color: ${({ theme }) => theme.colors.BACK};
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
     }
 
     .listButton {
       background-color: white;
-      color: #7db249;
-      border: 2px solid #7db249;
+      color: ${({ theme }) => theme.colors.MAIN};
+      border: 2px solid ${({ theme }) => theme.colors.MAIN};
     }
 
     .listButton:hover {
-      background-color: #d2ff7c;
+      background-color: white;
+      color: ${({ theme }) => theme.colors.SIDE};
+      border: 2px solid ${({ theme }) => theme.colors.SIDE};
     }
 
     .listButton:active {
-      background-color: #d2ff7c;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+      background-color: ${({ theme }) => theme.colors.MAIN};
+      color: ${({ theme }) => theme.colors.BACK};
+      border: 2px solid ${({ theme }) => theme.colors.BACK};
+    }
+
+    .skillSets {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: wrap;
+      margin: 0 20px 20px 20px;
+      button {
+        height: 40px;
+      }
     }
   }
 `;
@@ -115,7 +129,9 @@ const StyledPost = styled.div`
 const Post = () => {
   const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
+  const [jobType, setJobType] = useState();
   const [title, setTitle] = useState();
+  const [skillSets, setSkillSets] = useState([]);
   const [author, setAuthor] = useState();
   const [postId, setPostId] = useState();
   const [date, setDate] = useState();
@@ -127,9 +143,11 @@ const Post = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    customAxios.get(`posts/${searchParams.get("id")}`).then((res) => {
+    customAxios.get(`jobPost/${searchParams.get("id")}`).then((res) => {
       const data = res.data;
+      setJobType(data.jobType);
       setTitle(data.title);
+      setSkillSets(data.skillSets);
       setAuthor(data.author);
       setPostId(data._id);
       setDate(data.createdAt);
@@ -211,8 +229,24 @@ const Post = () => {
             onChange={handleEditTitleChange}
           />
         ) : (
-          <h1>{title}</h1>
+          <h1>
+            [{jobType}] {title}
+          </h1>
         )}
+        <div className="skillSets">
+          {skillSets.map((skillSet, idx) => {
+            return (
+              <button
+                key={idx + 1}
+                className="skillSet"
+                value={skillSet}
+                disabled
+              >
+                {skillSet}
+              </button>
+            );
+          })}
+        </div>
         <p>작성자: {author?.email}</p>
         <p>작성일: {date?.split("T").join(" ").split(".")[0]}</p>
         {editMode ? (
@@ -236,8 +270,8 @@ const Post = () => {
             author &&
             user.id === author._id && (
               <>
-                <button onClick={handleEditStart}>포스트 수정</button>
-                <button onClick={handleDeletePost}>포스트 삭제</button>
+                <button onClick={handleEditStart}>채용 공고 수정</button>
+                <button onClick={handleDeletePost}>채용 공고 삭제</button>
               </>
             )
           )}
@@ -256,13 +290,6 @@ const Post = () => {
               />
             );
           })}
-        {!editMode && (
-          <WriteCommentElement
-            user={user}
-            postId={postId}
-            updateComments={updateComments}
-          />
-        )}
       </div>
     </StyledPost>
   );

@@ -12,7 +12,6 @@ const StyledBoard = styled.div`
     background: ${({ theme }) => theme.colors.MAIN};
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
-    font-family: "Arial", sans-serif;
     color: #2c2c2c;
 
     a {
@@ -22,14 +21,14 @@ const StyledBoard = styled.div`
       padding: 10px 10px;
       margin: 8px 0;
       border-radius: 10px;
-      background-color: #f9f9f9;
+      background-color: transparent;
+      border: 3px solid ${({ theme }) => theme.colors.BACK};
       text-decoration: none;
       color: #2c2c2c;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease-in-out;
 
       &:hover {
-        background-color: #d2ff7c;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         cursor: pointer;
       }
@@ -41,16 +40,15 @@ const StyledBoard = styled.div`
       margin-top: 20px;
       a {
         margin: 0 0 0 auto;
-        background: white;
+        border: 3px solid ${({ theme }) => theme.colors.BACK};
+        background-color: ${({ theme }) => theme.colors.MAIN};
         .writePost {
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          height: 40px;
+          height: 30px;
           width: 120px;
           font-size: 18px;
-          border-radius: 12px;
           text-align: center;
-          background-color: #d2ff7c;
-          color: #7db249;
+          border-radius: 10px;
+          color: ${({ theme }) => theme.colors.BACK};
           justify-content: center;
           display: flex;
           flex-direction: column;
@@ -78,8 +76,8 @@ const StyledBoard = styled.div`
         font-size: 14px;
         font-weight: bold;
         border-radius: 20%;
-        background-color: #f2f2f2;
-        color: #585858;
+        background-color: ${({ theme }) => theme.colors.BACK};
+        color: ${({ theme }) => theme.colors.MAIN};
         border: none;
         transition: all 0.3s ease-in-out;
 
@@ -90,8 +88,9 @@ const StyledBoard = styled.div`
         }
 
         &.active {
-          background-color: #d2ff7c;
-          color: white;
+          border: 2px solid ${({ theme }) => theme.colors.BACK};
+          background-color: ${({ theme }) => theme.colors.MAIN};
+          color: ${({ theme }) => theme.colors.BACK};
         }
       }
     }
@@ -106,7 +105,7 @@ const Board = () => {
 
   useEffect(() => {
     customAxios
-      .get("/posts")
+      .get("/jobPost")
       .then((res) => {
         console.log(res);
         setAllPosts(res.data.reverse());
@@ -126,11 +125,11 @@ const Board = () => {
   return (
     <StyledBoard>
       <div className="boardContainer">
-        {posts.map(({ comments, createdAt, title, _id, author }, i) => (
+        {posts.map(({ jobType, createdAt, title, _id, author }, i) => (
           <a key={i} href={`/post?id=${_id}`}>
             <PostElement
               title={title}
-              numOfComments={comments.length}
+              jobType={jobType}
               author={author}
               date={createdAt}
             />
@@ -152,7 +151,7 @@ const Board = () => {
         {user && (
           <div className="writePostContainer">
             <a href="/writePost">
-              <div className="writePost">게시글 작성</div>
+              <div className="writePost">채용 공고 작성</div>
             </a>
           </div>
         )}

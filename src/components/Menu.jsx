@@ -54,7 +54,7 @@ const Menu = () => {
       </a>
       {user ? (
         <>
-          <h5 onClick={() => setShowLogout(!showLogout)}>{user.email}님</h5>
+          <h5 onClick={() => setShowLogout(!showLogout)}>{user.name}님</h5>
           {showLogout && (
             <a href="/login">
               <h5 id="logout" onClick={logout}>

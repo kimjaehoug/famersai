@@ -66,7 +66,7 @@ const StyledLogin = styled.div`
         transition: border 0.3s;
 
         &:focus {
-          border: 1px solid ${({ theme }) => theme.colors.MAIN};
+          border: 1px solid ${({ theme }) => theme.colors.SIDE};
           outline: none;
         }
 
@@ -88,7 +88,7 @@ const StyledLogin = styled.div`
           }
 
           &:active {
-            background-color: #5882fa;
+            background-color: ${({ theme }) => theme.colors.BACK};
             box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
           }
         }
@@ -168,7 +168,7 @@ const Login = () => {
           .then((res) => {
             console.log(res);
             if (res.status === 200) {
-              login(res.data);
+              login(res.data, isCompanyUser);
               navigate("/");
             }
           })

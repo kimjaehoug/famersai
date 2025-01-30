@@ -83,7 +83,7 @@ const StyledSignup = styled.div`
         margin: 0 auto;
 
         &:focus {
-          border: 1px solid #5882fa;
+          border: 1px solid ${({ theme }) => theme.colors.SIDE};
           outline: none;
         }
 
@@ -111,7 +111,7 @@ const StyledSignup = styled.div`
         }
 
         &:active {
-          background-color: #d2ff7c;
+          background-color: ${({ theme }) => theme.colors.BACK};
           box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
         }
       }
@@ -181,6 +181,10 @@ const StyledSignup = styled.div`
 `;
 
 const Signup = () => {
+  const [name, setName] = useState();
+  const [dOfB, setDOfB] = useState();
+  const [cName, setCName] = useState();
+  const [dOfF, setDOfF] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [password2, setPassword2] = useState();
@@ -196,11 +200,24 @@ const Signup = () => {
         if (password === password2) {
           setError(null);
           const route = isCompanyUser ? "/company" : "/user";
-          customAxios
-            .post(`${route}/signup`, {
+          let obj;
+          if (isCompanyUser) {
+            obj = {
+              name: cName,
+              dateOfFoundation: dOfF,
               email,
               password,
-            })
+            };
+          } else {
+            obj = {
+              name,
+              dateOfBirth: dOfB,
+              email,
+              password,
+            };
+          }
+          customAxios
+            .post(`${route}/signup`, obj)
             .then((res) => {
               console.log(res);
               if (res.status === 200) {
@@ -264,6 +281,54 @@ const Signup = () => {
               <p>기업 회원</p>
             </label>
           </form>
+          {isCompanyUser ? (
+            <>
+              <div>
+                <label>회사명</label>
+                <input
+                  name="name"
+                  type="name"
+                  placeholder="회사명"
+                  required
+                  onChange={(e) => setCName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>설립연도</label>
+                <input
+                  name="dateOfBirth"
+                  type="설립연도"
+                  placeholder="OOOO/OO/OO"
+                  required
+                  onChange={(e) => setDOfF(e.target.value)}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <label>이름</label>
+                <input
+                  name="name"
+                  type="name"
+                  placeholder="이름"
+                  required
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>생년월일</label>
+                <input
+                  name="dateOfBirth"
+                  type="생년월일"
+                  placeholder="OOOO/OO/OO"
+                  required
+                  onChange={(e) => setDOfB(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+
           <div>
             <label>이메일</label>
             <input

@@ -1,7 +1,7 @@
 const theme = {
   colors: {
     MAIN: "#f54458",
-    SIDE: "#ff5f6f",
+    SIDE: "#ff6f7f",
     BACK: "white",
   },
 };

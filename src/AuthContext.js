@@ -4,6 +4,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isCompanyUser, setIsCompanyUser] = useState(false);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -16,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (data) => {
+  const login = (data, isCompanyUser) => {
     const accessToken = data.accessToken;
     const email = data.user.email;
     const id = data.user._id;
@@ -24,6 +25,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("userEmail", email);
     localStorage.setItem("userId", id);
     setUser({ email, id, accessToken });
+    setIsCompanyUser(isCompanyUser);
   };
 
   const logout = () => {
@@ -31,10 +33,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userId");
     setUser(null);
+    setIsCompanyUser(false);
   };
 
   return (
-    <AuthContext.Provider value={{ login, logout, user }}>
+    <AuthContext.Provider value={{ login, logout, user, isCompanyUser }}>
       {children}
     </AuthContext.Provider>
   );

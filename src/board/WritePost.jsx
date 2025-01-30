@@ -69,7 +69,7 @@ const StyledPost = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #7db249;
+      background-color: ${({ theme }) => theme.colors.MAIN};
       color: white;
       border: none;
       border-radius: 12px;
@@ -82,46 +82,118 @@ const StyledPost = styled.div`
     }
 
     button:hover {
-      background-color: #d2ff7c;
+      background-color: ${({ theme }) => theme.colors.SIDE};
     }
 
     button:active {
-      background-color: #d2ff7c;
+      background-color: ${({ theme }) => theme.colors.BACK};
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
     }
 
     .listButton {
       background-color: white;
-      color: #7db249;
-      border: 2px solid #7db249;
+      color: ${({ theme }) => theme.colors.MAIN};
+      border: 2px solid ${({ theme }) => theme.colors.MAIN};
     }
 
     .listButton:hover {
-      background-color: #d2ff7c;
+      background-color: white;
+      color: ${({ theme }) => theme.colors.SIDE};
+      border: 2px solid ${({ theme }) => theme.colors.SIDE};
     }
 
     .listButton:active {
-      background-color: #e6e6e6;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+      color: ${({ theme }) => theme.colors.BACK};
+      border: 2px solid ${({ theme }) => theme.colors.BACK};
+    }
+
+    .radio {
+      display: flex;
+      flex-direction: row;
+      justify-content: left;
+      width: 100%;
+      margin: 0 20px;
+      label {
+        display: flex;
+        align-items: center;
+        margin: 0 5px;
+        input {
+          max-width: 15px;
+          box-shadow: none !important;
+          margin: 0 !important;
+        }
+        p {
+          margin: 10px;
+        }
+      }
+    }
+
+    .skillSets {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: wrap;
+      margin: 0 20px 20px 20px;
+      button {
+        height: 40px;
+      }
     }
   }
 `;
 
 const WritePost = () => {
+  const [jobType, setJobType] = useState();
   const [title, setTitle] = useState();
+  const [skillSets, setSkillSets] = useState([]);
   const [content, setContent] = useState();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const jobTypes = [
+    "인턴",
+    "신입",
+    "경력 1~2년차",
+    "경력 3~4년차",
+    "경력 5년+",
+  ];
+  const skillSetList = [
+    "Python",
+    "Java",
+    "Kotlin",
+    "Redis",
+    "JavaScript",
+    "NLP",
+    "Pytorch",
+    "Adobe Premier",
+    "SQL",
+    "Microsoft Excel",
+    "Data Science",
+    "Machine Learning",
+    "한글과컴퓨터",
+    "Database",
+    "Node JS",
+    "JSON",
+    "Microsoft Word",
+    "Microsoft Powerpoint",
+    "Figma",
+    "Photoshop",
+    "Illustrator",
+    "TOEIC",
+    "TEPS",
+    "JLPT",
+    "IELTS",
+  ];
 
   useEffect(() => {
-    setTitle("포스트 제목");
-    setContent("포스트 내용");
+    setJobType(jobTypes[0]);
   }, []);
 
   const handleEditFinish = () => {
     customAxios
-      .post("/posts", {
+      .post("/jobPost", {
+        jobType,
         title,
+        skillSets,
         content,
         author: { email: user.email, _id: user.id },
       })
@@ -144,22 +216,68 @@ const WritePost = () => {
     navigate("/board");
   };
 
+  const handleSkillSetChange = (e) => {
+    if (skillSets.includes(e.target.value)) {
+      const newSkillSets = skillSets.filter((set) => set !== e.target.value);
+      setSkillSets(newSkillSets);
+    } else {
+      setSkillSets([...skillSets, e.target.value]);
+    }
+    console.log(skillSets);
+  };
+
   return (
     <StyledPost>
       <div className="boardContainer">
+        <form className="radio">
+          {jobTypes.map((jobType, idx) => {
+            return (
+              <label key={idx + 1}>
+                <input
+                  name="radio"
+                  type="radio"
+                  value={jobType}
+                  defaultChecked={!idx}
+                />
+                <p>{jobType}</p>
+              </label>
+            );
+          })}
+        </form>
         <input
           className="editTitle"
           defaultValue={title}
+          placeholder="채용 공고 제목"
           onChange={handleEditTitleChange}
         />
+        <div className="skillSets">
+          {skillSetList.map((skillSet, idx) => {
+            return (
+              <button
+                key={idx + 1}
+                className="skillSet"
+                value={skillSet}
+                style={{
+                  backgroundColor: skillSets.includes(skillSet)
+                    ? ""
+                    : "lightgrey",
+                }}
+                onClick={handleSkillSetChange}
+              >
+                {skillSet}
+              </button>
+            );
+          })}
+        </div>
         <textarea
           className="editContent"
           defaultValue={content}
           rows={20}
           onChange={handleEditContentChange}
+          placeholder="채용 공고 관련 상세 내용"
         />
         <div className="buttonContainer">
-          <button onClick={handleEditFinish}>게시글 등록</button>
+          <button onClick={handleEditFinish}>채용 공고 등록</button>
 
           <button className="listButton" onClick={handleBackToBoard}>
             취소
