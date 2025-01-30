@@ -97,7 +97,7 @@ const StyledSignup = styled.div`
         height: 48px;
         color: #fff;
         font-size: 16px;
-        background-color: #7db249;
+        background-color: ${({ theme }) => theme.colors.MAIN};
         border: none;
         cursor: pointer;
         transition: background-color 0.3s;
@@ -107,7 +107,7 @@ const StyledSignup = styled.div`
         margin: 0 auto;
 
         &:hover {
-          background-color: #d2ff7c;
+          background-color: ${({ theme }) => theme.colors.SIDE};
         }
 
         &:active {
@@ -148,13 +148,33 @@ const StyledSignup = styled.div`
     .back-button {
       display: inline-block;
       font-size: 14px;
-      color: #7db249;
+      color: ${({ theme }) => theme.colors.MAIN};
       cursor: pointer;
       transition: color 0.3s;
       text-decoration: none;
 
       &:hover {
-        color: #d2ff7c;
+        color: ${({ theme }) => theme.colors.SIDE};
+      }
+    }
+
+    .radio {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      width: 90%;
+      label {
+        display: flex;
+        align-items: center;
+        width: 50%;
+        input {
+          max-width: 15px;
+          box-shadow: none !important;
+          margin: 0 !important;
+        }
+        p {
+          margin: 10px;
+        }
       }
     }
   }
@@ -165,6 +185,7 @@ const Signup = () => {
   const [password, setPassword] = useState();
   const [password2, setPassword2] = useState();
   const [error, setError] = useState(null);
+  const [isCompanyUser, setIsCompanyUser] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -174,17 +195,22 @@ const Signup = () => {
       if (password.length >= 8) {
         if (password === password2) {
           setError(null);
+          const route = isCompanyUser ? "/company" : "/user";
           customAxios
-            .post("/users/signup", {
+            .post(`${route}/signup`, {
               email,
               password,
             })
             .then((res) => {
               console.log(res);
               if (res.status === 200) {
-                toast("회원가입에 성공하였습니다.");
+                toast(
+                  isCompanyUser
+                    ? "기업 유저"
+                    : "일반 유저" + " 회원가입에 성공하였습니다."
+                );
                 customAxios
-                  .post("/users/login", {
+                  .post(`${route}/login`, {
                     email,
                     password,
                   })
@@ -217,6 +243,27 @@ const Signup = () => {
       <div className="signup">
         <h2>회원가입</h2>
         <form action="/signup" method="post" id="signup">
+          <form className="radio">
+            <label>
+              <input
+                name="radio"
+                type="radio"
+                value="일반 회원"
+                defaultChecked={true}
+                onChange={() => setIsCompanyUser(false)}
+              />
+              <p>일반 회원</p>
+            </label>
+            <label>
+              <input
+                name="radio"
+                type="radio"
+                value="기업 회원"
+                onChange={() => setIsCompanyUser(true)}
+              />
+              <p>기업 회원</p>
+            </label>
+          </form>
           <div>
             <label>이메일</label>
             <input

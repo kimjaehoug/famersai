@@ -66,7 +66,7 @@ const StyledLogin = styled.div`
         transition: border 0.3s;
 
         &:focus {
-          border: 1px solid #5882fa;
+          border: 1px solid ${({ theme }) => theme.colors.MAIN};
           outline: none;
         }
 
@@ -77,14 +77,14 @@ const StyledLogin = styled.div`
         &[type="button"] {
           color: #fff;
           font-size: 16px;
-          background-color: #7db249;
+          background-color: ${({ theme }) => theme.colors.MAIN};
           border: none;
           cursor: pointer;
           transition: background-color 0.3s;
           padding: 10px;
 
           &:hover {
-            background-color: #d2ff7c;
+            background-color: ${({ theme }) => theme.colors.SIDE};
           }
 
           &:active {
@@ -110,15 +110,36 @@ const StyledLogin = styled.div`
           a {
             font-size: 14px;
             text-decoration: none;
-            color: #7db249;
+            color: ${({ theme }) => theme.colors.MAIN};
             transition: color 0.3s;
 
             &:hover {
-              color: #d2ff7c;
+              color: ${({ theme }) => theme.colors.SIDE};
             }
           }
 
           list-style: none;
+        }
+      }
+    }
+
+    .radio {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      margin: auto;
+      width: 90%;
+      label {
+        display: flex;
+        align-items: center;
+        width: 50%;
+        input {
+          max-width: 15px;
+          box-shadow: none !important;
+          margin: 0 !important;
+        }
+        p {
+          margin: 10px;
         }
       }
     }
@@ -132,13 +153,15 @@ const Login = () => {
   const navigate = useNavigate();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const { login } = useAuth();
+  const [isCompanyUser, setIsCompanyUser] = useState(false);
 
   const handleLogin = () => {
     if (emailRegex.test(email)) {
       if (password.length >= 8) {
         setError(null);
+        const route = isCompanyUser ? "/company" : "/user";
         customAxios
-          .post("/users/login", {
+          .post(`${route}/login`, {
             email,
             password,
           })
@@ -166,6 +189,27 @@ const Login = () => {
       <div className="login">
         <h2>로그인</h2>
         <form id="login" action="/login" method="post">
+          <form className="radio">
+            <label>
+              <input
+                name="radio"
+                type="radio"
+                value="일반 회원"
+                defaultChecked={true}
+                onChange={() => setIsCompanyUser(false)}
+              />
+              <p>일반 회원</p>
+            </label>
+            <label>
+              <input
+                name="radio"
+                type="radio"
+                value="기업 회원"
+                onChange={() => setIsCompanyUser(true)}
+              />
+              <p>기업 회원</p>
+            </label>
+          </form>
           <div>
             <input
               id="email"
