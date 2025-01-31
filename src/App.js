@@ -18,6 +18,7 @@ import WritePost from "./board/WritePost";
 import { AuthProvider } from "./AuthContext";
 import { ThemeProvider } from "styled-components";
 import theme from "./theme";
+import MyPage from "./menu/MyPage";
 
 const router = createBrowserRouter([
   {
@@ -61,20 +62,8 @@ const router = createBrowserRouter([
     element: <WritePost />,
   },
   {
-    path: "quadstar",
-    element: <Quadstar />,
-  },
-  {
-    path: "quatturo1",
-    element: <Magicquatturo1 />,
-  },
-  {
-    path: "quatturo2",
-    element: <Magicquatturo2 />,
-  },
-  {
-    path: "mapView",
-    element: <MapView />,
+    path: "myPage",
+    element: <MyPage />,
   },
 ]);
 

@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
 
-const StyledPost = styled.div`
+const StyledMyPage = styled.div`
   .boardContainer {
     border: 1px solid #e0e0e0;
     margin: 20px auto;
@@ -125,46 +125,55 @@ const StyledPost = styled.div`
   }
 `;
 
-const Post = () => {
-  const [searchParams] = useSearchParams();
+const MyPage = () => {
   const [editMode, setEditMode] = useState(false);
-  const [jobType, setJobType] = useState();
-  const [title, setTitle] = useState();
-  const [skillSets, setSkillSets] = useState([]);
-  const [author, setAuthor] = useState();
-  const [postId, setPostId] = useState();
-  const [date, setDate] = useState();
-  const [content, setContent] = useState();
-  const [editTitle, setEditTitle] = useState();
-  const [editContent, setEditContent] = useState();
+
+  const [name, setName] = useState();
+  const [skillSet, setSkillSet] = useState([]);
+  const [id, setId] = useState();
+  const [email, setEmail] = useState();
+  const [dOfB, setDOfB] = useState();
+  const [aplliedJobs, setAppliedJobs] = useState([]);
+
+  const [editName, setEditName] = useState();
+  const [editSkillSet, setEditSkillSet] = useState([]);
+  const [editId, setEditId] = useState();
+  const [editEmail, setEditEmail] = useState();
+  const [editDOfB, setEditDOfB] = useState();
+
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
-    customAxios.get(`jobPost/${searchParams.get("id")}`).then((res) => {
+    customAxios.get(`user/${user()._id}`).then((res) => {
       console.log(res);
       const data = res.data;
-      setJobType(data.jobType);
-      setTitle(data.title);
-      setSkillSets(data.skillSets);
-      setAuthor(data.author);
-      setPostId(data._id);
-      setDate(data.createdAt);
-      setContent(data.content);
+      setName(data.name);
+      setSkillSet(data.skillSet);
+      setId(data.id);
+      setEmail(data.email);
+      setDOfB(data.dateOfBirth);
+      setAppliedJobs(data.appliedJobs);
     });
-  }, [editMode, searchParams]);
+  }, [editMode]);
 
   const handleEditStart = () => {
-    setEditTitle(title);
-    setEditContent(content);
+    setEditName(name);
+    setEditSkillSet(skillSet);
+    setEditId(id);
+    setEditEmail(email);
+    setEditDOfB(dOfB);
     setEditMode(true);
   };
 
   const handleEditFinish = () => {
     customAxios
-      .put(`posts/${searchParams.get("id")}`, {
-        title: editTitle,
-        content: editContent,
+      .put(`user/${user()._id}`, {
+        name,
+        skillSet,
+        id,
+        email,
+        dateOfBirth: dOfB,
       })
       .then((res) => {
         console.log(res);
@@ -173,23 +182,32 @@ const Post = () => {
       .catch((err) => console.log(err));
   };
 
-  const handleEditTitleChange = (e) => {
-    setEditTitle(e.target.value);
+  const handleEditNameChange = (e) => {
+    setEditName(e.target.value);
   };
 
-  const handleEditContentChange = (e) => {
-    setEditContent(e.target.value);
+  const handleEditIdChange = (e) => {
+    setEditId(e.target.value);
+  };
+
+  const handleEditEmailChange = (e) => {
+    setEditEmail(e.target.value);
+  };
+
+  const handleEditDOfBChange = (e) => {
+    setEditDOfB(e.target.value);
   };
 
   const handleBackToBoard = () => {
     navigate("/board");
   };
 
-  const handleDeletePost = () => {
+  const handleDeleteUser = () => {
     customAxios
-      .delete(`/posts/${postId}`)
+      .delete(`/user/${user()._id}`)
       .then((res) => {
         console.log(res);
+        logout();
         handleBackToBoard();
       })
       .catch((err) => console.log(err));
@@ -200,44 +218,65 @@ const Post = () => {
   };
 
   return (
-    <StyledPost>
+    <StyledMyPage>
       <div className="boardContainer">
         {editMode ? (
-          <input
-            className="editTitle"
-            defaultValue={title}
-            onChange={handleEditTitleChange}
-          />
+          <>
+            <input
+              className="editName"
+              defaultValue={name}
+              onChange={handleEditNameChange}
+            />
+            <div className="skillSets">
+              {skillSet.map((skill, idx) => {
+                return (
+                  <button
+                    key={idx + 1}
+                    className="skill"
+                    value={skill}
+                    disabled
+                  >
+                    {skill}
+                  </button>
+                );
+              })}
+            </div>
+            <input
+              className="editId"
+              defaultValue={id}
+              onChange={handleEditIdChange}
+            />
+
+            <input
+              className="editEmail"
+              defaultValue={email}
+              onChange={handleEditEmailChange}
+            />
+
+            <input
+              className="editDOfB"
+              defaultValue={dOfB}
+              onChange={handleEditDOfBChange}
+            />
+          </>
         ) : (
-          <h1>
-            [{jobType}] {title}
-          </h1>
-        )}
-        <div className="skillSets">
-          {skillSets.map((skillSet, idx) => {
-            return (
-              <button
-                key={idx + 1}
-                className="skillSet"
-                value={skillSet}
-                disabled
-              >
-                {skillSet}
-              </button>
-            );
-          })}
-        </div>
-        <p>작성자: {author?.name}</p>
-        <p>작성일: {date?.split("T").join(" ").split(".")[0]}</p>
-        {editMode ? (
-          <textarea
-            className="editContent"
-            defaultValue={content}
-            rows={20}
-            onChange={handleEditContentChange}
-          />
-        ) : (
-          <p id="content">{content}</p>
+          <>
+            <h1>{name}님, 안녕하세요.</h1>
+            <div className="skillSets">
+              {skillSet.map((skill, idx) => {
+                return (
+                  <button
+                    key={idx + 1}
+                    className="skill"
+                    value={skill}
+                    disabled
+                  >
+                    {skill}
+                  </button>
+                );
+              })}
+            </div>
+          </>
         )}
         <div className="buttonContainer">
           {editMode ? (
@@ -246,22 +285,15 @@ const Post = () => {
               <button onClick={handleEditCancel}>취소</button>
             </>
           ) : (
-            user() &&
-            author &&
-            user()._id === author._id && (
-              <>
-                <button onClick={handleEditStart}>채용 공고 수정</button>
-                <button onClick={handleDeletePost}>채용 공고 삭제</button>
-              </>
-            )
+            <>
+              <button onClick={handleEditStart}>개인 정보 수정</button>
+              <button onClick={handleDeleteUser}>유저 삭제</button>
+            </>
           )}
-          <button className="listButton" onClick={handleBackToBoard}>
-            목록
-          </button>
         </div>
       </div>
-    </StyledPost>
+    </StyledMyPage>
   );
 };
 
-export default Post;
+export default MyPage;

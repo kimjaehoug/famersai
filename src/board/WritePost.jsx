@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
+import { SkillSetList } from "../SkillSetList";
 
 const StyledPost = styled.div`
   .boardContainer {
@@ -142,51 +143,15 @@ const StyledPost = styled.div`
   }
 `;
 
+const jobTypes = ["인턴", "신입", "경력 1~2년차", "경력 3~4년차", "경력 5년+"];
+
 const WritePost = () => {
-  const [jobType, setJobType] = useState();
+  const [jobType, setJobType] = useState(jobTypes[0]);
   const [title, setTitle] = useState();
   const [skillSets, setSkillSets] = useState([]);
   const [content, setContent] = useState();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const jobTypes = [
-    "인턴",
-    "신입",
-    "경력 1~2년차",
-    "경력 3~4년차",
-    "경력 5년+",
-  ];
-  const skillSetList = [
-    "Python",
-    "Java",
-    "Kotlin",
-    "Redis",
-    "JavaScript",
-    "NLP",
-    "Pytorch",
-    "Adobe Premier",
-    "SQL",
-    "Microsoft Excel",
-    "Data Science",
-    "Machine Learning",
-    "한글과컴퓨터",
-    "Database",
-    "Node JS",
-    "JSON",
-    "Microsoft Word",
-    "Microsoft Powerpoint",
-    "Figma",
-    "Photoshop",
-    "Illustrator",
-    "TOEIC",
-    "TEPS",
-    "JLPT",
-    "IELTS",
-  ];
-
-  useEffect(() => {
-    setJobType(jobTypes[0]);
-  }, []);
 
   const handleEditFinish = () => {
     customAxios
@@ -195,7 +160,7 @@ const WritePost = () => {
         title,
         skillSets,
         content,
-        author: { email: user.email, _id: user.id },
+        author: user(),
       })
       .then((res) => {
         console.log(res);
@@ -238,6 +203,7 @@ const WritePost = () => {
                   type="radio"
                   value={jobType}
                   defaultChecked={!idx}
+                  onClick={() => setJobType(jobType)}
                 />
                 <p>{jobType}</p>
               </label>
@@ -251,7 +217,7 @@ const WritePost = () => {
           onChange={handleEditTitleChange}
         />
         <div className="skillSets">
-          {skillSetList.map((skillSet, idx) => {
+          {SkillSetList.map((skillSet, idx) => {
             return (
               <button
                 key={idx + 1}

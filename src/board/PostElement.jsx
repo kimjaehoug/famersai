@@ -30,7 +30,7 @@ const PostElement = ({ title, jobType, author, date }) => {
           [{jobType}] {title}
         </div>
         <div className="date">
-          {author?.email} | {date.split("T").join(" ").split(".")[0]}
+          {author?.name} | {date.split("T").join(" ").split(".")[0]}
         </div>
       </div>
     </StyledPostElement>

@@ -107,7 +107,6 @@ const Board = () => {
     customAxios
       .get("/jobPost")
       .then((res) => {
-        console.log(res);
         setAllPosts(res.data.reverse());
         setPage(1);
       })
@@ -148,7 +147,7 @@ const Board = () => {
             ))}
           </div>
         </div>
-        {user && (
+        {user().isCompanyUser && (
           <div className="writePostContainer">
             <a href="/writePost">
               <div className="writePost">채용 공고 작성</div>

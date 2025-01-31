@@ -195,7 +195,7 @@ const Login = () => {
                 type="radio"
                 value="일반 회원"
                 defaultChecked={true}
-                onChange={() => setIsCompanyUser(false)}
+                onClick={() => setIsCompanyUser(false)}
               />
               <p>일반 회원</p>
             </label>
@@ -204,7 +204,7 @@ const Login = () => {
                 name="radio"
                 type="radio"
                 value="기업 회원"
-                onChange={() => setIsCompanyUser(true)}
+                onClick={() => setIsCompanyUser(true)}
               />
               <p>기업 회원</p>
             </label>

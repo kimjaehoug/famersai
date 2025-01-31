@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAuth } from "../AuthContext";
 
@@ -6,6 +6,7 @@ const MenuWrapper = styled.div`
   flex: 1;
   max-width: 800px;
   margin: 0px 10px 0px 10px;
+  font-size: 20px;
   display: flex;
   flex-direction: row;
   ${"" /* color: #f54458; */}
@@ -26,11 +27,33 @@ const MenuWrapper = styled.div`
   h5:hover {
     cursor: pointer;
   }
+
+  .username {
+    position: relative;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: 20px;
+    left: -20px;
+    z-index: 1000;
+    background-color: white;
+    padding: 0 20px;
+
+    a {
+      height: 30px;
+      font-size: 20px;
+    }
+  }
 `;
 
 const Menu = () => {
   const { user, logout } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
+
+  useEffect(() => {
+    console.log(user());
+  }, []);
 
   return (
     <MenuWrapper>
@@ -52,16 +75,23 @@ const Menu = () => {
       <a href="/about">
         <h5>고객센터</h5>
       </a>
-      {user ? (
+      {user() ? (
         <>
-          <h5 onClick={() => setShowLogout(!showLogout)}>{user().name}님</h5>
-          {showLogout && (
-            <a href="/login">
-              <h5 id="logout" onClick={logout}>
-                로그아웃
-              </h5>
-            </a>
-          )}
+          <h5 className="username" onClick={() => setShowLogout(!showLogout)}>
+            {user().name}님
+            {showLogout && (
+              <div className="dropdown">
+                <a href="/mypage">
+                  <h5 id="mypage">My Page</h5>
+                </a>
+                <a href="/login">
+                  <h5 id="logout" onClick={logout}>
+                    Logout
+                  </h5>
+                </a>
+              </div>
+            )}
+          </h5>
         </>
       ) : (
         <a href="/login">

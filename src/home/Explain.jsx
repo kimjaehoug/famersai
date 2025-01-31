@@ -176,9 +176,9 @@ const Explain = () => {
             </TextTransition>
           </MainTitle>
           <MainContent>
-            오작교가 지역 인재의 구인구직을 수월하게 해줍니다.<br></br>
-            <br></br>지역 경제의 적극적인 참여자가 되거나 다음 커리어 기회를
-            찾아 보세요. 선택은 여러분의 몫입니다.
+            오작교는 지역 인재와 지방 이전 기업간의 매칭을 도와줍니다.<br></br>
+            <br></br>지역 경제의 적극적인 참여자가 되거나 새로운 커리어 기회를
+            찾아보세요.
           </MainContent>
         </MainAnimdation>
       </MainContainer>

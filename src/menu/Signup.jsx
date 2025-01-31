@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { ToastContainer, toast } from "react-toastify";
 import { useAuth } from "../AuthContext";
+import { SkillSetList } from "../SkillSetList";
 
 const StyledSignup = styled.div`
   @import url("https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css");
@@ -177,6 +178,46 @@ const StyledSignup = styled.div`
         }
       }
     }
+
+    .skillSet {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: wrap;
+      margin: 20px;
+      .skill {
+        height: 40px;
+        width: auto !important;
+      }
+    }
+
+    .introContainer {
+      display: flex;
+      flex-direction: column;
+      .introduction {
+        width: 93%;
+        margin: auto;
+        height: 200px;
+        font-size: 14px;
+        outline: none;
+        border-radius: 12px;
+        background-color: #f2f2f2;
+        border: 1px solid #e0e0e0;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border 0.3s;
+        padding: 10px;
+
+        &:focus {
+          border: 1px solid ${({ theme }) => theme.colors.SIDE};
+          outline: none;
+        }
+
+        &::placeholder {
+          color: #b0b0b0;
+        }
+      }
+    }
   }
 `;
 
@@ -184,9 +225,9 @@ const Signup = () => {
   const [id, setId] = useState();
   const [name, setName] = useState();
   const [dOfB, setDOfB] = useState();
-  const [cName, setCName] = useState();
-  const [dOfF, setDOfF] = useState();
   const [email, setEmail] = useState();
+  const [skillSet, setSkillSet] = useState([]);
+  const [introduction, setIntroduction] = useState();
   const [password, setPassword] = useState();
   const [password2, setPassword2] = useState();
   const [error, setError] = useState(null);
@@ -209,8 +250,10 @@ const Signup = () => {
                 if (isCompanyUser) {
                   obj = {
                     id,
-                    name: cName,
-                    dateOfFoundation: dOfF,
+                    name,
+                    dateOfFoundation: dOfB,
+                    skillSet,
+                    introduction,
                     email,
                     password,
                   };
@@ -219,6 +262,8 @@ const Signup = () => {
                     id,
                     name,
                     dateOfBirth: dOfB,
+                    skillSet,
+                    introduction,
                     email,
                     password,
                   };
@@ -235,7 +280,7 @@ const Signup = () => {
                       );
                       customAxios
                         .post(`${route}/login`, {
-                          email,
+                          id,
                           password,
                         })
                         .then((res) => {
@@ -269,6 +314,16 @@ const Signup = () => {
     } else {
       setError("아이디는 5자 이상이어야 합니다.");
     }
+  };
+
+  const handleSkillSetChange = (e) => {
+    if (skillSet.includes(e.target.value)) {
+      const newSkillSet = skillSet.filter((set) => set !== e.target.value);
+      setSkillSet(newSkillSet);
+    } else {
+      setSkillSet([...skillSet, e.target.value]);
+    }
+    console.log(skillSet);
   };
 
   return (
@@ -316,7 +371,7 @@ const Signup = () => {
                   type="name"
                   placeholder="회사명"
                   required
-                  onChange={(e) => setCName(e.target.value)}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div>
@@ -326,7 +381,7 @@ const Signup = () => {
                   type="설립연도"
                   placeholder="OOOO/OO/OO"
                   required
-                  onChange={(e) => setDOfF(e.target.value)}
+                  onChange={(e) => setDOfB(e.target.value)}
                 />
               </div>
             </>
@@ -365,6 +420,51 @@ const Signup = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+          {!isCompanyUser ? (
+            <>
+              <div>
+                <label>직무 역량</label>
+                <div className="skillSet">
+                  {SkillSetList.map((skill, idx) => {
+                    return (
+                      <button
+                        key={idx + 1}
+                        className="skill"
+                        value={skill}
+                        style={{
+                          backgroundColor: skillSet.includes(skill)
+                            ? ""
+                            : "lightgrey",
+                        }}
+                        onClick={handleSkillSetChange}
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="introContainer">
+                <label>간단 자기소개</label>
+                <textarea
+                  className="introduction"
+                  placeholder="간단 자기소개"
+                  rows={20}
+                  onChange={(e) => setIntroduction(e.target.value)}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="introContainer">
+              <label>간단 기업소개</label>
+              <textarea
+                className="introduction"
+                placeholder="간단 기업소개"
+                rows={20}
+                onChange={(e) => setIntroduction(e.target.value)}
+              />
+            </div>
+          )}
           <div>
             <label>비밀번호</label>
             <input
