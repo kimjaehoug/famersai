@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
+import { jobTypes, skillSetList } from "../data";
 
 const StyledPost = styled.div`
   .boardContainer {
@@ -111,7 +112,7 @@ const StyledPost = styled.div`
       border: 2px solid ${({ theme }) => theme.colors.BACK};
     }
 
-    .skillSets {
+    .skillSet {
       display: flex;
       flex-direction: row;
       gap: 10px;
@@ -130,13 +131,17 @@ const Post = () => {
   const [editMode, setEditMode] = useState(false);
   const [jobType, setJobType] = useState();
   const [title, setTitle] = useState();
-  const [skillSets, setSkillSets] = useState([]);
+  const [skillSet, setSkillSet] = useState([]);
   const [author, setAuthor] = useState();
   const [postId, setPostId] = useState();
   const [date, setDate] = useState();
   const [content, setContent] = useState();
+
+  const [editJobType, setEditJobType] = useState();
   const [editTitle, setEditTitle] = useState();
+  const [editSkillSet, setEditSkillSet] = useState();
   const [editContent, setEditContent] = useState();
+
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -146,7 +151,7 @@ const Post = () => {
       const data = res.data;
       setJobType(data.jobType);
       setTitle(data.title);
-      setSkillSets(data.skillSets);
+      setSkillSet(data.skillSets);
       setAuthor(data.author);
       setPostId(data._id);
       setDate(data.createdAt);
@@ -199,34 +204,84 @@ const Post = () => {
     setEditMode(false);
   };
 
+  const handleSkillSetChange = (e) => {
+    if (editSkillSet.includes(e.target.value)) {
+      const newSkillSet = editSkillSet.filter((set) => set !== e.target.value);
+      setEditSkillSet(newSkillSet);
+    } else {
+      setEditSkillSet([...editSkillSet, e.target.value]);
+    }
+    console.log(skillSet);
+  };
+
   return (
     <StyledPost>
       <div className="boardContainer">
         {editMode ? (
-          <input
-            className="editTitle"
-            defaultValue={title}
-            onChange={handleEditTitleChange}
-          />
+          <>
+            <form className="radio">
+              {jobTypes.map((type, idx) => {
+                return (
+                  <label key={idx + 1}>
+                    <input
+                      name="radio"
+                      type="radio"
+                      value={type}
+                      defaultChecked={type === jobType}
+                      onClick={() => setEditJobType(type)}
+                    />
+                    <p>{type}</p>
+                  </label>
+                );
+              })}
+            </form>
+            <input
+              className="editTitle"
+              defaultValue={title}
+              onChange={handleEditTitleChange}
+            />
+            <div className="skillSet">
+              {skillSetList.map((skill, idx) => {
+                return (
+                  <button
+                    key={idx + 1}
+                    className="skill"
+                    value={skill}
+                    style={{
+                      backgroundColor: skillSet.includes(skill)
+                        ? ""
+                        : "lightgrey",
+                    }}
+                    onClick={handleSkillSetChange}
+                  >
+                    {skill}
+                  </button>
+                );
+              })}
+            </div>
+          </>
         ) : (
-          <h1>
-            [{jobType}] {title}
-          </h1>
+          <>
+            <h1>
+              [{jobType}] {title}
+            </h1>
+            <div className="skillSet">
+              {skillSet.map((skill, idx) => {
+                return (
+                  <button
+                    key={idx + 1}
+                    className="skill"
+                    value={skill}
+                    disabled
+                  >
+                    {skill}
+                  </button>
+                );
+              })}
+            </div>
+          </>
         )}
-        <div className="skillSets">
-          {skillSets.map((skillSet, idx) => {
-            return (
-              <button
-                key={idx + 1}
-                className="skillSet"
-                value={skillSet}
-                disabled
-              >
-                {skillSet}
-              </button>
-            );
-          })}
-        </div>
+
         <p>작성자: {author?.name}</p>
         <p>작성일: {date?.split("T").join(" ").split(".")[0]}</p>
         {editMode ? (

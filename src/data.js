@@ -1,4 +1,4 @@
-export const SkillSetList = [
+export const skillSetList = [
   "Python",
   "Java",
   "Kotlin",
@@ -8,6 +8,14 @@ export const SkillSetList = [
   "Pytorch",
   "Adobe Premier",
   "SQL",
+  "MySQL",
+  "PostgreSQL",
+  "SQLite",
+  "Docker",
+  "Kubernetes",
+  "AWS",
+  "GCP",
+  "Azure",
   "Microsoft Excel",
   "Data Science",
   "Machine Learning",
@@ -24,4 +32,12 @@ export const SkillSetList = [
   "TEPS",
   "JLPT",
   "IELTS",
+];
+
+export const jobTypes = [
+  "인턴",
+  "신입",
+  "경력 1~2년차",
+  "경력 3~4년차",
+  "경력 5년+",
 ];

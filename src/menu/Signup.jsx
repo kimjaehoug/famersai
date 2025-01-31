@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { ToastContainer, toast } from "react-toastify";
 import { useAuth } from "../AuthContext";
-import { SkillSetList } from "../SkillSetList";
+import { skillSetList } from "../data";
 
 const StyledSignup = styled.div`
   @import url("https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css");
@@ -163,7 +163,7 @@ const StyledSignup = styled.div`
       display: flex;
       flex-direction: row;
       justify-content: space-around;
-      width: 90%;
+
       label {
         display: flex;
         align-items: center;
@@ -222,6 +222,7 @@ const StyledSignup = styled.div`
 `;
 
 const Signup = () => {
+  const [searchParams] = useSearchParams();
   const [id, setId] = useState();
   const [name, setName] = useState();
   const [dOfB, setDOfB] = useState();
@@ -236,6 +237,12 @@ const Signup = () => {
   const { login } = useAuth();
   const dOfBRegex = /^\d{4}\/\d{2}\/\d{2}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  useEffect(() => {
+    if (searchParams.get("company") === "true") {
+      setIsCompanyUser(true);
+    }
+  }, []);
 
   const signup = () => {
     if (id.length >= 5) {
@@ -330,14 +337,14 @@ const Signup = () => {
     <StyledSignup>
       <div className="signup">
         <h2>회원가입</h2>
-        <form action="/signup" method="post" id="signup">
-          <form className="radio">
+        <div id="signup">
+          <div className="radio">
             <label>
               <input
                 name="radio"
                 type="radio"
                 value="일반 회원"
-                defaultChecked={true}
+                defaultChecked={searchParams.get("company") === "false"}
                 onChange={() => setIsCompanyUser(false)}
               />
               <p>일반 회원</p>
@@ -347,11 +354,12 @@ const Signup = () => {
                 name="radio"
                 type="radio"
                 value="기업 회원"
+                defaultChecked={searchParams.get("company") === "true"}
                 onChange={() => setIsCompanyUser(true)}
               />
               <p>기업 회원</p>
             </label>
-          </form>
+          </div>
           <div>
             <label>아이디</label>
             <input
@@ -403,8 +411,18 @@ const Signup = () => {
                   name="dateOfBirth"
                   type="생년월일"
                   placeholder="OOOO/OO/OO"
+                  maxLength={10}
                   required
-                  onChange={(e) => setDOfB(e.target.value)}
+                  onKeyUp={(e) => {
+                    if ([4, 7].includes(e.target.value.length)) {
+                      if (e.key === "Backspace") {
+                        e.target.value = e.target.value.slice(0, -1);
+                      } else {
+                        e.target.value += "/";
+                      }
+                    }
+                    setDOfB(e.target.value);
+                  }}
                 />
               </div>
             </>
@@ -425,7 +443,7 @@ const Signup = () => {
               <div>
                 <label>직무 역량</label>
                 <div className="skillSet">
-                  {SkillSetList.map((skill, idx) => {
+                  {skillSetList.map((skill, idx) => {
                     return (
                       <button
                         key={idx + 1}
@@ -471,7 +489,6 @@ const Signup = () => {
               name="password"
               type="password"
               placeholder="비밀번호"
-              required
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
@@ -481,7 +498,6 @@ const Signup = () => {
               name="password"
               type="password"
               placeholder="비밀번호 확인"
-              required
               onChange={(e) => setPassword2(e.target.value)}
             />
           </div>
@@ -492,7 +508,7 @@ const Signup = () => {
             뒤로
           </label>
           <div style={{ color: "red", textAlign: "center" }}>{error}</div>
-        </form>
+        </div>
       </div>
       <ToastContainer />
     </StyledSignup>

@@ -147,7 +147,7 @@ const Board = () => {
             ))}
           </div>
         </div>
-        {user().isCompanyUser && (
+        {user()?.isCompanyUser && (
           <div className="writePostContainer">
             <a href="/writePost">
               <div className="writePost">채용 공고 작성</div>

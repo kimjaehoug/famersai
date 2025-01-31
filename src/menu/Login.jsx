@@ -235,7 +235,9 @@ const Login = () => {
           <div className="option">
             <ul>
               <li>
-                <a onClick={() => navigate("/signup")}>회원가입</a>
+                <a onClick={() => navigate(`/signup?company=${isCompanyUser}`)}>
+                  회원가입
+                </a>
               </li>
             </ul>
           </div>

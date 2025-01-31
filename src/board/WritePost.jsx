@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
-import { SkillSetList } from "../SkillSetList";
+import { jobTypes, skillSetList } from "../data";
 
 const StyledPost = styled.div`
   .boardContainer {
@@ -143,8 +143,6 @@ const StyledPost = styled.div`
   }
 `;
 
-const jobTypes = ["인턴", "신입", "경력 1~2년차", "경력 3~4년차", "경력 5년+"];
-
 const WritePost = () => {
   const [jobType, setJobType] = useState(jobTypes[0]);
   const [title, setTitle] = useState();
@@ -217,7 +215,7 @@ const WritePost = () => {
           onChange={handleEditTitleChange}
         />
         <div className="skillSets">
-          {SkillSetList.map((skillSet, idx) => {
+          {skillSetList.map((skillSet, idx) => {
             return (
               <button
                 key={idx + 1}

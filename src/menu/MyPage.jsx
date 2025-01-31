@@ -122,6 +122,42 @@ const StyledMyPage = styled.div`
         height: 40px;
       }
     }
+
+    .editContainer {
+      display: flex;
+      align-items: center;
+      h1 {
+        min-width: 100px;
+      }
+    }
+
+    .edit {
+      font-size: 24px;
+      font-weight: bold;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 10px;
+      margin-left: 20px;
+      width: 93%;
+      margin-bottom: 20px;
+      outline: none;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .editIntro {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 10px;
+      margin-left: 20px;
+      width: 93%;
+      height: 200px;
+      resize: vertical;
+      font-size: 14px;
+      margin-bottom: 20px;
+      outline: none;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
   }
 `;
 
@@ -133,6 +169,7 @@ const MyPage = () => {
   const [id, setId] = useState();
   const [email, setEmail] = useState();
   const [dOfB, setDOfB] = useState();
+  const [introduction, setIntroduction] = useState();
   const [aplliedJobs, setAppliedJobs] = useState([]);
 
   const [editName, setEditName] = useState();
@@ -140,6 +177,7 @@ const MyPage = () => {
   const [editId, setEditId] = useState();
   const [editEmail, setEditEmail] = useState();
   const [editDOfB, setEditDOfB] = useState();
+  const [editIntro, setEditIntro] = useState();
 
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -153,6 +191,7 @@ const MyPage = () => {
       setId(data.id);
       setEmail(data.email);
       setDOfB(data.dateOfBirth);
+      setIntroduction(data.introduction);
       setAppliedJobs(data.appliedJobs);
     });
   }, [editMode]);
@@ -163,6 +202,7 @@ const MyPage = () => {
     setEditId(id);
     setEditEmail(email);
     setEditDOfB(dOfB);
+    setEditIntro(introduction);
     setEditMode(true);
   };
 
@@ -198,19 +238,27 @@ const MyPage = () => {
     setEditDOfB(e.target.value);
   };
 
+  const handleEditIntroChange = (e) => {
+    setEditIntro(e.target.value);
+  };
+
   const handleBackToBoard = () => {
     navigate("/board");
   };
 
   const handleDeleteUser = () => {
-    customAxios
-      .delete(`/user/${user()._id}`)
-      .then((res) => {
-        console.log(res);
-        logout();
-        handleBackToBoard();
-      })
-      .catch((err) => console.log(err));
+    if (window.confirm("유저를 삭제하시겠습니까?")) {
+      if (window.confirm("유저를 영구히 삭제합니다.")) {
+        customAxios
+          .delete(`/user/${user()._id}`)
+          .then((res) => {
+            console.log(res);
+            logout();
+            handleBackToBoard();
+          })
+          .catch((err) => console.log(err));
+      }
+    }
   };
 
   const handleEditCancel = () => {
@@ -222,46 +270,61 @@ const MyPage = () => {
       <div className="boardContainer">
         {editMode ? (
           <>
-            <input
-              className="editName"
-              defaultValue={name}
-              onChange={handleEditNameChange}
-            />
+            <div className="editContainer">
+              <h1>성명</h1>
+              <input
+                className="edit"
+                defaultValue={name}
+                onChange={handleEditNameChange}
+              />
+            </div>
             <div className="skillSets">
               {skillSet.map((skill, idx) => {
                 return (
-                  <button
-                    key={idx + 1}
-                    className="skill"
-                    value={skill}
-                    disabled
-                  >
+                  <button key={idx + 1} className="skill" value={skill}>
                     {skill}
                   </button>
                 );
               })}
             </div>
-            <input
-              className="editId"
-              defaultValue={id}
-              onChange={handleEditIdChange}
-            />
+            <div className="editContainer">
+              <h1>아이디</h1>
+              <input
+                className="edit"
+                defaultValue={id}
+                onChange={handleEditIdChange}
+              />
+            </div>
 
-            <input
-              className="editEmail"
-              defaultValue={email}
-              onChange={handleEditEmailChange}
-            />
+            <div className="editContainer">
+              <h1>이메일</h1>
+              <input
+                className="edit"
+                defaultValue={email}
+                onChange={handleEditEmailChange}
+              />
+            </div>
 
-            <input
-              className="editDOfB"
-              defaultValue={dOfB}
-              onChange={handleEditDOfBChange}
+            <div className="editContainer">
+              <h1>생년월일</h1>
+              <input
+                className="edit"
+                defaultValue={dOfB}
+                onChange={handleEditDOfBChange}
+              />
+            </div>
+            <h1>간단 자기소개</h1>
+            <textarea
+              className="editIntro"
+              placeholder="간단 자기소개"
+              rows={20}
+              onChange={handleEditIntroChange}
             />
           </>
         ) : (
           <>
             <h1>{name}님, 안녕하세요.</h1>
+            <h1>기술 스택</h1>
             <div className="skillSets">
               {skillSet.map((skill, idx) => {
                 return (
@@ -276,6 +339,10 @@ const MyPage = () => {
                 );
               })}
             </div>
+            <h1>ID: {id}</h1>
+            <h1>Email: {email}</h1>
+            <h1>Date of Birth: {dOfB}</h1>
+            <h1>소개: {introduction}</h1>
           </>
         )}
         <div className="buttonContainer">
