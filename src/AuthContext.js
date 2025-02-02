@@ -14,7 +14,8 @@ export const AuthProvider = ({ children }) => {
     } else {
       user = data.user;
     }
-    localStorage.setItem("user", JSON.stringify({ ...user, isCompanyUser }));
+    localStorage.setItem("user", JSON.stringify({ ...user }));
+    localStorage.setItem("isCompanyUser", isCompanyUser);
   };
 
   const logout = () => {
@@ -30,8 +31,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const isCompanyUser = () => {
+    return localStorage.getItem("isCompanyUser") === "true";
+  };
+
   return (
-    <AuthContext.Provider value={{ login, logout, user }}>
+    <AuthContext.Provider value={{ login, logout, user, isCompanyUser }}>
       {children}
     </AuthContext.Provider>
   );

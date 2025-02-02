@@ -6,11 +6,12 @@ import Menu from "./Menu";
 const HeaderWrapper = styled.div`
   width: 100%;
   height: 60px;
-  padding-top: 10px;
+  padding: 15px 0 15px 0;
   background: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: ${({ theme }) => theme.colors.MAIN};
 `;
 
 const Logo = styled.img`

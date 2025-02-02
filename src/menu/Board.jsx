@@ -3,6 +3,7 @@ import PostElement from "../board/PostElement";
 import { useEffect, useState } from "react";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
+import { useSearchParams } from "react-router-dom";
 
 const StyledBoard = styled.div`
   .boardContainer {
@@ -55,6 +56,11 @@ const StyledBoard = styled.div`
         }
       }
     }
+
+    .upload {
+      color: white;
+      text-align: center;
+    }
   }
 
   .pagenation {
@@ -98,14 +104,19 @@ const StyledBoard = styled.div`
 `;
 
 const Board = () => {
+  const [searchParams] = useSearchParams();
   const [allPosts, setAllPosts] = useState([]);
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState();
-  const { user } = useAuth();
+  const { user, isCompanyUser } = useAuth();
 
   useEffect(() => {
+    let route = "/jobPost";
+    if (searchParams.get("mine")) {
+      route += "/company/" + user()._id;
+    }
     customAxios
-      .get("/jobPost")
+      .get(route)
       .then((res) => {
         setAllPosts(res.data.reverse());
         setPage(1);
@@ -124,6 +135,11 @@ const Board = () => {
   return (
     <StyledBoard>
       <div className="boardContainer">
+        {allPosts.length === 0 && (
+          <div className="upload">
+            <h1>진행중이신 채용 공고가 없습니다.</h1>
+          </div>
+        )}
         {posts.map(({ jobType, createdAt, title, _id, author }, i) => (
           <a key={i} href={`/post?id=${_id}`}>
             <PostElement
@@ -147,7 +163,7 @@ const Board = () => {
             ))}
           </div>
         </div>
-        {user()?.isCompanyUser && (
+        {searchParams.get("mine") && isCompanyUser() && (
           <div className="writePostContainer">
             <a href="/writePost">
               <div className="writePost">채용 공고 작성</div>

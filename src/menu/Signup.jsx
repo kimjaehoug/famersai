@@ -227,6 +227,7 @@ const Signup = () => {
   const [name, setName] = useState();
   const [dOfB, setDOfB] = useState();
   const [email, setEmail] = useState();
+  const [phoneNumber, setPhoneNumber] = useState();
   const [skillSet, setSkillSet] = useState([]);
   const [introduction, setIntroduction] = useState();
   const [password, setPassword] = useState();
@@ -236,6 +237,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const dOfBRegex = /^\d{4}\/\d{2}\/\d{2}$/;
+  const phoneNumberRegex = /^\d{3}-\d{4}-\d{4}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   useEffect(() => {
@@ -249,65 +251,70 @@ const Signup = () => {
       if (name.length >= 2) {
         if (dOfBRegex.test(dOfB)) {
           if (emailRegex.test(email)) {
-            if (password.length >= 8) {
-              if (password === password2) {
-                setError(null);
-                const route = isCompanyUser ? "/company" : "/user";
-                let obj;
-                if (isCompanyUser) {
-                  obj = {
-                    id,
-                    name,
-                    dateOfFoundation: dOfB,
-                    skillSet,
-                    introduction,
-                    email,
-                    password,
-                  };
+            if (phoneNumberRegex.test(phoneNumber)) {
+              if (password.length >= 8) {
+                if (password === password2) {
+                  setError(null);
+                  const route = isCompanyUser ? "/company" : "/user";
+                  let obj;
+                  if (isCompanyUser) {
+                    obj = {
+                      id,
+                      name,
+                      dateOfFoundation: dOfB,
+                      skillSet,
+                      introduction,
+                      email,
+                      password,
+                    };
+                  } else {
+                    obj = {
+                      id,
+                      name,
+                      dateOfBirth: dOfB,
+                      skillSet,
+                      phoneNumber,
+                      introduction,
+                      email,
+                      password,
+                    };
+                  }
+                  customAxios
+                    .post(`${route}/signup`, obj)
+                    .then((res) => {
+                      console.log(res);
+                      if (res.status === 200) {
+                        toast(
+                          isCompanyUser
+                            ? "기업 유저"
+                            : "일반 유저" + " 회원가입에 성공하였습니다."
+                        );
+                        customAxios
+                          .post(`${route}/login`, {
+                            id,
+                            password,
+                          })
+                          .then((res) => {
+                            console.log(res);
+                            if (res.status === 200) {
+                              login(res.data, isCompanyUser);
+                              navigate("/");
+                            }
+                          });
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                      setError(err.response.data.error);
+                    });
                 } else {
-                  obj = {
-                    id,
-                    name,
-                    dateOfBirth: dOfB,
-                    skillSet,
-                    introduction,
-                    email,
-                    password,
-                  };
+                  setError("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
                 }
-                customAxios
-                  .post(`${route}/signup`, obj)
-                  .then((res) => {
-                    console.log(res);
-                    if (res.status === 200) {
-                      toast(
-                        isCompanyUser
-                          ? "기업 유저"
-                          : "일반 유저" + " 회원가입에 성공하였습니다."
-                      );
-                      customAxios
-                        .post(`${route}/login`, {
-                          id,
-                          password,
-                        })
-                        .then((res) => {
-                          console.log(res);
-                          if (res.status === 200) {
-                            login(res.data);
-                            navigate("/");
-                          }
-                        });
-                    }
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                    setError(err.response.data.error);
-                  });
               } else {
-                setError("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+                setError("패스워드는 8자 이상이어야 합니다.");
               }
             } else {
-              setError("패스워드는 8자 이상이어야 합니다.");
+              setError("휴대폰 번호 형식이 올바르지 않습니다.");
             }
           } else {
             setError("이메일 형식이 올바르지 않습니다.");
@@ -389,7 +396,16 @@ const Signup = () => {
                   type="설립연도"
                   placeholder="OOOO/OO/OO"
                   required
-                  onChange={(e) => setDOfB(e.target.value)}
+                  onKeyUp={(e) => {
+                    if ([4, 7].includes(e.target.value.length)) {
+                      if (e.key === "Backspace") {
+                        e.target.value = e.target.value.slice(0, -1);
+                      } else {
+                        e.target.value += "/";
+                      }
+                    }
+                    setDOfB(e.target.value);
+                  }}
                 />
               </div>
             </>
@@ -440,6 +456,26 @@ const Signup = () => {
           </div>
           {!isCompanyUser ? (
             <>
+              <div>
+                <label>휴대폰 번호</label>
+                <input
+                  name="phoneNumber"
+                  type="phoneNumber"
+                  placeholder="OOO-OOOO-OOOO"
+                  maxLength={13}
+                  required
+                  onKeyUp={(e) => {
+                    if ([3, 8].includes(e.target.value.length)) {
+                      if (e.key === "Backspace") {
+                        e.target.value = e.target.value.slice(0, -1);
+                      } else {
+                        e.target.value += "-";
+                      }
+                    }
+                    setPhoneNumber(e.target.value);
+                  }}
+                />
+              </div>
               <div>
                 <label>직무 역량</label>
                 <div className="skillSet">

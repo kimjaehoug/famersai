@@ -48,7 +48,7 @@ const MenuWrapper = styled.div`
 `;
 
 const Menu = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isCompanyUser } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
 
   useEffect(() => {
@@ -58,12 +58,17 @@ const Menu = () => {
   return (
     <MenuWrapper>
       <a href="/board">
-        <h5>채용 공고</h5>
+        <h5>{isCompanyUser() && "전체 "}채용 공고</h5>
       </a>
-
-      <a href="/products">
-        <h5>이력서 관리</h5>
-      </a>
+      {user() && isCompanyUser() ? (
+        <a href="/board?mine=true">
+          <h5>나의 채용 공고</h5>
+        </a>
+      ) : (
+        <a href="/products">
+          <h5>이력서 관리</h5>
+        </a>
+      )}
 
       <a href="/news">
         <h5>기업 뉴스</h5>
@@ -72,18 +77,31 @@ const Menu = () => {
       <a href="/bikemap">
         <h5>지역 특구 맵</h5>
       </a>
-      <a href="/about">
-        <h5>고객센터</h5>
-      </a>
+
+      {user() && isCompanyUser() ? (
+        <a href="/about">
+          <h5>인재 풀 탐색</h5>
+        </a>
+      ) : (
+        <a href="/about">
+          <h5>회사 탐색</h5>
+        </a>
+      )}
       {user() ? (
         <>
           <h5 className="username" onClick={() => setShowLogout(!showLogout)}>
             {user().name}님
             {showLogout && (
               <div className="dropdown">
-                <a href="/mypage">
-                  <h5 id="mypage">My Page</h5>
-                </a>
+                {isCompanyUser() ? (
+                  <a href="/companyMyPage">
+                    <h5 id="mypage">Company Page</h5>
+                  </a>
+                ) : (
+                  <a href="/mypage">
+                    <h5 id="mypage">My Page</h5>
+                  </a>
+                )}
                 <a href="/login">
                   <h5 id="logout" onClick={logout}>
                     Logout

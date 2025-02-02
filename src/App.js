@@ -19,6 +19,8 @@ import { AuthProvider } from "./AuthContext";
 import { ThemeProvider } from "styled-components";
 import theme from "./theme";
 import MyPage from "./menu/MyPage";
+import CompanyMyPage from "./menu/CompanyMyPage";
+import JobApplication from "./board/JobApplication";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +66,14 @@ const router = createBrowserRouter([
   {
     path: "myPage",
     element: <MyPage />,
+  },
+  {
+    path: "companyMyPage",
+    element: <CompanyMyPage />,
+  },
+  {
+    path: "application",
+    element: <JobApplication />,
   },
 ]);
 

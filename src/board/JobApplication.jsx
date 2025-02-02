@@ -1,17 +1,10 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
-import { skillSetList } from "../data";
-import Degree from "../components/Degree";
-import ForeignLanguage from "../components/ForeignLanguage";
-import EditDegree from "../components/EditDegree";
-import EditForeignLanguage from "../components/EditForeignLanguage";
-import DegreeModel from "../objects/DegreeModel";
-import ForeignLanguageModel from "../objects/ForeignLanguageModel";
 
-const StyledMyPage = styled.div`
+const StyledJobApplication = styled.div`
   .boardContainer {
     border: 1px solid #e0e0e0;
     margin: 20px auto;
@@ -165,27 +158,15 @@ const StyledMyPage = styled.div`
       outline: none;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-
-    .forms {
-      width: 100%;
-      margin-left: 20px;
-      button {
-        margin: 20px auto;
-        width: 80px;
-      }
-    }
   }
 `;
 
-const MyPage = () => {
+const JobApplication = () => {
+  const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
 
   const [name, setName] = useState();
   const [skillSet, setSkillSet] = useState([]);
-  const [address, setAddress] = useState();
-  const [phoneNumber, setPhoneNumber] = useState();
-  const [degrees, setDegrees] = useState([]);
-  const [foreignLanguages, setForeignLanguages] = useState([]);
   const [id, setId] = useState();
   const [email, setEmail] = useState();
   const [dOfB, setDOfB] = useState();
@@ -198,10 +179,6 @@ const MyPage = () => {
   const [editEmail, setEditEmail] = useState();
   const [editDOfB, setEditDOfB] = useState();
   const [editIntro, setEditIntro] = useState();
-  const [editAddress, setEditAddress] = useState();
-  const [editPhoneNumber, setEditPhoneNumber] = useState();
-  const [editDegrees, setEditDegrees] = useState([]);
-  const [editForeignLanguages, setEditForeignLanguages] = useState([]);
 
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -212,10 +189,6 @@ const MyPage = () => {
       const data = res.data;
       setName(data.name);
       setSkillSet(data.skillSet);
-      setAddress(data.address);
-      setPhoneNumber(data.phoneNumber);
-      setDegrees(data.degrees);
-      setForeignLanguages(data.foreignLanguages);
       setId(data.id);
       setEmail(data.email);
       setDOfB(data.dateOfBirth);
@@ -231,27 +204,17 @@ const MyPage = () => {
     setEditEmail(email);
     setEditDOfB(dOfB);
     setEditIntro(introduction);
-    setEditAddress(address);
-    setEditPhoneNumber(phoneNumber);
-    setEditDegrees(degrees);
-    setEditForeignLanguages(foreignLanguages);
     setEditMode(true);
   };
 
-  const handleEditFinish = () => {
-    console.log(editDegrees);
+  const handleApply = () => {
     customAxios
       .put(`user/${user()._id}`, {
-        name: editName,
-        skillSet: editSkillSet,
-        id: editId,
-        email: editEmail,
-        dateOfBirth: editDOfB,
-        introduction: editIntro,
-        address: editAddress,
-        phoneNumber: editPhoneNumber,
-        degrees: editDegrees,
-        foreignLanguages: editForeignLanguages,
+        name,
+        skillSet,
+        id,
+        email,
+        dateOfBirth: dOfB,
       })
       .then((res) => {
         console.log(res);
@@ -262,16 +225,6 @@ const MyPage = () => {
 
   const handleEditNameChange = (e) => {
     setEditName(e.target.value);
-  };
-
-  const handleEditSkillSetChange = (e) => {
-    if (editSkillSet.includes(e.target.value)) {
-      const newSkillSet = editSkillSet.filter((set) => set !== e.target.value);
-      setEditSkillSet(newSkillSet);
-    } else {
-      setEditSkillSet([...editSkillSet, e.target.value]);
-    }
-    console.log(editSkillSet);
   };
 
   const handleEditIdChange = (e) => {
@@ -290,50 +243,12 @@ const MyPage = () => {
     setEditIntro(e.target.value);
   };
 
-  const handleEditAddressChange = (e) => {
-    setEditAddress(e.target.value);
-  };
-
-  const handleEditPhoneNumberChange = (e) => {
-    setEditPhoneNumber(e.target.value);
-  };
-
-  const handleEditForeignLanguagesChange = (e) => {
-    setEditForeignLanguages(e.target.value);
-  };
-
-  const updateEditDegree = (id, newDegree) => {
-    const degree = editDegrees.find((degree) => degree.id === id);
-    const idx = editDegrees.indexOf(degree);
-    const tmp = [...editDegrees];
-    tmp.splice(idx, 1, newDegree);
-    setEditDegrees(tmp);
-    console.log(editDegrees);
-  };
-
-  const removeEditDegree = (id) => {
-    setEditDegrees(editDegrees.filter((degree) => degree.id != id));
-  };
-
-  const updateEditForeignLanguage = (id, newLanguage) => {
-    const foreignLanguage = editForeignLanguages.find(
-      (foreignLanguage) => foreignLanguage.id === id
-    );
-    const idx = editForeignLanguages.indexOf(foreignLanguage);
-    const tmp = [...editForeignLanguages];
-    tmp.splice(idx, 1, newLanguage);
-    setEditForeignLanguages(tmp);
-    console.log(editForeignLanguages);
-  };
-
-  const removeEditForeignLanguage = (id) => {
-    setEditForeignLanguages(
-      editForeignLanguages.filter((foreignLanguage) => foreignLanguage.id != id)
-    );
-  };
-
   const handleBackToBoard = () => {
     navigate("/board");
+  };
+
+  const handleBackToPost = () => {
+    navigate(`/post?id=${searchParams.get("id")}`);
   };
 
   const handleDeleteUser = () => {
@@ -355,19 +270,8 @@ const MyPage = () => {
     setEditMode(false);
   };
 
-  const handleAddDegree = () => {
-    setEditDegrees([...editDegrees, { ...DegreeModel }]);
-  };
-
-  const handleAddForeignLanguage = () => {
-    setEditForeignLanguages([
-      ...editForeignLanguages,
-      { ...ForeignLanguageModel },
-    ]);
-  };
-
   return (
-    <StyledMyPage>
+    <StyledJobApplication>
       <div className="boardContainer">
         {editMode ? (
           <>
@@ -380,19 +284,9 @@ const MyPage = () => {
               />
             </div>
             <div className="skillSets">
-              {skillSetList.map((skill, idx) => {
+              {skillSet.map((skill, idx) => {
                 return (
-                  <button
-                    key={idx + 1}
-                    className="skill"
-                    value={skill}
-                    style={{
-                      backgroundColor: editSkillSet.includes(skill)
-                        ? ""
-                        : "lightgrey",
-                    }}
-                    onClick={handleEditSkillSetChange}
-                  >
+                  <button key={idx + 1} className="skill" value={skill}>
                     {skill}
                   </button>
                 );
@@ -406,6 +300,7 @@ const MyPage = () => {
                 onChange={handleEditIdChange}
               />
             </div>
+
             <div className="editContainer">
               <h1>이메일</h1>
               <input
@@ -414,6 +309,7 @@ const MyPage = () => {
                 onChange={handleEditEmailChange}
               />
             </div>
+
             <div className="editContainer">
               <h1>생년월일</h1>
               <input
@@ -426,62 +322,13 @@ const MyPage = () => {
             <textarea
               className="editIntro"
               placeholder="간단 자기소개"
-              defaultValue={introduction}
               rows={20}
               onChange={handleEditIntroChange}
             />
-            <div className="editContainer">
-              <h1>주소</h1>
-              <input
-                className="edit"
-                defaultValue={address}
-                onChange={handleEditAddressChange}
-              />
-            </div>
-            <div className="editContainer">
-              <h1>휴대전화</h1>
-              <input
-                className="edit"
-                defaultValue={phoneNumber}
-                onChange={handleEditPhoneNumberChange}
-              />
-            </div>
-            <div className="editContainer">
-              <h1>학력사항</h1>
-              <div className="forms">
-                {editDegrees?.map((degree, i) => {
-                  return (
-                    <EditDegree
-                      key={i}
-                      removeEditDegree={removeEditDegree}
-                      updateEditDegree={updateEditDegree}
-                      data={degree}
-                    />
-                  );
-                })}
-                <button onClick={handleAddDegree}>+</button>
-              </div>
-            </div>
-            <div className="editContainer">
-              <h1>어학성적</h1>
-              <div className="forms">
-                {editForeignLanguages?.map((foreignLanguage, i) => {
-                  return (
-                    <EditForeignLanguage
-                      key={i + 1}
-                      removeEditForeignLanguage={removeEditForeignLanguage}
-                      updateEditForeignLanguage={updateEditForeignLanguage}
-                      data={foreignLanguage}
-                    />
-                  );
-                })}
-                <button onClick={handleAddForeignLanguage}>+</button>
-              </div>
-            </div>
           </>
         ) : (
           <>
-            <h1>{name}님의 마이페이지</h1>
+            <h1>{name}</h1>
             <h1>기술 스택</h1>
             <div className="skillSets">
               {skillSet.map((skill, idx) => {
@@ -501,34 +348,15 @@ const MyPage = () => {
             <h1>Email: {email}</h1>
             <h1>Date of Birth: {dOfB}</h1>
             <h1>소개: {introduction}</h1>
-            <h1>주소: {address}</h1>
-            <h1>휴대전화: {phoneNumber}</h1>
-            <h1>학력사항</h1>
-            {degrees?.map((degree, i) => {
-              return <Degree key={i + 1} data={degree} />;
-            })}
-            <h1>어학성적</h1>
-            {foreignLanguages?.map((foreignLanguage, i) => {
-              return <ForeignLanguage key={i + 1} data={foreignLanguage} />;
-            })}
           </>
         )}
         <div className="buttonContainer">
-          {editMode ? (
-            <>
-              <button onClick={handleEditFinish}>수정 완료</button>
-              <button onClick={handleEditCancel}>취소</button>
-            </>
-          ) : (
-            <>
-              <button onClick={handleEditStart}>개인 정보 수정</button>
-              <button onClick={handleDeleteUser}>유저 삭제</button>
-            </>
-          )}
+          <button onClick={handleApply}>지원하기</button>
+          <button onClick={handleBackToPost}>뒤로가기</button>
         </div>
       </div>
-    </StyledMyPage>
+    </StyledJobApplication>
   );
 };
 
-export default MyPage;
+export default JobApplication;

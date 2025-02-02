@@ -143,7 +143,7 @@ const Post = () => {
   const [editContent, setEditContent] = useState();
 
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isCompanyUser } = useAuth();
 
   useEffect(() => {
     customAxios.get(`jobPost/${searchParams.get("id")}`).then((res) => {
@@ -186,8 +186,12 @@ const Post = () => {
     setEditContent(e.target.value);
   };
 
-  const handleBackToBoard = () => {
+  const handleBackToBoard = (e) => {
     navigate("/board");
+  };
+
+  const handleApplication = () => {
+    navigate(`/application?id=${postId}`);
   };
 
   const handleDeletePost = () => {
@@ -309,6 +313,11 @@ const Post = () => {
                 <button onClick={handleDeletePost}>채용 공고 삭제</button>
               </>
             )
+          )}
+          {!isCompanyUser() && (
+            <button className="listButton" onClick={handleApplication}>
+              지원하기
+            </button>
           )}
           <button className="listButton" onClick={handleBackToBoard}>
             목록
