@@ -8,12 +8,7 @@ import News from "./menu/News";
 import Board from "./menu/Board";
 import Signup from "./menu/Signup";
 import Login from "./menu/Login";
-import Quadstar from "./product/Quadstar";
-import Magicquatturo1 from "./product/Magicquattuor1";
-import Magicquatturo2 from "./product/Magicquatturo2";
 import Post from "./board/Post";
-import MapView from "./menu/MapView";
-import BikeMap from "./menu/BikeMap";
 import WritePost from "./board/WritePost";
 import { AuthProvider } from "./AuthContext";
 import { ThemeProvider } from "styled-components";
@@ -34,10 +29,6 @@ const router = createBrowserRouter([
   {
     path: "products",
     element: <Products />,
-  },
-  {
-    path: "bikemap",
-    element: <BikeMap />,
   },
   {
     path: "news",

@@ -73,11 +73,6 @@ const Menu = () => {
       <a href="/news">
         <h5>기업 뉴스</h5>
       </a>
-
-      <a href="/bikemap">
-        <h5>지역 특구 맵</h5>
-      </a>
-
       {user() && isCompanyUser() ? (
         <a href="/about">
           <h5>인재 풀 탐색</h5>

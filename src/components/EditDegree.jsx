@@ -24,33 +24,39 @@ const EditDegree = ({ data, updateEditDegree, removeEditDegree }) => {
   const [editDegree, setEditDegree] = useState(data);
 
   const handleTypeChange = (e) => {
-    setEditDegree({ ...editDegree, type: e.target.value });
-    updateEditDegree(data.id, editDegree);
+    const newEditDegree = { ...editDegree, type: e.target.value };
+    setEditDegree(newEditDegree);
+    updateEditDegree(data._id, newEditDegree);
   };
 
   const handleInstitutionChange = (e) => {
-    setEditDegree({ ...editDegree, institution: e.target.value });
-    updateEditDegree(data.id, editDegree);
+    const newEditDegree = { ...editDegree, institution: e.target.value };
+    setEditDegree(newEditDegree);
+    updateEditDegree(data._id, newEditDegree);
   };
 
   const handleMajorChange = (e) => {
-    setEditDegree({ ...editDegree, major: e.target.value });
-    updateEditDegree(data.id, editDegree);
+    const newEditDegree = { ...editDegree, major: e.target.value };
+    setEditDegree(newEditDegree);
+    updateEditDegree(data._id, newEditDegree);
   };
 
   const handleGPAChange = (e) => {
-    setEditDegree({ ...editDegree, GPA: e.target.value });
-    updateEditDegree(data.id, editDegree);
+    const newEditDegree = { ...editDegree, GPA: e.target.value };
+    setEditDegree(newEditDegree);
+    updateEditDegree(data._id, newEditDegree);
   };
 
   const handleGradStatusChange = (e) => {
-    setEditDegree({ ...editDegree, gradStatus: e.target.value });
-    updateEditDegree(data.id, editDegree);
+    const newEditDegree = { ...editDegree, gradStatus: e.target.value };
+    setEditDegree(newEditDegree);
+    updateEditDegree(data._id, newEditDegree);
   };
 
   const handleGradYearMonthChange = (e) => {
-    setEditDegree({ ...editDegree, gradYearMonth: e.target.value });
-    updateEditDegree(data.id, editDegree);
+    const newEditDegree = { ...editDegree, gradYearMonth: e.target.value };
+    setEditDegree(newEditDegree);
+    updateEditDegree(data._id, newEditDegree);
   };
 
   return (
@@ -103,7 +109,7 @@ const EditDegree = ({ data, updateEditDegree, removeEditDegree }) => {
           onChange={handleGradYearMonthChange}
         />
       </div>
-      <button onClick={() => removeEditDegree(data.id)}>Delete</button>
+      <button onClick={() => removeEditDegree(data._id)}>Delete</button>
     </StyledEditDegree>
   );
 };

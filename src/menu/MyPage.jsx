@@ -57,6 +57,8 @@ const StyledMyPage = styled.div`
       font-weight: bold;
       color: #2c2c2c;
       margin-left: 30px;
+      margin-bottom: 0;
+      margin-top: 20px;
     }
 
     p {
@@ -124,7 +126,7 @@ const StyledMyPage = styled.div`
       gap: 10px;
       width: 100%;
       flex-wrap: wrap;
-      margin: 0 20px 20px 20px;
+      margin: 10px 20px 20px 30px;
       button {
         height: 40px;
       }
@@ -250,8 +252,14 @@ const MyPage = () => {
         introduction: editIntro,
         address: editAddress,
         phoneNumber: editPhoneNumber,
-        degrees: editDegrees,
-        foreignLanguages: editForeignLanguages,
+        degrees: editDegrees.map((el) => {
+          delete el._id;
+          return el;
+        }),
+        foreignLanguages: editForeignLanguages.map((el) => {
+          delete el._id;
+          return el;
+        }),
       })
       .then((res) => {
         console.log(res);
@@ -298,12 +306,8 @@ const MyPage = () => {
     setEditPhoneNumber(e.target.value);
   };
 
-  const handleEditForeignLanguagesChange = (e) => {
-    setEditForeignLanguages(e.target.value);
-  };
-
   const updateEditDegree = (id, newDegree) => {
-    const degree = editDegrees.find((degree) => degree.id === id);
+    const degree = editDegrees.find((degree) => degree._id === id);
     const idx = editDegrees.indexOf(degree);
     const tmp = [...editDegrees];
     tmp.splice(idx, 1, newDegree);
@@ -312,12 +316,12 @@ const MyPage = () => {
   };
 
   const removeEditDegree = (id) => {
-    setEditDegrees(editDegrees.filter((degree) => degree.id != id));
+    setEditDegrees(editDegrees.filter((degree) => degree._id !== id));
   };
 
   const updateEditForeignLanguage = (id, newLanguage) => {
     const foreignLanguage = editForeignLanguages.find(
-      (foreignLanguage) => foreignLanguage.id === id
+      (foreignLanguage) => foreignLanguage._id === id
     );
     const idx = editForeignLanguages.indexOf(foreignLanguage);
     const tmp = [...editForeignLanguages];
@@ -328,7 +332,9 @@ const MyPage = () => {
 
   const removeEditForeignLanguage = (id) => {
     setEditForeignLanguages(
-      editForeignLanguages.filter((foreignLanguage) => foreignLanguage.id != id)
+      editForeignLanguages.filter(
+        (foreignLanguage) => foreignLanguage._id !== id
+      )
     );
   };
 
@@ -356,13 +362,19 @@ const MyPage = () => {
   };
 
   const handleAddDegree = () => {
-    setEditDegrees([...editDegrees, { ...DegreeModel }]);
+    setEditDegrees([
+      ...editDegrees,
+      { ...DegreeModel, _id: new Date().getTime() },
+    ]);
   };
 
   const handleAddForeignLanguage = () => {
     setEditForeignLanguages([
       ...editForeignLanguages,
-      { ...ForeignLanguageModel },
+      {
+        ...ForeignLanguageModel,
+        _id: new Date().getTime(),
+      },
     ]);
   };
 
@@ -449,10 +461,10 @@ const MyPage = () => {
             <div className="editContainer">
               <h1>학력사항</h1>
               <div className="forms">
-                {editDegrees?.map((degree, i) => {
+                {editDegrees.map((degree) => {
                   return (
                     <EditDegree
-                      key={i}
+                      key={degree._id}
                       removeEditDegree={removeEditDegree}
                       updateEditDegree={updateEditDegree}
                       data={degree}
@@ -465,10 +477,11 @@ const MyPage = () => {
             <div className="editContainer">
               <h1>어학성적</h1>
               <div className="forms">
-                {editForeignLanguages?.map((foreignLanguage, i) => {
+                {editForeignLanguages.map((foreignLanguage) => {
+                  console.log(editForeignLanguages);
                   return (
                     <EditForeignLanguage
-                      key={i + 1}
+                      key={foreignLanguage._id}
                       removeEditForeignLanguage={removeEditForeignLanguage}
                       updateEditForeignLanguage={updateEditForeignLanguage}
                       data={foreignLanguage}
@@ -481,7 +494,13 @@ const MyPage = () => {
           </>
         ) : (
           <>
-            <h1>{name}님의 마이페이지</h1>
+            <h1>
+              {name}({id})
+            </h1>
+            <h1>학력사항</h1>
+            {degrees?.map((degree, i) => {
+              return <Degree key={i + 1} data={degree} />;
+            })}
             <h1>기술 스택</h1>
             <div className="skillSets">
               {skillSet.map((skill, idx) => {
@@ -497,16 +516,16 @@ const MyPage = () => {
                 );
               })}
             </div>
-            <h1>ID: {id}</h1>
-            <h1>Email: {email}</h1>
-            <h1>Date of Birth: {dOfB}</h1>
-            <h1>소개: {introduction}</h1>
-            <h1>주소: {address}</h1>
-            <h1>휴대전화: {phoneNumber}</h1>
-            <h1>학력사항</h1>
-            {degrees?.map((degree, i) => {
-              return <Degree key={i + 1} data={degree} />;
-            })}
+            <h1>이메일</h1>
+            <p>{email}</p>
+            <h1>생년월일</h1>
+            <p>{dOfB}</p>
+            <h1>주소</h1>
+            <p>{address}</p>
+            <h1>휴대전화</h1>
+            <p>{phoneNumber}</p>
+            <h1>소개</h1>
+            <p>{introduction}</p>
             <h1>어학성적</h1>
             {foreignLanguages?.map((foreignLanguage, i) => {
               return <ForeignLanguage key={i + 1} data={foreignLanguage} />;

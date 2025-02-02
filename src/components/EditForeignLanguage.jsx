@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const StyledEditForeignLanguage = styled.div`
@@ -27,18 +27,30 @@ const EditForeignLanguage = ({
   const [editForeignLanguage, setEditForeignLanguage] = useState();
 
   const handleNameChange = (e) => {
-    setEditForeignLanguage({ ...editForeignLanguage, name: e.target.value });
-    updateEditForeignLanguage(editForeignLanguage);
+    const newEditForeignLanguage = {
+      ...editForeignLanguage,
+      name: e.target.value,
+    };
+    setEditForeignLanguage(newEditForeignLanguage);
+    updateEditForeignLanguage(data._id, newEditForeignLanguage);
   };
 
   const handlePeriodChange = (e) => {
-    setEditForeignLanguage({ ...editForeignLanguage, period: e.target.value });
-    updateEditForeignLanguage(editForeignLanguage);
+    const newEditForeignLanguage = {
+      ...editForeignLanguage,
+      period: e.target.value,
+    };
+    setEditForeignLanguage(newEditForeignLanguage);
+    updateEditForeignLanguage(data._id, newEditForeignLanguage);
   };
 
   const handleScoreChange = (e) => {
-    setEditForeignLanguage({ ...editForeignLanguage, score: e.target.value });
-    updateEditForeignLanguage(editForeignLanguage);
+    const newEditForeignLanguage = {
+      ...editForeignLanguage,
+      score: e.target.value,
+    };
+    setEditForeignLanguage(newEditForeignLanguage);
+    updateEditForeignLanguage(data._id, newEditForeignLanguage);
   };
 
   return (
@@ -67,7 +79,9 @@ const EditForeignLanguage = ({
           onChange={handleScoreChange}
         />
       </div>
-      <button onClick={() => removeEditForeignLanguage(data.id)}>Delete</button>
+      <button onClick={() => removeEditForeignLanguage(data._id)}>
+        Delete
+      </button>
     </StyledEditForeignLanguage>
   );
 };
