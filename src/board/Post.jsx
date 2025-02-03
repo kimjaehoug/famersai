@@ -64,7 +64,7 @@ const StyledPost = styled.div`
 
     .buttonContainer {
       display: flex;
-      gap: 10px;
+      gap: 20px;
       justify-content: center;
       margin-bottom: 20px;
     }
@@ -83,6 +83,7 @@ const StyledPost = styled.div`
       cursor: pointer;
       transition: background-color 0.3s ease;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      height: 40px;
     }
 
     button:hover {
@@ -95,9 +96,9 @@ const StyledPost = styled.div`
     }
 
     .listButton {
-      background-color: white;
-      color: ${({ theme }) => theme.colors.MAIN};
-      border: 2px solid ${({ theme }) => theme.colors.MAIN};
+      background-color: ${({ theme }) => theme.colors.BACK};
+      color: ${({ theme }) => theme.colors.SIDE};
+      border: 2px solid ${({ theme }) => theme.colors.SIDE};
     }
 
     .listButton:hover {
@@ -119,9 +120,6 @@ const StyledPost = styled.div`
       width: 100%;
       flex-wrap: wrap;
       margin: 0 20px 20px 20px;
-      button {
-        height: 40px;
-      }
     }
   }
 `;
@@ -319,7 +317,11 @@ const Post = () => {
               지원하기
             </button>
           )}
-          <button className="listButton" onClick={handleBackToBoard}>
+          <button
+            id="backBtn"
+            className="listButton"
+            onClick={handleBackToBoard}
+          >
             목록
           </button>
         </div>

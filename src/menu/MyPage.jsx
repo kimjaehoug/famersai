@@ -38,6 +38,15 @@ const StyledMyPage = styled.div`
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
+    h1 {
+      font-size: 27px;
+      font-weight: bold;
+      color: #2c2c2c;
+      margin-left: 30px;
+      margin-bottom: 0;
+      margin-top: 30px;
+    }
+
     .editContent {
       border: 1px solid #e0e0e0;
       border-radius: 12px;
@@ -52,17 +61,8 @@ const StyledMyPage = styled.div`
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
-      font-size: 27px;
-      font-weight: bold;
-      color: #2c2c2c;
-      margin-left: 30px;
-      margin-bottom: 0;
-      margin-top: 20px;
-    }
-
     p {
-      margin: 0 30px;
+      margin: 0 31px;
       color: #6e6e6e;
     }
 
@@ -72,9 +72,9 @@ const StyledMyPage = styled.div`
 
     .buttonContainer {
       display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
+      justify-content: right;
+      gap: 20px;
+      margin: 50px 0 10px;
     }
 
     button {
@@ -91,6 +91,7 @@ const StyledMyPage = styled.div`
       cursor: pointer;
       transition: background-color 0.3s ease;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      height: 40px;
     }
 
     button:hover {
@@ -127,9 +128,6 @@ const StyledMyPage = styled.div`
       width: 100%;
       flex-wrap: wrap;
       margin: 10px 20px 20px 30px;
-      button {
-        height: 40px;
-      }
     }
 
     .editContainer {
@@ -137,6 +135,7 @@ const StyledMyPage = styled.div`
       align-items: center;
       h1 {
         min-width: 100px;
+        margin: 0 0 0 30px;
       }
     }
 
@@ -241,7 +240,6 @@ const MyPage = () => {
   };
 
   const handleEditFinish = () => {
-    console.log(editDegrees);
     customAxios
       .put(`user/${user()._id}`, {
         name: editName,
@@ -306,36 +304,20 @@ const MyPage = () => {
     setEditPhoneNumber(e.target.value);
   };
 
-  const updateEditDegree = (id, newDegree) => {
-    const degree = editDegrees.find((degree) => degree._id === id);
-    const idx = editDegrees.indexOf(degree);
-    const tmp = [...editDegrees];
-    tmp.splice(idx, 1, newDegree);
-    setEditDegrees(tmp);
-    console.log(editDegrees);
+  const add = (target, setter, model) => {
+    setter([...target, { ...model, _id: new Date().getTime() }]);
   };
 
-  const removeEditDegree = (id) => {
-    setEditDegrees(editDegrees.filter((degree) => degree._id !== id));
+  const update = (id, newEl, target, setter) => {
+    const el = target.find((el) => el._id === id);
+    const idx = target.indexOf(el);
+    const tmp = [...target];
+    tmp.splice(idx, 1, newEl);
+    setter(tmp);
   };
 
-  const updateEditForeignLanguage = (id, newLanguage) => {
-    const foreignLanguage = editForeignLanguages.find(
-      (foreignLanguage) => foreignLanguage._id === id
-    );
-    const idx = editForeignLanguages.indexOf(foreignLanguage);
-    const tmp = [...editForeignLanguages];
-    tmp.splice(idx, 1, newLanguage);
-    setEditForeignLanguages(tmp);
-    console.log(editForeignLanguages);
-  };
-
-  const removeEditForeignLanguage = (id) => {
-    setEditForeignLanguages(
-      editForeignLanguages.filter(
-        (foreignLanguage) => foreignLanguage._id !== id
-      )
-    );
+  const remove = (id, target, setter) => {
+    setter(target.filter((el) => el._id !== id));
   };
 
   const handleBackToBoard = () => {
@@ -359,23 +341,6 @@ const MyPage = () => {
 
   const handleEditCancel = () => {
     setEditMode(false);
-  };
-
-  const handleAddDegree = () => {
-    setEditDegrees([
-      ...editDegrees,
-      { ...DegreeModel, _id: new Date().getTime() },
-    ]);
-  };
-
-  const handleAddForeignLanguage = () => {
-    setEditForeignLanguages([
-      ...editForeignLanguages,
-      {
-        ...ForeignLanguageModel,
-        _id: new Date().getTime(),
-      },
-    ]);
   };
 
   return (
@@ -465,36 +430,66 @@ const MyPage = () => {
                   return (
                     <EditDegree
                       key={degree._id}
-                      removeEditDegree={removeEditDegree}
-                      updateEditDegree={updateEditDegree}
+                      removeEditDegree={(id) =>
+                        remove(id, editDegrees, setEditDegrees)
+                      }
+                      updateEditDegree={(id, newEl) =>
+                        update(id, newEl, editDegrees, setEditDegrees)
+                      }
                       data={degree}
                     />
                   );
                 })}
-                <button onClick={handleAddDegree}>+</button>
+                <button
+                  onClick={() => add(editDegrees, setEditDegrees, DegreeModel)}
+                >
+                  +
+                </button>
               </div>
             </div>
             <div className="editContainer">
               <h1>어학성적</h1>
               <div className="forms">
                 {editForeignLanguages.map((foreignLanguage) => {
-                  console.log(editForeignLanguages);
                   return (
                     <EditForeignLanguage
                       key={foreignLanguage._id}
-                      removeEditForeignLanguage={removeEditForeignLanguage}
-                      updateEditForeignLanguage={updateEditForeignLanguage}
+                      removeEditForeignLanguage={(id) =>
+                        remove(
+                          id,
+                          editForeignLanguages,
+                          setEditForeignLanguages
+                        )
+                      }
+                      updateEditForeignLanguage={(id, newEl) =>
+                        update(
+                          id,
+                          newEl,
+                          editForeignLanguages,
+                          setEditForeignLanguages
+                        )
+                      }
                       data={foreignLanguage}
                     />
                   );
                 })}
-                <button onClick={handleAddForeignLanguage}>+</button>
+                <button
+                  onClick={() =>
+                    add(
+                      editForeignLanguages,
+                      setEditForeignLanguages,
+                      ForeignLanguageModel
+                    )
+                  }
+                >
+                  +
+                </button>
               </div>
             </div>
           </>
         ) : (
           <>
-            <h1>
+            <h1 style={{ fontSize: "40px" }}>
               {name}({id})
             </h1>
             <h1>학력사항</h1>
@@ -536,12 +531,27 @@ const MyPage = () => {
           {editMode ? (
             <>
               <button onClick={handleEditFinish}>수정 완료</button>
-              <button onClick={handleEditCancel}>취소</button>
+              <button
+                style={{ background: "#353535" }}
+                onClick={handleEditCancel}
+              >
+                취소
+              </button>
             </>
           ) : (
             <>
-              <button onClick={handleEditStart}>개인 정보 수정</button>
-              <button onClick={handleDeleteUser}>유저 삭제</button>
+              <button
+                style={{ background: "#353535" }}
+                onClick={handleEditStart}
+              >
+                개인 정보 수정
+              </button>
+              <button
+                style={{ background: "#353535" }}
+                onClick={handleDeleteUser}
+              >
+                계정 삭제
+              </button>
             </>
           )}
         </div>

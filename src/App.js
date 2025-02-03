@@ -16,6 +16,8 @@ import theme from "./theme";
 import MyPage from "./menu/MyPage";
 import CompanyMyPage from "./menu/CompanyMyPage";
 import JobApplication from "./board/JobApplication";
+import Resumes from "./menu/Resumes";
+import Resume from "./menu/Resume";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +39,14 @@ const router = createBrowserRouter([
   {
     path: "board",
     element: <Board />,
+  },
+  {
+    path: "resumes",
+    element: <Resumes />,
+  },
+  {
+    path: "resume",
+    element: <Resume />,
   },
   {
     path: "login",
