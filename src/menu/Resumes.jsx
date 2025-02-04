@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const StyledResumes = styled.div`
   .resumesContainer {
@@ -28,7 +28,7 @@ const StyledResumes = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: ${({ theme }) => theme.colors.MAIN};
+      background-color: ${({ theme }) => theme.colors.DARK};
       color: white;
       border: none;
       border-radius: 12px;
@@ -39,6 +39,7 @@ const StyledResumes = styled.div`
       transition: background-color 0.3s ease;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       height: 40px;
+      margin-top: 10px;
     }
 
     .resume {
@@ -55,20 +56,29 @@ const StyledResumes = styled.div`
 
 const Resumes = () => {
   const [resumes, setResumes] = useState([]);
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
+  const [applyMode, setApplyMode] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     user() &&
       customAxios.get(`/resume/user/${user()._id}`).then((res) => {
-        setResumes(res.data);
+        setResumes(res.data.reverse());
+        if (searchParams.get("applyTo")) {
+          setApplyMode(true);
+        }
         setIsLoading(false);
       });
   }, []);
 
   const handleWriteResume = () => {
     navigate("/resume");
+  };
+
+  const handleViewResume = (id) => {
+    navigate(`/resume?id=${id}&applyTo=${searchParams.get("applyTo")}`);
   };
 
   return (
@@ -87,11 +97,16 @@ const Resumes = () => {
                         <div key={resume._id} className="resume">
                           <h2>{resume.title}</h2>
                           <p>{resume.motivation}</p>
-                          <button
-                            onClick={() => navigate(`/resume?id=${resume._id}`)}
-                          >
-                            View
+                          <button onClick={() => handleViewResume(resume._id)}>
+                            상세 보기
                           </button>
+                          {applyMode && (
+                            <button
+                              onClick={() => handleViewResume(resume._id)}
+                            >
+                              이력서 선택
+                            </button>
+                          )}
                         </div>
                       );
                     })}

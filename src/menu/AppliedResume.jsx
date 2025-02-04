@@ -9,7 +9,7 @@ import EditActivity from "../components/EditActivity";
 import ActivityModel from "../objects/ActivityModel";
 import Activity from "../components/Activity";
 
-const StyledResume = styled.div`
+const StyledAppliedResume = styled.div`
   .boardContainer {
     border: 1px solid #e0e0e0;
     margin: 20px auto;
@@ -195,7 +195,7 @@ const StyledResume = styled.div`
   }
 `;
 
-const Resume = () => {
+const AppliedResume = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
@@ -350,7 +350,21 @@ const Resume = () => {
     setEditMotiv(e.target.value);
   };
 
-  const handleDeleteResume = () => {};
+  const handleCancelApplication = () => {
+    customAxios
+      .put(`/jobPost/apply/${searchParams.get("appliedJob")}`, {
+        resumeId: searchParams.get("id"),
+        userId: user()._id,
+      })
+      .then((res) => {
+        console.log(res);
+        window.alert("지원을 성공적으로 취소하였습니다.");
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleBackToResumes = () => {
     navigate("/resumes");
@@ -422,8 +436,16 @@ const Resume = () => {
       });
   };
 
+  const handleBackToAppliedJob = () => {
+    navigate(
+      `/appliedJob?id=${searchParams.get(
+        "appliedJob"
+      )}&resume=${searchParams.get("id")}`
+    );
+  };
+
   return (
-    <StyledResume>
+    <StyledAppliedResume>
       <div className="boardContainer">
         {isLoading ? (
           <div className="editContainer">
@@ -478,8 +500,6 @@ const Resume = () => {
             {foreignLanguages?.map((foreignLanguage, i) => {
               return <ForeignLanguage key={i + 1} data={foreignLanguage} />;
             })}
-            <h1>지원동기</h1>
-            <p>{motivation}</p>
             {editMode ? (
               <>
                 <div className="editContainer">
@@ -553,15 +573,17 @@ const Resume = () => {
                 </>
               ) : (
                 <>
-                  <button onClick={handleEditStart}>이력서 수정</button>
-                  <button onClick={handleBackToResumes}>뒤로 가기</button>
+                  <button onClick={handleBackToAppliedJob}>뒤로 가기</button>
                   {applyMode ? (
                     <button className="cancel" onClick={handleApply}>
                       이 이력서로 지원
                     </button>
                   ) : (
-                    <button className="cancel" onClick={handleDeleteResume}>
-                      이력서 삭제
+                    <button
+                      className="cancel"
+                      onClick={handleCancelApplication}
+                    >
+                      지원 취소
                     </button>
                   )}
                 </>
@@ -570,8 +592,8 @@ const Resume = () => {
           </>
         )}
       </div>
-    </StyledResume>
+    </StyledAppliedResume>
   );
 };
 
-export default Resume;
+export default AppliedResume;

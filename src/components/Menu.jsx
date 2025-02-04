@@ -65,9 +65,14 @@ const Menu = () => {
           <h5>나의 채용 공고</h5>
         </a>
       ) : (
-        <a href="/resumes">
-          <h5>이력서 관리</h5>
-        </a>
+        <>
+          <a href="/resumes">
+            <h5>이력서 관리</h5>
+          </a>
+          <a href="/appliedJobs">
+            <h5>지원 현황</h5>
+          </a>
+        </>
       )}
 
       <a href="/news">

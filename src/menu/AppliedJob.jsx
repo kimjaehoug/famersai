@@ -5,7 +5,7 @@ import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
 import { jobTypes, skillSetList } from "../data";
 
-const StyledPost = styled.div`
+const StyledAppliedJob = styled.div`
   .boardContainer {
     border: 1px solid #e0e0e0;
     margin: 20px auto;
@@ -124,7 +124,7 @@ const StyledPost = styled.div`
   }
 `;
 
-const Post = () => {
+const AppliedJob = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
@@ -190,8 +190,12 @@ const Post = () => {
     navigate("/board");
   };
 
-  const handleApplication = () => {
-    navigate(`/resumes?applyTo=${postId}`);
+  const handleViewResume = () => {
+    navigate(
+      `/appliedResume?id=${searchParams.get(
+        "resume"
+      )}&appliedJob=${searchParams.get("id")}`
+    );
   };
 
   const handleDeletePost = () => {
@@ -219,7 +223,7 @@ const Post = () => {
   };
 
   return (
-    <StyledPost>
+    <StyledAppliedJob>
       <div className="boardContainer">
         {isLoading ? (
           <div style={{ display: "flex" }}>
@@ -321,8 +325,8 @@ const Post = () => {
                 )
               )}
               {!isCompanyUser() && (
-                <button className="listButton" onClick={handleApplication}>
-                  지원하기
+                <button className="listButton" onClick={handleViewResume}>
+                  지원 이력서 보기
                 </button>
               )}
               <button
@@ -336,8 +340,8 @@ const Post = () => {
           </>
         )}
       </div>
-    </StyledPost>
+    </StyledAppliedJob>
   );
 };
 
-export default Post;
+export default AppliedJob;

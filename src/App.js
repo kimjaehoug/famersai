@@ -15,9 +15,11 @@ import { ThemeProvider } from "styled-components";
 import theme from "./theme";
 import MyPage from "./menu/MyPage";
 import CompanyMyPage from "./menu/CompanyMyPage";
-import JobApplication from "./board/JobApplication";
 import Resumes from "./menu/Resumes";
 import Resume from "./menu/Resume";
+import AppliedJobs from "./menu/AppliedJobs";
+import AppliedJob from "./menu/AppliedJob";
+import AppliedResume from "./menu/AppliedResume";
 
 const router = createBrowserRouter([
   {
@@ -73,8 +75,16 @@ const router = createBrowserRouter([
     element: <CompanyMyPage />,
   },
   {
-    path: "application",
-    element: <JobApplication />,
+    path: "appliedJobs",
+    element: <AppliedJobs />,
+  },
+  {
+    path: "appliedJob",
+    element: <AppliedJob />,
+  },
+  {
+    path: "appliedResume",
+    element: <AppliedResume />,
   },
 ]);
 
