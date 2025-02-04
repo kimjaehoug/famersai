@@ -125,6 +125,7 @@ const StyledPost = styled.div`
 `;
 
 const Post = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
   const [jobType, setJobType] = useState();
@@ -154,6 +155,7 @@ const Post = () => {
       setPostId(data._id);
       setDate(data.createdAt);
       setContent(data.content);
+      setIsLoading(false);
     });
   }, [editMode, searchParams]);
 
@@ -219,112 +221,120 @@ const Post = () => {
   return (
     <StyledPost>
       <div className="boardContainer">
-        {editMode ? (
-          <>
-            <form className="radio">
-              {jobTypes.map((type, idx) => {
-                return (
-                  <label key={idx + 1}>
-                    <input
-                      name="radio"
-                      type="radio"
-                      value={type}
-                      defaultChecked={type === jobType}
-                      onClick={() => setEditJobType(type)}
-                    />
-                    <p>{type}</p>
-                  </label>
-                );
-              })}
-            </form>
-            <input
-              className="editTitle"
-              defaultValue={title}
-              onChange={handleEditTitleChange}
-            />
-            <div className="skillSet">
-              {skillSetList.map((skill, idx) => {
-                return (
-                  <button
-                    key={idx + 1}
-                    className="skill"
-                    value={skill}
-                    style={{
-                      backgroundColor: skillSet.includes(skill)
-                        ? ""
-                        : "lightgrey",
-                    }}
-                    onClick={handleSkillSetChange}
-                  >
-                    {skill}
-                  </button>
-                );
-              })}
-            </div>
-          </>
+        {isLoading ? (
+          <div style={{ display: "flex" }}>
+            <h1 style={{ margin: "auto" }}>Loading...</h1>
+          </div>
         ) : (
           <>
-            <h1>
-              [{jobType}] {title}
-            </h1>
-            <div className="skillSet">
-              {skillSet.map((skill, idx) => {
-                return (
-                  <button
-                    key={idx + 1}
-                    className="skill"
-                    value={skill}
-                    disabled
-                  >
-                    {skill}
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        )}
-
-        <p>작성자: {author?.name}</p>
-        <p>작성일: {date?.split("T").join(" ").split(".")[0]}</p>
-        {editMode ? (
-          <textarea
-            className="editContent"
-            defaultValue={content}
-            rows={20}
-            onChange={handleEditContentChange}
-          />
-        ) : (
-          <p id="content">{content}</p>
-        )}
-        <div className="buttonContainer">
-          {editMode ? (
-            <>
-              <button onClick={handleEditFinish}>수정 완료</button>
-              <button onClick={handleEditCancel}>취소</button>
-            </>
-          ) : (
-            user() &&
-            author &&
-            user()._id === author._id && (
+            {editMode ? (
               <>
-                <button onClick={handleEditStart}>채용 공고 수정</button>
-                <button onClick={handleDeletePost}>채용 공고 삭제</button>
+                <form className="radio">
+                  {jobTypes.map((type, idx) => {
+                    return (
+                      <label key={idx + 1}>
+                        <input
+                          name="radio"
+                          type="radio"
+                          value={type}
+                          defaultChecked={type === jobType}
+                          onClick={() => setEditJobType(type)}
+                        />
+                        <p>{type}</p>
+                      </label>
+                    );
+                  })}
+                </form>
+                <input
+                  className="editTitle"
+                  defaultValue={title}
+                  onChange={handleEditTitleChange}
+                />
+                <div className="skillSet">
+                  {skillSetList.map((skill, idx) => {
+                    return (
+                      <button
+                        key={idx + 1}
+                        className="skill"
+                        value={skill}
+                        style={{
+                          backgroundColor: skillSet.includes(skill)
+                            ? ""
+                            : "lightgrey",
+                        }}
+                        onClick={handleSkillSetChange}
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
               </>
-            )
-          )}
-          {!isCompanyUser() && (
-            <button className="listButton" onClick={handleApplication}>
-              지원하기
-            </button>
-          )}
-          <button
-            id="backBtn"
-            className="listButton"
-            onClick={handleBackToBoard}
-          >
-            목록
-          </button>
-        </div>
+            ) : (
+              <>
+                <h1>
+                  [{jobType}] {title}
+                </h1>
+                <div className="skillSet">
+                  {skillSet.map((skill, idx) => {
+                    return (
+                      <button
+                        key={idx + 1}
+                        className="skill"
+                        value={skill}
+                        disabled
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            <p>작성자: {author?.name}</p>
+            <p>작성일: {date?.split("T").join(" ").split(".")[0]}</p>
+            {editMode ? (
+              <textarea
+                className="editContent"
+                defaultValue={content}
+                rows={20}
+                onChange={handleEditContentChange}
+              />
+            ) : (
+              <p id="content">{content}</p>
+            )}
+            <div className="buttonContainer">
+              {editMode ? (
+                <>
+                  <button onClick={handleEditFinish}>수정 완료</button>
+                  <button onClick={handleEditCancel}>취소</button>
+                </>
+              ) : (
+                user() &&
+                author &&
+                user()._id === author._id && (
+                  <>
+                    <button onClick={handleEditStart}>채용 공고 수정</button>
+                    <button onClick={handleDeletePost}>채용 공고 삭제</button>
+                  </>
+                )
+              )}
+              {!isCompanyUser() && (
+                <button className="listButton" onClick={handleApplication}>
+                  지원하기
+                </button>
+              )}
+              <button
+                id="backBtn"
+                className="listButton"
+                onClick={handleBackToBoard}
+              >
+                목록
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </StyledPost>
   );

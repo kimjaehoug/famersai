@@ -140,7 +140,7 @@ const Board = () => {
       <div className="boardContainer">
         {isLoading ? (
           <div className="upload">
-            <h1>로딩중...</h1>
+            <h1>Loading...</h1>
           </div>
         ) : (
           allPosts.length === 0 && (

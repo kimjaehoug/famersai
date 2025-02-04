@@ -184,6 +184,7 @@ const StyledResume = styled.div`
 `;
 
 const Resume = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
 
@@ -260,6 +261,7 @@ const Resume = () => {
       setPhoneNumber(data.phoneNumber);
       setDegrees(data.degrees);
       setForeignLanguages(data.foreignLanguages);
+      setIsLoading(false);
     });
   }, [editMode]);
 
@@ -390,141 +392,154 @@ const Resume = () => {
   return (
     <StyledResume>
       <div className="boardContainer">
-        {editMode ? (
+        {isLoading ? (
           <div className="editContainer">
-            <input
-              className="edit"
-              placeholder="이력서 제목"
-              value={editTitle}
-              onChange={handleEditTitleChange}
-            />
+            <h1 style={{ margin: "auto" }}>Loading...</h1>
           </div>
         ) : (
-          <h1 style={{ fontSize: "40px" }}>{title}</h1>
-        )}
-        <h1 style={{ fontSize: "50px" }}>{name}</h1>
-        <h1>학력사항</h1>
-        {degrees?.map((degree, i) => {
-          return <Degree key={i + 1} data={degree} />;
-        })}
-        <h1>기술 스택</h1>
-        <div className="skillSets">
-          {skillSet.map((skill, idx) => {
-            return (
-              <button key={idx + 1} className="skill" value={skill} disabled>
-                {skill}
-              </button>
-            );
-          })}
-        </div>
-        <h1>이메일</h1>
-        <p>{email}</p>
-        <h1>생년월일</h1>
-        <p>{dOfB}</p>
-        <h1>주소</h1>
-        <p>{address}</p>
-        <h1>휴대전화</h1>
-        <p>{phoneNumber}</p>
-        <h1>소개</h1>
-        <p>{introduction}</p>
-        <h1>어학성적</h1>
-        {foreignLanguages?.map((foreignLanguage, i) => {
-          return <ForeignLanguage key={i + 1} data={foreignLanguage} />;
-        })}
-        {editMode ? (
           <>
-            <div className="editContainer">
-              <h1>지원 동기</h1>
-              <textarea
-                className="editIntro"
-                defaultValue={editMotiv}
-                rows={20}
-                onChange={handleEditMotivChange}
-              />
+            {editMode ? (
+              <div className="editContainer">
+                <input
+                  className="edit"
+                  placeholder="이력서 제목"
+                  value={editTitle}
+                  onChange={handleEditTitleChange}
+                />
+              </div>
+            ) : (
+              <h1 style={{ fontSize: "40px" }}>{title}</h1>
+            )}
+            <h1 style={{ fontSize: "50px" }}>{name}</h1>
+            <h1>학력사항</h1>
+            {degrees?.map((degree, i) => {
+              return <Degree key={i + 1} data={degree} />;
+            })}
+            <h1>기술 스택</h1>
+            <div className="skillSets">
+              {skillSet.map((skill, idx) => {
+                return (
+                  <button
+                    key={idx + 1}
+                    className="skill"
+                    value={skill}
+                    disabled
+                  >
+                    {skill}
+                  </button>
+                );
+              })}
             </div>
-            <EditActivities
-              name={"경력"}
-              target={editJobExp}
-              setter={setEditJobExp}
-            />
-            <EditActivities
-              name={"프로젝트"}
-              target={editProjects}
-              setter={setEditProjects}
-            />
-            <EditActivities
-              name={"대외활동"}
-              target={editActivities}
-              setter={setEditActivities}
-            />
-            <EditActivities
-              name={"포트폴리오"}
-              target={editPortfolioLinks}
-              setter={setEditPortfolioLinks}
-            />
-            <EditActivities
-              name={"수상경력"}
-              target={editAwards}
-              setter={setEditAwards}
-            />
-            <EditActivities
-              name={"자격증"}
-              target={editCertificates}
-              setter={setEditCertificates}
-            />
-          </>
-        ) : (
-          <>
-            <Activities name={"경력"} target={jobExperience} />
-            <Activities name={"프로젝트"} target={projects} />
-            <Activities name={"대회활동"} target={activities} />
-            <Activities name={"포트폴리오"} target={portfolioLinks} />
-            <Activities name={"수상경력"} target={awards} />
-            <Activities name={"자격증"} target={certificates} />
+            <h1>이메일</h1>
+            <p>{email}</p>
+            <h1>생년월일</h1>
+            <p>{dOfB}</p>
+            <h1>주소</h1>
+            <p>{address}</p>
+            <h1>휴대전화</h1>
+            <p>{phoneNumber}</p>
+            <h1>소개</h1>
+            <p>{introduction}</p>
+            <h1>어학성적</h1>
+            {foreignLanguages?.map((foreignLanguage, i) => {
+              return <ForeignLanguage key={i + 1} data={foreignLanguage} />;
+            })}
+            {editMode ? (
+              <>
+                <div className="editContainer">
+                  <h1>지원 동기</h1>
+                  <textarea
+                    className="editIntro"
+                    defaultValue={editMotiv}
+                    rows={20}
+                    onChange={handleEditMotivChange}
+                  />
+                </div>
+                <EditActivities
+                  name={"경력"}
+                  target={editJobExp}
+                  setter={setEditJobExp}
+                />
+                <EditActivities
+                  name={"프로젝트"}
+                  target={editProjects}
+                  setter={setEditProjects}
+                />
+                <EditActivities
+                  name={"대외활동"}
+                  target={editActivities}
+                  setter={setEditActivities}
+                />
+                <EditActivities
+                  name={"포트폴리오"}
+                  target={editPortfolioLinks}
+                  setter={setEditPortfolioLinks}
+                />
+                <EditActivities
+                  name={"수상경력"}
+                  target={editAwards}
+                  setter={setEditAwards}
+                />
+                <EditActivities
+                  name={"자격증"}
+                  target={editCertificates}
+                  setter={setEditCertificates}
+                />
+              </>
+            ) : (
+              <>
+                <Activities name={"경력"} target={jobExperience} />
+                <Activities name={"프로젝트"} target={projects} />
+                <Activities name={"대회활동"} target={activities} />
+                <Activities name={"포트폴리오"} target={portfolioLinks} />
+                <Activities name={"수상경력"} target={awards} />
+                <Activities name={"자격증"} target={certificates} />
+              </>
+            )}
+            <div className="buttonContainer">
+              {editMode ? (
+                <>
+                  <button onClick={handleEditFinish}>
+                    {searchParams.get("id") ? "수정 완료" : "이력서 생성"}
+                  </button>
+                  <button
+                    style={{ background: "#353535" }}
+                    onClick={() => {
+                      if (searchParams.get("id")) {
+                        setEditMode(false);
+                      } else {
+                        handleBackToResumes();
+                      }
+                    }}
+                  >
+                    취소
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    style={{ background: "#353535" }}
+                    onClick={handleEditStart}
+                  >
+                    이력서 수정
+                  </button>
+                  <button
+                    style={{ background: "#353535" }}
+                    onClick={handleBackToResumes}
+                  >
+                    뒤로 가기
+                  </button>
+                  <button
+                    style={{ background: "#f54458" }}
+                    onClick={handleDeleteResume}
+                  >
+                    이력서 삭제
+                  </button>
+                </>
+              )}
+            </div>
           </>
         )}
-        <div className="buttonContainer">
-          {editMode ? (
-            <>
-              <button onClick={handleEditFinish}>
-                {searchParams.get("id") ? "수정 완료" : "이력서 생성"}
-              </button>
-              <button
-                style={{ background: "#353535" }}
-                onClick={() => {
-                  if (searchParams.get("id")) {
-                    setEditMode(false);
-                  } else {
-                    handleBackToResumes();
-                  }
-                }}
-              >
-                취소
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                style={{ background: "#353535" }}
-                onClick={handleEditStart}
-              >
-                이력서 수정
-              </button>
-              <button
-                style={{ background: "#353535" }}
-                onClick={handleBackToResumes}
-              >
-                뒤로 가기
-              </button>
-              <button
-                style={{ background: "#f54458" }}
-                onClick={handleDeleteResume}
-              >
-                이력서 삭제
-              </button>
-            </>
-          )}
-        </div>
       </div>
     </StyledResume>
   );

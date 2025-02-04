@@ -55,13 +55,16 @@ const StyledResumes = styled.div`
 
 const Resumes = () => {
   const [resumes, setResumes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    customAxios.get(`/resume/user/${user()._id}`).then((res) => {
-      setResumes(res.data);
-    });
+    user() &&
+      customAxios.get(`/resume/user/${user()._id}`).then((res) => {
+        setResumes(res.data);
+        setIsLoading(false);
+      });
   }, []);
 
   const handleWriteResume = () => {
@@ -71,30 +74,44 @@ const Resumes = () => {
   return (
     <StyledResumes>
       <div className="resumesContainer">
-        {resumes.length ? (
+        {user() ? (
           <>
-            {resumes.map((resume) => {
-              return (
-                <div key={resume._id} className="resume">
-                  <h2>{resume.title}</h2>
-                  <p>{resume.motivation}</p>
-                  <button onClick={() => navigate(`/resume?id=${resume._id}`)}>
-                    View
-                  </button>
-                </div>
-              );
-            })}
-            <button className="addResume" onClick={handleWriteResume}>
-              +
-            </button>
+            {isLoading ? (
+              <h2>Loading...</h2>
+            ) : (
+              <>
+                {resumes.length ? (
+                  <>
+                    {resumes.map((resume) => {
+                      return (
+                        <div key={resume._id} className="resume">
+                          <h2>{resume.title}</h2>
+                          <p>{resume.motivation}</p>
+                          <button
+                            onClick={() => navigate(`/resume?id=${resume._id}`)}
+                          >
+                            View
+                          </button>
+                        </div>
+                      );
+                    })}
+                    <button className="addResume" onClick={handleWriteResume}>
+                      +
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h2>이력서를 생성해주세요</h2>
+                    <button className="addResume" onClick={handleWriteResume}>
+                      +
+                    </button>
+                  </>
+                )}
+              </>
+            )}
           </>
         ) : (
-          <>
-            <h2>이력서를 생성해주세요</h2>
-            <button className="addResume" onClick={handleWriteResume}>
-              +
-            </button>
-          </>
+          <h2>로그인/회원가입이 필요한 서비스입니다.</h2>
         )}
       </div>
     </StyledResumes>

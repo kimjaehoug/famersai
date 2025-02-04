@@ -179,6 +179,7 @@ const StyledMyPage = styled.div`
 `;
 
 const MyPage = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
 
   const [name, setName] = useState();
@@ -222,6 +223,7 @@ const MyPage = () => {
       setDOfB(data.dateOfBirth);
       setIntroduction(data.introduction);
       setAppliedJobs(data.appliedJobs);
+      setIsLoading(false);
     });
   }, [editMode]);
 
@@ -346,215 +348,225 @@ const MyPage = () => {
   return (
     <StyledMyPage>
       <div className="boardContainer">
-        {editMode ? (
-          <>
-            <div className="editContainer">
-              <h1>성명</h1>
-              <input
-                className="edit"
-                defaultValue={name}
-                onChange={handleEditNameChange}
-              />
-            </div>
-            <div className="skillSets">
-              {skillSetList.map((skill, idx) => {
-                return (
-                  <button
-                    key={idx + 1}
-                    className="skill"
-                    value={skill}
-                    style={{
-                      backgroundColor: editSkillSet.includes(skill)
-                        ? ""
-                        : "lightgrey",
-                    }}
-                    onClick={handleEditSkillSetChange}
-                  >
-                    {skill}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="editContainer">
-              <h1>아이디</h1>
-              <input
-                className="edit"
-                defaultValue={id}
-                onChange={handleEditIdChange}
-              />
-            </div>
-            <div className="editContainer">
-              <h1>이메일</h1>
-              <input
-                className="edit"
-                defaultValue={email}
-                onChange={handleEditEmailChange}
-              />
-            </div>
-            <div className="editContainer">
-              <h1>생년월일</h1>
-              <input
-                className="edit"
-                defaultValue={dOfB}
-                onChange={handleEditDOfBChange}
-              />
-            </div>
-            <h1>간단 자기소개</h1>
-            <textarea
-              className="editIntro"
-              placeholder="간단 자기소개"
-              defaultValue={introduction}
-              rows={20}
-              onChange={handleEditIntroChange}
-            />
-            <div className="editContainer">
-              <h1>주소</h1>
-              <input
-                className="edit"
-                defaultValue={address}
-                onChange={handleEditAddressChange}
-              />
-            </div>
-            <div className="editContainer">
-              <h1>휴대전화</h1>
-              <input
-                className="edit"
-                defaultValue={phoneNumber}
-                onChange={handleEditPhoneNumberChange}
-              />
-            </div>
-            <div className="editContainer">
-              <h1>학력사항</h1>
-              <div className="forms">
-                {editDegrees.map((degree) => {
-                  return (
-                    <EditDegree
-                      key={degree._id}
-                      removeEditDegree={(id) =>
-                        remove(id, editDegrees, setEditDegrees)
-                      }
-                      updateEditDegree={(id, newEl) =>
-                        update(id, newEl, editDegrees, setEditDegrees)
-                      }
-                      data={degree}
-                    />
-                  );
-                })}
-                <button
-                  onClick={() => add(editDegrees, setEditDegrees, DegreeModel)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-            <div className="editContainer">
-              <h1>어학성적</h1>
-              <div className="forms">
-                {editForeignLanguages.map((foreignLanguage) => {
-                  return (
-                    <EditForeignLanguage
-                      key={foreignLanguage._id}
-                      removeEditForeignLanguage={(id) =>
-                        remove(
-                          id,
-                          editForeignLanguages,
-                          setEditForeignLanguages
-                        )
-                      }
-                      updateEditForeignLanguage={(id, newEl) =>
-                        update(
-                          id,
-                          newEl,
-                          editForeignLanguages,
-                          setEditForeignLanguages
-                        )
-                      }
-                      data={foreignLanguage}
-                    />
-                  );
-                })}
-                <button
-                  onClick={() =>
-                    add(
-                      editForeignLanguages,
-                      setEditForeignLanguages,
-                      ForeignLanguageModel
-                    )
-                  }
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          </>
+        {isLoading ? (
+          <div className="editContainer">
+            <h1 style={{ margin: "auto" }}>Loading...</h1>
+          </div>
         ) : (
           <>
-            <h1 style={{ fontSize: "40px" }}>
-              {name}({id})
-            </h1>
-            <h1>학력사항</h1>
-            {degrees?.map((degree, i) => {
-              return <Degree key={i + 1} data={degree} />;
-            })}
-            <h1>기술 스택</h1>
-            <div className="skillSets">
-              {skillSet.map((skill, idx) => {
-                return (
+            {editMode ? (
+              <>
+                <div className="editContainer">
+                  <h1>성명</h1>
+                  <input
+                    className="edit"
+                    defaultValue={name}
+                    onChange={handleEditNameChange}
+                  />
+                </div>
+                <div className="skillSets">
+                  {skillSetList.map((skill, idx) => {
+                    return (
+                      <button
+                        key={idx + 1}
+                        className="skill"
+                        value={skill}
+                        style={{
+                          backgroundColor: editSkillSet.includes(skill)
+                            ? ""
+                            : "lightgrey",
+                        }}
+                        onClick={handleEditSkillSetChange}
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="editContainer">
+                  <h1>아이디</h1>
+                  <input
+                    className="edit"
+                    defaultValue={id}
+                    onChange={handleEditIdChange}
+                  />
+                </div>
+                <div className="editContainer">
+                  <h1>이메일</h1>
+                  <input
+                    className="edit"
+                    defaultValue={email}
+                    onChange={handleEditEmailChange}
+                  />
+                </div>
+                <div className="editContainer">
+                  <h1>생년월일</h1>
+                  <input
+                    className="edit"
+                    defaultValue={dOfB}
+                    onChange={handleEditDOfBChange}
+                  />
+                </div>
+                <h1>간단 자기소개</h1>
+                <textarea
+                  className="editIntro"
+                  placeholder="간단 자기소개"
+                  defaultValue={introduction}
+                  rows={20}
+                  onChange={handleEditIntroChange}
+                />
+                <div className="editContainer">
+                  <h1>주소</h1>
+                  <input
+                    className="edit"
+                    defaultValue={address}
+                    onChange={handleEditAddressChange}
+                  />
+                </div>
+                <div className="editContainer">
+                  <h1>휴대전화</h1>
+                  <input
+                    className="edit"
+                    defaultValue={phoneNumber}
+                    onChange={handleEditPhoneNumberChange}
+                  />
+                </div>
+                <div className="editContainer">
+                  <h1>학력사항</h1>
+                  <div className="forms">
+                    {editDegrees.map((degree) => {
+                      return (
+                        <EditDegree
+                          key={degree._id}
+                          removeEditDegree={(id) =>
+                            remove(id, editDegrees, setEditDegrees)
+                          }
+                          updateEditDegree={(id, newEl) =>
+                            update(id, newEl, editDegrees, setEditDegrees)
+                          }
+                          data={degree}
+                        />
+                      );
+                    })}
+                    <button
+                      onClick={() =>
+                        add(editDegrees, setEditDegrees, DegreeModel)
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <div className="editContainer">
+                  <h1>어학성적</h1>
+                  <div className="forms">
+                    {editForeignLanguages.map((foreignLanguage) => {
+                      return (
+                        <EditForeignLanguage
+                          key={foreignLanguage._id}
+                          removeEditForeignLanguage={(id) =>
+                            remove(
+                              id,
+                              editForeignLanguages,
+                              setEditForeignLanguages
+                            )
+                          }
+                          updateEditForeignLanguage={(id, newEl) =>
+                            update(
+                              id,
+                              newEl,
+                              editForeignLanguages,
+                              setEditForeignLanguages
+                            )
+                          }
+                          data={foreignLanguage}
+                        />
+                      );
+                    })}
+                    <button
+                      onClick={() =>
+                        add(
+                          editForeignLanguages,
+                          setEditForeignLanguages,
+                          ForeignLanguageModel
+                        )
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 style={{ fontSize: "40px" }}>
+                  {name}({id})
+                </h1>
+                <h1>학력사항</h1>
+                {degrees?.map((degree, i) => {
+                  return <Degree key={i + 1} data={degree} />;
+                })}
+                <h1>기술 스택</h1>
+                <div className="skillSets">
+                  {skillSet.map((skill, idx) => {
+                    return (
+                      <button
+                        key={idx + 1}
+                        className="skill"
+                        value={skill}
+                        disabled
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
+                <h1>이메일</h1>
+                <p>{email}</p>
+                <h1>생년월일</h1>
+                <p>{dOfB}</p>
+                <h1>주소</h1>
+                <p>{address}</p>
+                <h1>휴대전화</h1>
+                <p>{phoneNumber}</p>
+                <h1>소개</h1>
+                <p>{introduction}</p>
+                <h1>어학성적</h1>
+                {foreignLanguages?.map((foreignLanguage, i) => {
+                  return <ForeignLanguage key={i + 1} data={foreignLanguage} />;
+                })}
+              </>
+            )}
+            <div className="buttonContainer">
+              {editMode ? (
+                <>
+                  <button onClick={handleEditFinish}>수정 완료</button>
                   <button
-                    key={idx + 1}
-                    className="skill"
-                    value={skill}
-                    disabled
+                    style={{ background: "#353535" }}
+                    onClick={handleEditCancel}
                   >
-                    {skill}
+                    취소
                   </button>
-                );
-              })}
+                </>
+              ) : (
+                <>
+                  <button
+                    style={{ background: "#353535" }}
+                    onClick={handleEditStart}
+                  >
+                    개인 정보 수정
+                  </button>
+                  <button
+                    style={{ background: "#353535" }}
+                    onClick={handleDeleteUser}
+                  >
+                    계정 삭제
+                  </button>
+                </>
+              )}
             </div>
-            <h1>이메일</h1>
-            <p>{email}</p>
-            <h1>생년월일</h1>
-            <p>{dOfB}</p>
-            <h1>주소</h1>
-            <p>{address}</p>
-            <h1>휴대전화</h1>
-            <p>{phoneNumber}</p>
-            <h1>소개</h1>
-            <p>{introduction}</p>
-            <h1>어학성적</h1>
-            {foreignLanguages?.map((foreignLanguage, i) => {
-              return <ForeignLanguage key={i + 1} data={foreignLanguage} />;
-            })}
           </>
         )}
-        <div className="buttonContainer">
-          {editMode ? (
-            <>
-              <button onClick={handleEditFinish}>수정 완료</button>
-              <button
-                style={{ background: "#353535" }}
-                onClick={handleEditCancel}
-              >
-                취소
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                style={{ background: "#353535" }}
-                onClick={handleEditStart}
-              >
-                개인 정보 수정
-              </button>
-              <button
-                style={{ background: "#353535" }}
-                onClick={handleDeleteUser}
-              >
-                계정 삭제
-              </button>
-            </>
-          )}
-        </div>
       </div>
     </StyledMyPage>
   );
