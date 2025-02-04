@@ -113,15 +113,17 @@ const AppliedJobs = () => {
   const { user, isCompanyUser } = useAuth();
 
   useEffect(() => {
-    customAxios
-      .get(`/jobPost/appliedJobs/${user()._id}`)
-      .then((res) => {
-        setAllApplications(res.data.reverse());
-        setPage(1);
-        setIsLoading(false);
-        console.log(res);
-      })
-      .catch((err) => console.log(err));
+    if (user()) {
+      customAxios
+        .get(`/jobPost/appliedJobs/${user()._id}`)
+        .then((res) => {
+          setAllApplications(res.data.reverse());
+          setPage(1);
+          setIsLoading(false);
+          console.log(res);
+        })
+        .catch((err) => console.log(err));
+    }
   }, []);
 
   useEffect(() => {
@@ -135,40 +137,53 @@ const AppliedJobs = () => {
   return (
     <StyledAppliedJobs>
       <div className="boardContainer">
-        {isLoading ? (
-          <div className="upload">
-            <h1>Loading...</h1>
-          </div>
-        ) : (
-          allApplications.length === 0 && (
-            <div className="upload">
-              <h1>지원 내역이 존재하지 않습니다.</h1>
-            </div>
-          )
-        )}
-        {applications.map(({ jobPost, resume }, i) => (
-          <a key={i} href={`/appliedJob?id=${jobPost._id}&resume=${resume}`}>
-            <PostElement
-              title={jobPost.title}
-              jobType={jobPost.jobType}
-              author={jobPost.author}
-              date={jobPost.createdAt}
-            />
-          </a>
-        ))}
-        <div className="pagenation">
-          <div className="inner">
-            {[...Array(Math.ceil(allApplications.length / 10))].map((_, i) => (
-              <div
-                key={i + 1}
-                className={`num ${page === i + 1 ? "active" : ""}`}
-                onClick={() => handlePagenation(i + 1)}
-              >
-                {i + 1}
+        {user() ? (
+          <>
+            {isLoading ? (
+              <div className="upload">
+                <h1>Loading...</h1>
               </div>
+            ) : (
+              allApplications.length === 0 && (
+                <div className="upload">
+                  <h1>지원 내역이 존재하지 않습니다.</h1>
+                </div>
+              )
+            )}
+            {applications.map(({ jobPost, resume }, i) => (
+              <a
+                key={i}
+                href={`/appliedJob?id=${jobPost._id}&resume=${resume}`}
+              >
+                <PostElement
+                  title={jobPost.title}
+                  jobType={jobPost.jobType}
+                  author={jobPost.author}
+                  date={jobPost.createdAt}
+                />
+              </a>
             ))}
-          </div>
-        </div>
+            <div className="pagenation">
+              <div className="inner">
+                {[...Array(Math.ceil(allApplications.length / 10))].map(
+                  (_, i) => (
+                    <div
+                      key={i + 1}
+                      className={`num ${page === i + 1 ? "active" : ""}`}
+                      onClick={() => handlePagenation(i + 1)}
+                    >
+                      {i + 1}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <h1 style={{ color: "white", textAlign: "center" }}>
+            로그인/회원가입이 필요한 서비스입니다.
+          </h1>
+        )}
       </div>
     </StyledAppliedJobs>
   );
