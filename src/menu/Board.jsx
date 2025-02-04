@@ -105,6 +105,8 @@ const StyledBoard = styled.div`
 
 const Board = () => {
   const [searchParams] = useSearchParams();
+
+  const [isLoading, setIsLoading] = useState(true);
   const [allPosts, setAllPosts] = useState([]);
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState();
@@ -120,6 +122,7 @@ const Board = () => {
       .then((res) => {
         setAllPosts(res.data.reverse());
         setPage(1);
+        setIsLoading(false);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -135,10 +138,20 @@ const Board = () => {
   return (
     <StyledBoard>
       <div className="boardContainer">
-        {allPosts.length === 0 && (
+        {isLoading ? (
           <div className="upload">
-            <h1>진행중이신 채용 공고가 없습니다.</h1>
+            <h1>로딩중...</h1>
           </div>
+        ) : (
+          allPosts.length === 0 && (
+            <div className="upload">
+              <h1>
+                {isCompanyUser
+                  ? "진행중이신 채용 공고가 없습니다."
+                  : "현재 진행중인 채용 공고가 없습니다."}
+              </h1>
+            </div>
+          )
         )}
         {posts.map(({ jobType, createdAt, title, _id, author }, i) => (
           <a key={i} href={`/post?id=${_id}`}>
