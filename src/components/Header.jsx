@@ -19,7 +19,7 @@ const Logo = styled.img`
   margin-top: 10px;
   margin-left: 20px;
   height: auto;
-  width: 200px;
+  width: 220px;
 `;
 
 const Header = () => {
