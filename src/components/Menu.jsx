@@ -39,15 +39,22 @@ const MenuWrapper = styled.div`
 
     .infoDropdown {
       position: absolute;
-      top: 20px;
-      left: -20px;
+      top: 40px;
+      left: -30px;
       z-index: 1000;
       background-color: white;
       padding: 0 20px;
+      width: 70px;
+      border: 1px solid black;
+      border-radius: 10px;
 
       a {
         height: 30px;
         font-size: 20px;
+
+        h5 {
+          margin: 15px 0 20px 0;
+        }
       }
     }
   }
@@ -130,11 +137,11 @@ const Menu = () => {
           <h5>기업 뉴스</h5>
         </a>
         {user() && isCompanyUser() ? (
-          <a href="/about">
+          <a href="/candidates">
             <h5>인재 풀 탐색</h5>
           </a>
         ) : (
-          <a href="/about">
+          <a href="/companies">
             <h5>회사 탐색</h5>
           </a>
         )}
@@ -208,30 +215,20 @@ const Menu = () => {
             )}
             {user() ? (
               <>
-                <h5
-                  className="username"
-                  onClick={() => setShowLogout(!showLogout)}
-                >
-                  {user().name}님
-                  {showLogout && (
-                    <div className="infoDropdown">
-                      {isCompanyUser() ? (
-                        <a href="/companyMyPage">
-                          <h5 id="mypage">Company Page</h5>
-                        </a>
-                      ) : (
-                        <a href="/mypage">
-                          <h5 id="mypage">My Page</h5>
-                        </a>
-                      )}
-                      <a href="/login">
-                        <h5 id="logout" onClick={logout}>
-                          Logout
-                        </h5>
-                      </a>
-                    </div>
-                  )}
-                </h5>
+                {isCompanyUser() ? (
+                  <a href="/companyMyPage">
+                    <h5 id="mypage">Company Page</h5>
+                  </a>
+                ) : (
+                  <a href="/mypage">
+                    <h5 id="mypage">My Page</h5>
+                  </a>
+                )}
+                <a href="/login">
+                  <h5 id="logout" onClick={logout}>
+                    Logout
+                  </h5>
+                </a>
               </>
             ) : (
               <a href="/login">

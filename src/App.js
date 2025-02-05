@@ -20,6 +20,11 @@ import Resume from "./menu/Resume";
 import AppliedJobs from "./menu/AppliedJobs";
 import AppliedJob from "./menu/AppliedJob";
 import AppliedResume from "./menu/AppliedResume";
+import Companies from "./menu/Companies";
+import Company from "./menu/Company";
+import Candidates from "./menu/Candidates";
+import Candidate from "./menu/Candidate";
+import ApplicantResume from "./menu/ApplicantResume";
 
 const router = createBrowserRouter([
   {
@@ -85,6 +90,26 @@ const router = createBrowserRouter([
   {
     path: "appliedResume",
     element: <AppliedResume />,
+  },
+  {
+    path: "companies",
+    element: <Companies />,
+  },
+  {
+    path: "company",
+    element: <Company />,
+  },
+  {
+    path: "candidates",
+    element: <Candidates />,
+  },
+  {
+    path: "candidate",
+    element: <Candidate />,
+  },
+  {
+    path: "applicantResume",
+    element: <ApplicantResume />,
   },
 ]);
 

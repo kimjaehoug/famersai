@@ -69,6 +69,12 @@ const StyledPost = styled.div`
       margin-bottom: 20px;
     }
 
+    .buttonContainer2 {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
     button {
       display: flex;
       justify-content: center;
@@ -121,6 +127,20 @@ const StyledPost = styled.div`
       flex-wrap: wrap;
       margin: 0 20px 20px 20px;
     }
+
+    .application {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      min-width: 200px;
+    }
+
+    .applications {
+      display: flex;
+      gap: 10px;
+      margin: 0 20px;
+      flex-wrap: wrap;
+    }
   }
 `;
 
@@ -136,6 +156,8 @@ const Post = () => {
   const [date, setDate] = useState();
   const [content, setContent] = useState();
 
+  const [applications, setApplications] = useState([]);
+
   const [editJobType, setEditJobType] = useState();
   const [editTitle, setEditTitle] = useState();
   const [editSkillSet, setEditSkillSet] = useState();
@@ -145,18 +167,32 @@ const Post = () => {
   const { user, isCompanyUser } = useAuth();
 
   useEffect(() => {
-    customAxios.get(`jobPost/${searchParams.get("id")}`).then((res) => {
-      console.log(res);
-      const data = res.data;
-      setJobType(data.jobType);
-      setTitle(data.title);
-      setSkillSet(data.skillSets);
-      setAuthor(data.author);
-      setPostId(data._id);
-      setDate(data.createdAt);
-      setContent(data.content);
-      setIsLoading(false);
-    });
+    customAxios
+      .get(`jobPost/${searchParams.get("id")}`)
+      .then((res) => {
+        const data = res.data;
+        setJobType(data.jobType);
+        setTitle(data.title);
+        setSkillSet(data.skillSets);
+        setAuthor(data.author);
+        setPostId(data._id);
+        setDate(data.createdAt);
+        setContent(data.content);
+        user() &&
+          data.author &&
+          user()._id === data.author._id &&
+          customAxios
+            .get(`jobPost/appliedUsers/${searchParams.get("id")}`)
+            .then((res) => {
+              setApplications(res.data);
+              console.log(res);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        setIsLoading(false);
+      })
+      .catch((err) => console.log(err));
   }, [editMode, searchParams]);
 
   const handleEditStart = () => {
@@ -187,7 +223,11 @@ const Post = () => {
   };
 
   const handleBackToBoard = (e) => {
-    navigate("/board");
+    if (searchParams.get("company")) {
+      navigate(`/company?id=${searchParams.get("company")}`);
+    } else {
+      navigate("/board");
+    }
   };
 
   const handleApplication = () => {
@@ -216,6 +256,14 @@ const Post = () => {
       setEditSkillSet([...editSkillSet, e.target.value]);
     }
     console.log(skillSet);
+  };
+
+  const handleViewResume = (application) => {
+    navigate(
+      `/applicantResume?id=${application.resume._id}&user=${
+        application.user._id
+      }&from=${searchParams.get("id")}`
+    );
   };
 
   return (
@@ -330,12 +378,46 @@ const Post = () => {
                 className="listButton"
                 onClick={handleBackToBoard}
               >
-                목록
+                뒤로가기
               </button>
             </div>
           </>
         )}
       </div>
+      {user() && author && user()._id === author._id && (
+        <div className="boardContainer">
+          <h1>지원자 명단</h1>
+          {isLoading ? (
+            <h2>Loading...</h2>
+          ) : (
+            <>
+              {applications.length ? (
+                <div className="applications">
+                  {applications.map((application) => {
+                    return (
+                      <div key={application.resume._id} className="application">
+                        <p>
+                          {application.resume.title} ({application.user.name})
+                        </p>
+                        <p>지원 동기: {application.resume.motivation}</p>
+                        <p>{application.resume.phone}</p>
+                        <p>{application.resume.email}</p>
+                        <div className="buttonContainer2">
+                          <button onClick={() => handleViewResume(application)}>
+                            자세히 보기
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <h2>현재 지원자가 없습니다.</h2>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </StyledPost>
   );
 };

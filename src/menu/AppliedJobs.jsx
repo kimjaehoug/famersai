@@ -104,13 +104,11 @@ const StyledAppliedJobs = styled.div`
 `;
 
 const AppliedJobs = () => {
-  const [searchParams] = useSearchParams();
-
   const [isLoading, setIsLoading] = useState(true);
   const [allApplications, setAllApplications] = useState([]);
   const [applications, setApplications] = useState([]);
   const [page, setPage] = useState();
-  const { user, isCompanyUser } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (user()) {
