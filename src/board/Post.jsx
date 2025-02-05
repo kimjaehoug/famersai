@@ -171,6 +171,7 @@ const Post = () => {
       .get(`jobPost/${searchParams.get("id")}`)
       .then((res) => {
         const data = res.data;
+        console.log(data);
         setJobType(data.jobType);
         setTitle(data.title);
         setSkillSet(data.skillSets);
@@ -266,6 +267,10 @@ const Post = () => {
     );
   };
 
+  const handleViewCompany = () => {
+    navigate(`/company?id=${author?._id}&from=${postId}`);
+  };
+
   return (
     <StyledPost>
       <div className="boardContainer">
@@ -321,7 +326,7 @@ const Post = () => {
             ) : (
               <>
                 <h1>
-                  [{jobType}] {title}
+                  [{jobType}] {title} - {author?.name}
                 </h1>
                 <div className="skillSet">
                   {skillSet.map((skill, idx) => {
@@ -339,9 +344,7 @@ const Post = () => {
                 </div>
               </>
             )}
-
-            <p>작성자: {author?.name}</p>
-            <p>작성일: {date?.split("T").join(" ").split(".")[0]}</p>
+            <p>{date?.split("T")[0]}</p>
             {editMode ? (
               <textarea
                 className="editContent"
@@ -373,6 +376,9 @@ const Post = () => {
                   지원하기
                 </button>
               )}
+              <button className="listButton" onClick={handleViewCompany}>
+                회사 정보 확인
+              </button>
               <button
                 id="backBtn"
                 className="listButton"

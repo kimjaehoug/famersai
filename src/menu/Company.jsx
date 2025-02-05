@@ -256,7 +256,11 @@ const Company = () => {
   }, []);
 
   const handleBackToCompanies = () => {
-    navigate("/companies");
+    if (searchParams.get("from")) {
+      navigate(`/post?id=${searchParams.get("from")}`);
+    } else {
+      navigate("/companies");
+    }
   };
 
   const handlePagenation = (page) => {
