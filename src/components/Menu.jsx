@@ -80,12 +80,12 @@ const MenuWrapper = styled.div`
     position: absolute;
     top: 50px;
     color: black;
-    font-size: 30px;
+    font-size: 25px;
     right: 0;
     background-color: white;
     border: 1px solid black;
     border-radius: 10px;
-    width: 200px;
+    width: 160px;
     z-index: 10000;
   }
 
@@ -205,11 +205,11 @@ const Menu = () => {
               <h5>기업 뉴스</h5>
             </a>
             {user() && isCompanyUser() ? (
-              <a href="/about">
+              <a href="/candidates">
                 <h5>인재 풀 탐색</h5>
               </a>
             ) : (
-              <a href="/about">
+              <a href="/companies">
                 <h5>회사 탐색</h5>
               </a>
             )}
