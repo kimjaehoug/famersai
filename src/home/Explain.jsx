@@ -46,6 +46,7 @@ const MainAnimdation = styled.div`
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
   border-bottom: 0.5px solid #8e8d8d;
   @media screen and (min-width: 768px) {
     flex-direction: row;

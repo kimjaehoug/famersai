@@ -217,8 +217,7 @@ const Resume = () => {
   const [awards, setAwards] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [portfolioLinks, setPortfolioLinks] = useState([]);
-  const [portfolioFiles, setPortfolioFiles] = useState([]);
-  const [additionalFiles, setAdditionalFiles] = useState([]);
+  const [pdfResume, setPdfResume] = useState();
 
   const [editTitle, setEditTitle] = useState();
   const [editMotiv, setEditMotiv] = useState();
@@ -226,8 +225,7 @@ const Resume = () => {
   const [editProjects, setEditProjects] = useState([]);
   const [editActivities, setEditActivities] = useState([]);
   const [editPortfolioLinks, setEditPortfolioLinks] = useState([]);
-  const [editPortfolioFiles, setEditPortfolioFiles] = useState([]);
-  const [editAdditionalFiles, setEditAdditionalFiles] = useState([]);
+  const [editPdfResume, setEditPdfResume] = useState();
   const [editAwards, setEditAwards] = useState([]);
   const [editCertificates, setEditCertificates] = useState([]);
 
@@ -258,10 +256,8 @@ const Resume = () => {
         setEditCertificates(data.certificates);
         setPortfolioLinks(data.portfolioLinks);
         setEditPortfolioLinks(data.portfolioLinks);
-        setPortfolioFiles(data.portfolioFiles);
-        setEditPortfolioFiles(data.portfolioFiles);
-        setAdditionalFiles(data.additionalFiles);
-        setEditAdditionalFiles(data.additionalFiles);
+        setPdfResume(data.pdfResume);
+        setEditPdfResume(data.portfolioFiles);
       });
     } else {
       setEditMode(true);
@@ -318,8 +314,6 @@ const Resume = () => {
         delete el._id;
         return el;
       }),
-      portfolioFiles: editPortfolioFiles,
-      additionalFiles: editAdditionalFiles,
     };
 
     if (searchParams.get("id")) {
@@ -327,7 +321,14 @@ const Resume = () => {
         .put(`/resume/${searchParams.get("id")}`, newResume)
         .then((res) => {
           console.log(res);
-          setEditMode(false);
+        })
+        .catch((err) => console.log(err));
+      customAxios
+        .put(`/resume/pdfResume/${searchParams.get("id")}`, editPdfResume, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((res) => {
+          console.log(res);
         })
         .catch((err) => console.log(err));
     } else {
@@ -335,6 +336,15 @@ const Resume = () => {
         .post("/resume", newResume)
         .then((res) => {
           console.log(res);
+          customAxios
+            .post(`/resume/pdfResume/${res.data._id}`, editPdfResume, {
+              headers: { "Content-Type": "multipart/form-data" },
+            })
+            .then((res) => {
+              console.log(res);
+              setEditMode(false);
+            })
+            .catch((err) => console.log(err));
           navigate(`/resume?id=${res.data._id}`);
           setEditMode(false);
         })
@@ -348,6 +358,12 @@ const Resume = () => {
 
   const handleEditMotivChange = (e) => {
     setEditMotiv(e.target.value);
+  };
+
+  const handleEditPdfResumeChange = (e) => {
+    const formData = new FormData();
+    formData.append("file", e.target.files[0]);
+    setEditPdfResume(formData);
   };
 
   const handleDeleteResume = () => {};
@@ -521,6 +537,18 @@ const Resume = () => {
                   target={editCertificates}
                   setter={setEditCertificates}
                 />
+                <h1>PDF 이력서</h1>
+                <form encType="multipart/form-data">
+                  <input
+                    style={{
+                      marginLeft: "30px",
+                      fontSize: "20px",
+                    }}
+                    type="file"
+                    accept="application/pdf"
+                    onChange={handleEditPdfResumeChange}
+                  />
+                </form>
               </>
             ) : (
               <>
@@ -530,6 +558,7 @@ const Resume = () => {
                 <Activities name={"포트폴리오"} target={portfolioLinks} />
                 <Activities name={"수상경력"} target={awards} />
                 <Activities name={"자격증"} target={certificates} />
+                <h1>PDF 이력서</h1>
               </>
             )}
             <div className="buttonContainer">
