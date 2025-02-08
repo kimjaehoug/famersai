@@ -29,7 +29,8 @@ const ContentWrapper = styled.div`
   margin: 0 25px;
   padding: 0;
   overflow: hidden;
-  @media screen and (min-width: 1000px) {
+  @media screen and (min-width: 1400px) {
+    max-width: 1200px;
     margin: 0 auto;
   }
 `;
@@ -54,6 +55,7 @@ const MapContainer = styled.div`
   max-width: 700px;
   margin: auto;
   gap: 30px;
+  margin-bottom: 100px;
   @media screen and (min-width: 1000px) {
     flex-direction: row;
     align-items: center;
@@ -64,6 +66,17 @@ const MapContainer = styled.div`
     justify-content: left;
     input {
       font-size: 30px;
+    }
+    .searchBar {
+      display: flex;
+    }
+    .searchBtn {
+      margin-left: 10px;
+      font-size: 30px;
+      background: white;
+      border-radius: 10px;
+      color: ${({ theme }) => theme.colors.MAIN};
+      border: 3px solid ${({ theme }) => theme.colors.MAIN};
     }
   }
 `;
@@ -150,6 +163,7 @@ const Explain = () => {
   const [inView, setInView] = useState({});
   const refs = useRef([]);
   const [index, setIndex] = useState(0);
+  const [keyword, setKeyword] = useState();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -185,13 +199,24 @@ const Explain = () => {
     return () => clearTimeout(intervalId);
   }, []);
 
+  const handleKeywordChange = (e) => {
+    setKeyword(e.target.value);
+  };
+
   return (
     <ContentWrapper>
       <MapContainer>
         <Map />
         <div className="search">
           <h1>지역 특구 검색</h1>
-          <input type="text" placeholder="예) 서울 강동구" />
+          <div className="searchBar">
+            <input
+              type="text"
+              placeholder="예) 서울 강동구"
+              onChange={handleKeywordChange}
+            />
+            <button className="searchBtn">&#128269;</button>
+          </div>
         </div>
       </MapContainer>
       <MainContainer>
