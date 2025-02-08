@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { customAxios } from "../customAxios";
 // 회사 뉴스 및 이벤트 내용
 // 규정, 서엊ㄱ서 등 공지사항
 
@@ -65,24 +66,15 @@ const Summary = styled.p`
 `;
 
 const News = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [news, setNews] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`/v1/search/news.json`, {
-        headers: {
-          "X-Naver-Client-Id": process.env.REACT_APP_NAVER_ID,
-          "X-Naver-Client-Secret": process.env.REACT_APP_NAVER_SECRET,
-        },
-        params: {
-          query: "기업",
-          diaply: 100,
-        },
-      })
-      .then((res) => {
-        console.log(res.data.items);
-        setNews(res.data.items);
-      });
+    customAxios.get(`/naver/news`).then((res) => {
+      console.log(res.data);
+      setNews(res.data);
+      setIsLoading(false);
+    });
   }, []);
 
   const replaceHTMLEntities = (str) => {
@@ -105,20 +97,26 @@ const News = () => {
       <ButtonWrapper>
         <Button active>뉴스</Button>
       </ButtonWrapper>
-      {news.map((newsItem) => {
-        return (
-          <a
-            href={newsItem.link}
-            target="_blank"
-            style={{ color: "inherit", textDecoration: "none" }}
-          >
-            <ContentWrapper key={newsItem.title}>
-              <NewsTitle>{replaceHTMLEntities(newsItem.title)}</NewsTitle>
-              <Summary>{replaceHTMLEntities(newsItem.description)}</Summary>
-            </ContentWrapper>
-          </a>
-        );
-      })}
+      {isLoading ? (
+        <h1>Loading...</h1>
+      ) : (
+        <>
+          {news.map((newsItem) => {
+            return (
+              <a
+                href={newsItem.link}
+                target="_blank"
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                <ContentWrapper key={newsItem.title}>
+                  <NewsTitle>{replaceHTMLEntities(newsItem.title)}</NewsTitle>
+                  <Summary>{replaceHTMLEntities(newsItem.description)}</Summary>
+                </ContentWrapper>
+              </a>
+            );
+          })}
+        </>
+      )}
     </Container>
   );
 };

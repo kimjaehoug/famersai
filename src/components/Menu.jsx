@@ -74,6 +74,10 @@ const MenuWrapper = styled.div`
     p {
       margin-top: -10px;
     }
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .dropdown {

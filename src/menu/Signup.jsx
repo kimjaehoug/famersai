@@ -251,7 +251,7 @@ const Signup = () => {
       if (name.length >= 2) {
         if (dOfBRegex.test(dOfB)) {
           if (emailRegex.test(email)) {
-            if (phoneNumberRegex.test(phoneNumber)) {
+            if (isCompanyUser || phoneNumberRegex.test(phoneNumber)) {
               if (password.length >= 8) {
                 if (password === password2) {
                   setError(null);
