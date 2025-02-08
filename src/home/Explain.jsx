@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import TextTransition, { presets } from "react-text-transition";
+import { Map } from "../components/Map";
 
 const slideIn = keyframes`
     0% {
@@ -27,8 +28,9 @@ const slideDown = keyframes`
 const ContentWrapper = styled.div`
   margin: 0 25px;
   padding: 0;
-  @media screen and (min-width: 768px) {
-    margin: 0 170px;
+  overflow: hidden;
+  @media screen and (min-width: 1000px) {
+    margin: 0 auto;
   }
 `;
 
@@ -43,14 +45,35 @@ const MainAnimdation = styled.div`
   }
 `;
 
+const MapContainer = styled.div`
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 80vw;
+  max-width: 700px;
+  margin: auto;
+  gap: 30px;
+  @media screen and (min-width: 1000px) {
+    flex-direction: row;
+    align-items: center;
+    max-width: 1200px;
+  }
+  .search {
+    margin: 0;
+    justify-content: left;
+    input {
+      font-size: 30px;
+    }
+  }
+`;
+
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   border-bottom: 0.5px solid #8e8d8d;
   @media screen and (min-width: 768px) {
     flex-direction: row;
-    align-items: center;
     border: none;
   }
 `;
@@ -164,6 +187,13 @@ const Explain = () => {
 
   return (
     <ContentWrapper>
+      <MapContainer>
+        <Map />
+        <div className="search">
+          <h1>지역 특구 검색</h1>
+          <input type="text" placeholder="예) 서울 강동구" />
+        </div>
+      </MapContainer>
       <MainContainer>
         <MainAnimdation
           ref={(el) => (refs.current[0] = el)}
