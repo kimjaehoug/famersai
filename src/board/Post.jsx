@@ -183,7 +183,7 @@ const Post = () => {
           data.author &&
           user()._id === data.author._id &&
           customAxios
-            .get(`jobPost/appliedUsers/${searchParams.get("id")}`)
+            .get(`jobPost/applications/${searchParams.get("id")}`)
             .then((res) => {
               setApplications(res.data);
               console.log(res);
@@ -261,7 +261,7 @@ const Post = () => {
 
   const handleViewResume = (application) => {
     navigate(
-      `/applicantResume?id=${application.resume._id}&user=${
+      `/resume?id=${application.resume._id}&user=${
         application.user._id
       }&from=${searchParams.get("id")}`
     );

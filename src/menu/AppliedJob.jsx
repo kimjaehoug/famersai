@@ -192,9 +192,9 @@ const AppliedJob = () => {
 
   const handleViewResume = () => {
     navigate(
-      `/appliedResume?id=${searchParams.get(
-        "resume"
-      )}&appliedJob=${searchParams.get("id")}`
+      `/resume?id=${searchParams.get("resume")}&appliedTo=${searchParams.get(
+        "id"
+      )}`
     );
   };
 

@@ -270,10 +270,16 @@ const Company = () => {
   return (
     <StyledCompany>
       <div className="boardContainer">
-        <h1 style={{ fontSize: "50px" }}>{name}</h1>
-        <h1>이메일: {email}</h1>
-        <h1>설립일: {dOfF}</h1>
-        <h1>{introduction}</h1>
+        {isLoading ? (
+          <h1>Loading...</h1>
+        ) : (
+          <>
+            <h1 style={{ fontSize: "50px" }}>{name}</h1>
+            <h1>이메일: {email}</h1>
+            <h1>설립일: {dOfF}</h1>
+            <h1>{introduction}</h1>
+          </>
+        )}
       </div>
       <div className="boardContainer">
         <h1>채용 공고</h1>

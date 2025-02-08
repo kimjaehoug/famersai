@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import img from "../img/explore.png";
+import axios from "axios";
 // 회사 뉴스 및 이벤트 내용
 // 규정, 서엊ㄱ서 등 공지사항
 
@@ -29,37 +29,28 @@ const Button = styled.div`
   font: bold 14px "arial";
   color: ${(props) => (props.active ? "#82a5eb" : "gray")};
   cursor: pointer;
-  border-bottom: 2px solid ${(props) => (props.active ? "#82a5eb" : "transparent")};
+  border-bottom: 2px solid
+    ${(props) => (props.active ? "#82a5eb" : "transparent")};
   &:hover {
     color: ${(props) => (props.active ? "#82a5eb" : "darkgray")};
   }
 `;
 
 const ContentWrapper = styled.div`
-  width: calc(100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   border-radius: 5px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2), 0px 6px 20px rgba(0, 0, 0, 0.15);
-  margin: 20px 0;
+  margin: 20px auto;
   transition: transform 0.3s ease;
+  padding: 20px 30px;
   &:hover {
     transform: scale(1.05);
   }
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 1000px) {
     width: calc(70%);
-  }
-`;
-
-const Img = styled.img`
-  width: calc(80%);
-  height: 300px;
-  margin: 20px 0 0 0;
-  border-radius: 5px;
-  @media screen and (min-width: 768px) {
-    height: 400px;
   }
 `;
 
@@ -73,73 +64,61 @@ const Summary = styled.p`
   font: 500 14px "arial";
 `;
 
-const Link = styled.a`
-  margin: 10px 0;
-  text-decoration: none;
-  font: bold 13px "arial";
-  color: #82a5eb;
-  border-bottom: 2px solid transparent;
-  &:hover {
-    border-bottom: 2px solid #82a5eb;
-  }
-`;
-
 const News = () => {
-  const [info, setInfo] = useState(true);
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`/v1/search/news.json`, {
+        headers: {
+          "X-Naver-Client-Id": process.env.REACT_APP_NAVER_ID,
+          "X-Naver-Client-Secret": process.env.REACT_APP_NAVER_SECRET,
+        },
+        params: {
+          query: "기업",
+          diaply: 100,
+        },
+      })
+      .then((res) => {
+        console.log(res.data.items);
+        setNews(res.data.items);
+      });
+  }, []);
+
+  const replaceHTMLEntities = (str) => {
+    const htmlEntities = {
+      "&amp;": "&",
+      "&lt;": "<",
+      "&gt;": ">",
+      "&quot;": '"',
+      "&#039;": "'",
+      "&ndash;": "-",
+    };
+
+    return str.replace(/<\/?[^>]+(>|$)/g, "").replace(/&[\w#]+;/g, (entity) => {
+      return htmlEntities[entity] || entity;
+    });
+  };
 
   return (
     <Container>
       <ButtonWrapper>
-        <Button onClick={() => setInfo(true)} active={info}>
-          뉴스
-        </Button>
-        <Button onClick={() => setInfo(false)} active={!info}>
-          이벤트
-        </Button>
+        <Button active>뉴스</Button>
       </ButtonWrapper>
-      {info ? (
-        <>
-          <ContentWrapper>
-            <Img src={img} />
-            <NewsTitle>뉴스</NewsTitle>
-            <Summary>뉴스 간단한 내용이 들어갈 자리입니다</Summary>
-            <Link href="#">뉴스 보러가기</Link>
-          </ContentWrapper>
-          <ContentWrapper>
-            <Img src={img} />
-            <NewsTitle>뉴스</NewsTitle>
-            <Summary>뉴스 간단한 내용이 들어갈 자리입니다</Summary>
-            <Link href="#">뉴스 보러가기</Link>
-          </ContentWrapper>
-          <ContentWrapper>
-            <Img src={img} />
-            <NewsTitle>뉴스</NewsTitle>
-            <Summary>뉴스 간단한 내용이 들어갈 자리입니다</Summary>
-            <Link href="#">뉴스 보러가기</Link>
-          </ContentWrapper>
-        </>
-      ) : (
-        <>
-          <ContentWrapper>
-            <Img src={img} />
-            <NewsTitle>이벤트</NewsTitle>
-            <Summary>간단한 이벤트 내용이 들어갈 자리입니다</Summary>
-            <Link href="#">자세히 보기</Link>
-          </ContentWrapper>
-          <ContentWrapper>
-            <Img src={img} />
-            <NewsTitle>이벤트</NewsTitle>
-            <Summary>간단한 이벤트 내용이 들어갈 자리입니다</Summary>
-            <Link href="#">자세히 보기</Link>
-          </ContentWrapper>
-          <ContentWrapper>
-            <Img src={img} />
-            <NewsTitle>이벤트</NewsTitle>
-            <Summary>간단한 이벤트 내용이 들어갈 자리입니다</Summary>
-            <Link href="#">자세히 보기</Link>
-          </ContentWrapper>
-        </>
-      )}
+      {news.map((newsItem) => {
+        return (
+          <a
+            href={newsItem.link}
+            target="_blank"
+            style={{ color: "inherit", textDecoration: "none" }}
+          >
+            <ContentWrapper key={newsItem.title}>
+              <NewsTitle>{replaceHTMLEntities(newsItem.title)}</NewsTitle>
+              <Summary>{replaceHTMLEntities(newsItem.description)}</Summary>
+            </ContentWrapper>
+          </a>
+        );
+      })}
     </Container>
   );
 };

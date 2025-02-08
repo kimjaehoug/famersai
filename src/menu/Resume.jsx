@@ -192,6 +192,10 @@ const StyledResume = styled.div`
         width: 80px;
       }
     }
+
+    .pdfResumeName:hover {
+      cursor: pointer;
+    }
   }
 `;
 
@@ -199,6 +203,7 @@ const Resume = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
+  const [pdfResumeLoading, setPdfResumeLoading] = useState(true);
 
   const [name, setName] = useState();
   const [skillSet, setSkillSet] = useState([]);
@@ -232,49 +237,66 @@ const Resume = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [applyMode, setApplyMode] = useState(false);
+  const [viewAppliedMode, setViewAppliedMode] = useState(false);
+  const [applicantResumeMode, setApplicantResumeMode] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("applyTo")) {
       setApplyMode(true);
+    } else if (searchParams.get("appliedTo")) {
+      setViewAppliedMode(true);
+    } else if (searchParams.get("from")) {
+      setApplicantResumeMode(true);
     }
     if (searchParams.get("id")) {
-      customAxios.get(`resume/${searchParams.get("id")}`).then((res) => {
-        const data = res.data;
-        setTitle(data.title);
-        setEditTitle(data.title);
-        setMotivation(data.motivation);
-        setEditMotiv(data.motivation);
-        setJobExperience(data.jobExperience);
-        setEditJobExp(data.jobExperience);
-        setProjects(data.projects);
-        setEditProjects(data.projects);
-        setActivities(data.activities);
-        setEditActivities(data.activities);
-        setAwards(data.awards);
-        setEditAwards(data.awards);
-        setCertificates(data.certificates);
-        setEditCertificates(data.certificates);
-        setPortfolioLinks(data.portfolioLinks);
-        setEditPortfolioLinks(data.portfolioLinks);
-        setPdfResume(data.pdfResume);
-        setEditPdfResume(data.portfolioFiles);
-      });
+      customAxios
+        .get(`resume/${searchParams.get("id")}`)
+        .then((res) => {
+          const data = res.data;
+          setTitle(data.title);
+          setEditTitle(data.title);
+          setMotivation(data.motivation);
+          setEditMotiv(data.motivation);
+          setJobExperience(data.jobExperience);
+          setEditJobExp(data.jobExperience);
+          setProjects(data.projects);
+          setEditProjects(data.projects);
+          setActivities(data.activities);
+          setEditActivities(data.activities);
+          setAwards(data.awards);
+          setEditAwards(data.awards);
+          setCertificates(data.certificates);
+          setEditCertificates(data.certificates);
+          setPortfolioLinks(data.portfolioLinks);
+          setEditPortfolioLinks(data.portfolioLinks);
+          setEditPdfResume(data.portfolioFiles);
+        })
+        .catch((err) => console.error(err));
+      customAxios
+        .get(`/resume/pdfResume/${searchParams.get("id")}`)
+        .then((res) => {
+          setPdfResume(res.data[0]);
+          setPdfResumeLoading(false);
+        })
+        .catch((err) => console.error(err));
     } else {
       setEditMode(true);
     }
-    customAxios.get(`user/${user()._id}`).then((res) => {
-      const data = res.data;
-      setName(data.name);
-      setSkillSet(data.skillSet);
-      setEmail(data.email);
-      setDOfB(data.dateOfBirth);
-      setIntroduction(data.introduction);
-      setAddress(data.address);
-      setPhoneNumber(data.phoneNumber);
-      setDegrees(data.degrees);
-      setForeignLanguages(data.foreignLanguages);
-      setIsLoading(false);
-    });
+    customAxios
+      .get(`user/${searchParams.get("user") || user()._id}`)
+      .then((res) => {
+        const data = res.data;
+        setName(data.name);
+        setSkillSet(data.skillSet);
+        setEmail(data.email);
+        setDOfB(data.dateOfBirth);
+        setIntroduction(data.introduction);
+        setAddress(data.address);
+        setPhoneNumber(data.phoneNumber);
+        setDegrees(data.degrees);
+        setForeignLanguages(data.foreignLanguages);
+        setIsLoading(false);
+      });
   }, [editMode]);
 
   const handleEditStart = () => {
@@ -316,19 +338,17 @@ const Resume = () => {
       }),
     };
 
+    let route;
+
     if (searchParams.get("id")) {
       customAxios
         .put(`/resume/${searchParams.get("id")}`, newResume)
         .then((res) => {
           console.log(res);
-        })
-        .catch((err) => console.log(err));
-      customAxios
-        .put(`/resume/pdfResume/${searchParams.get("id")}`, editPdfResume, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((res) => {
-          console.log(res);
+          route = `/resume?id=${res.data._id}`;
+          uploadPdfResume(res.data._id);
+          navigate(route);
+          setEditMode(false);
         })
         .catch((err) => console.log(err));
     } else {
@@ -336,20 +356,24 @@ const Resume = () => {
         .post("/resume", newResume)
         .then((res) => {
           console.log(res);
-          customAxios
-            .post(`/resume/pdfResume/${res.data._id}`, editPdfResume, {
-              headers: { "Content-Type": "multipart/form-data" },
-            })
-            .then((res) => {
-              console.log(res);
-              setEditMode(false);
-            })
-            .catch((err) => console.log(err));
-          navigate(`/resume?id=${res.data._id}`);
+          route = `/resume?id=${res.data._id}`;
+          uploadPdfResume(res.data._id);
+          navigate(route);
           setEditMode(false);
         })
         .catch((err) => console.log(err));
     }
+  };
+
+  const uploadPdfResume = (id) => {
+    customAxios
+      .put(`/resume/pdfResume/${id}`, editPdfResume, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleEditTitleChange = (e) => {
@@ -366,10 +390,31 @@ const Resume = () => {
     setEditPdfResume(formData);
   };
 
-  const handleDeleteResume = () => {};
+  const handleDeleteResume = () => {
+    customAxios
+      .delete(`/resume/${searchParams.get("id")}`)
+      .then((res) => {
+        console.log(res);
+        window.alert("이력서가 성공적으로 삭제되었습니다.");
+        navigate("/resumes");
+      })
+      .catch((err) => console.log(err));
+  };
 
   const handleBackToResumes = () => {
-    navigate("/resumes");
+    if (searchParams.get("user")) {
+      navigate(`/post?id=${searchParams.get("from")}`);
+    } else if (viewAppliedMode) {
+      navigate(
+        `/appliedJob?id=${searchParams.get(
+          "appliedTo"
+        )}&resume=${searchParams.get("id")}`
+      );
+    } else if (applicantResumeMode) {
+      navigate(`/post?id=&${searchParams.get("from")}`);
+    } else {
+      navigate("/resumes");
+    }
   };
 
   const add = (target, setter, model) => {
@@ -436,6 +481,30 @@ const Resume = () => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const handleCancelApplication = () => {
+    customAxios
+      .put(`/jobPost/apply/${searchParams.get("appliedJob")}`, {
+        resumeId: searchParams.get("id"),
+        userId: user()._id,
+      })
+      .then((res) => {
+        console.log(res);
+        window.alert("지원을 성공적으로 취소하였습니다.");
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const showPdf = () => {
+    window.open(
+      process.env.REACT_APP_API + "/resume/" + pdfResume.fileName,
+      "_blank",
+      "noreferrer"
+    );
   };
 
   return (
@@ -559,6 +628,10 @@ const Resume = () => {
                 <Activities name={"수상경력"} target={awards} />
                 <Activities name={"자격증"} target={certificates} />
                 <h1>PDF 이력서</h1>
+                <p className="pdfResumeName" onClick={showPdf}>
+                  {pdfResumeLoading && "불러오는 중..."}
+                  {pdfResume?.fileName}
+                </p>
               </>
             )}
             <div className="buttonContainer">
@@ -582,16 +655,36 @@ const Resume = () => {
                 </>
               ) : (
                 <>
-                  <button onClick={handleEditStart}>이력서 수정</button>
+                  {!viewAppliedMode && !searchParams.get("user") && (
+                    <button onClick={handleEditStart}>이력서 수정</button>
+                  )}
                   <button onClick={handleBackToResumes}>뒤로 가기</button>
                   {applyMode ? (
                     <button className="cancel" onClick={handleApply}>
                       이 이력서로 지원
                     </button>
                   ) : (
-                    <button className="cancel" onClick={handleDeleteResume}>
-                      이력서 삭제
-                    </button>
+                    <>
+                      {viewAppliedMode ? (
+                        <button
+                          className="cancel"
+                          onClick={handleCancelApplication}
+                        >
+                          지원 취소
+                        </button>
+                      ) : (
+                        <>
+                          {!applicantResumeMode && (
+                            <button
+                              className="cancel"
+                              onClick={handleDeleteResume}
+                            >
+                              이력서 삭제
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </>
                   )}
                 </>
               )}
