@@ -49,12 +49,8 @@ const MenuWrapper = styled.div`
       border-radius: 10px;
 
       a {
-        height: 30px;
+        height: 50px;
         font-size: 20px;
-
-        h5 {
-          margin: 15px 0 20px 0;
-        }
       }
     }
   }

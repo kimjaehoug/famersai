@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }) => {
       user = data.user;
     }
     localStorage.setItem("user", JSON.stringify({ ...user }));
-    localStorage.setItem("isCompanyUser", isCompanyUser);
   };
 
   const logout = () => {

@@ -114,20 +114,17 @@ const Board = () => {
 
   useEffect(() => {
     let route = "/jobPost";
-    if (searchParams.get("mine")) {
-      if (user()) {
-        route += "/company/" + user()._id;
-      }
-    } else {
-      customAxios
-        .get(route)
-        .then((res) => {
-          setAllPosts(res.data.reverse());
-          setPage(1);
-          setIsLoading(false);
-        })
-        .catch((err) => console.log(err));
+    if (user() && searchParams.get("mine")) {
+      route += "/company/" + user()._id;
     }
+    customAxios
+      .get(route)
+      .then((res) => {
+        setAllPosts(res.data.reverse());
+        setPage(1);
+        setIsLoading(false);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
