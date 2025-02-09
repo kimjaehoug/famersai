@@ -91,6 +91,9 @@ const MenuWrapper = styled.div`
     border-radius: 10px;
     width: 160px;
     z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   @media screen and (min-width: 900px) {
@@ -107,7 +110,7 @@ const MenuWrapper = styled.div`
 `;
 
 const Menu = () => {
-  const { user, logout, isCompanyUser } = useAuth();
+  const { user, logout, isCompanyUser, setCompanyUser } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
   const [showDropdown, setShowDropdown] = useState(true);
 
@@ -122,7 +125,7 @@ const Menu = () => {
           <h5>{isCompanyUser() && "전체 "}채용 공고</h5>
         </a>
 
-        {user() && isCompanyUser() ? (
+        {isCompanyUser() ? (
           <a href="/board?mine=true">
             <h5>나의 채용 공고</h5>
           </a>
@@ -140,7 +143,7 @@ const Menu = () => {
         <a href="/news">
           <h5>기업 뉴스</h5>
         </a>
-        {user() && isCompanyUser() ? (
+        {isCompanyUser() ? (
           <a href="/candidates">
             <h5>인재 풀 탐색</h5>
           </a>
@@ -174,9 +177,31 @@ const Menu = () => {
             </h5>
           </>
         ) : (
-          <a href="/login">
-            <h5>로그인/회원가입</h5>
-          </a>
+          <>
+            {isCompanyUser() ? (
+              <h5
+                onClick={() => {
+                  setCompanyUser(false);
+                  window.location.pathname = "/";
+                }}
+              >
+                오작교(구직)
+              </h5>
+            ) : (
+              <h5
+                onClick={() => {
+                  setCompanyUser(true);
+                  window.location.pathname = "/";
+                }}
+              >
+                오작교(기업)
+              </h5>
+            )}
+
+            <a href="/login">
+              <h5>로그인/회원가입</h5>
+            </a>
+          </>
         )}
       </div>
       <button
@@ -216,6 +241,25 @@ const Menu = () => {
               <a href="/companies">
                 <h5>회사 탐색</h5>
               </a>
+            )}
+            {isCompanyUser() ? (
+              <h5
+                onClick={() => {
+                  setCompanyUser(false);
+                  window.location.pathname = "/";
+                }}
+              >
+                오작교(구직)
+              </h5>
+            ) : (
+              <h5
+                onClick={() => {
+                  setCompanyUser(true);
+                  window.location.pathname = "/";
+                }}
+              >
+                오작교(기업)
+              </h5>
             )}
             {user() ? (
               <>

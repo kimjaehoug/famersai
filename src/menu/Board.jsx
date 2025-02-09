@@ -115,16 +115,19 @@ const Board = () => {
   useEffect(() => {
     let route = "/jobPost";
     if (searchParams.get("mine")) {
-      route += "/company/" + user()._id;
+      if (user()) {
+        route += "/company/" + user()._id;
+      }
+    } else {
+      customAxios
+        .get(route)
+        .then((res) => {
+          setAllPosts(res.data.reverse());
+          setPage(1);
+          setIsLoading(false);
+        })
+        .catch((err) => console.log(err));
     }
-    customAxios
-      .get(route)
-      .then((res) => {
-        setAllPosts(res.data.reverse());
-        setPage(1);
-        setIsLoading(false);
-      })
-      .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
@@ -138,50 +141,58 @@ const Board = () => {
   return (
     <StyledBoard>
       <div className="boardContainer">
-        {isLoading ? (
+        {searchParams.get("mine") && !user() ? (
           <div className="upload">
-            <h1>Loading...</h1>
+            <h1>로그인/회원가입이 필요한 서비스입니다.</h1>
           </div>
         ) : (
-          allPosts.length === 0 && (
-            <div className="upload">
-              <h1>
-                {isCompanyUser
-                  ? "진행중이신 채용 공고가 없습니다."
-                  : "현재 진행중인 채용 공고가 없습니다."}
-              </h1>
-            </div>
-          )
-        )}
-        {posts.map(({ jobType, createdAt, title, _id, author }, i) => (
-          <a key={i} href={`/post?id=${_id}`}>
-            <PostElement
-              title={title}
-              jobType={jobType}
-              author={author}
-              date={createdAt}
-            />
-          </a>
-        ))}
-        <div className="pagenation">
-          <div className="inner">
-            {[...Array(Math.ceil(allPosts.length / 10))].map((_, i) => (
-              <div
-                key={i + 1}
-                className={`num ${page === i + 1 ? "active" : ""}`}
-                onClick={() => handlePagenation(i + 1)}
-              >
-                {i + 1}
+          <>
+            {isLoading ? (
+              <div className="upload">
+                <h1>Loading...</h1>
               </div>
+            ) : (
+              allPosts.length === 0 && (
+                <div className="upload">
+                  <h1>
+                    {isCompanyUser
+                      ? "진행중이신 채용 공고가 없습니다."
+                      : "현재 진행중인 채용 공고가 없습니다."}
+                  </h1>
+                </div>
+              )
+            )}
+            {posts.map(({ jobType, createdAt, title, _id, author }, i) => (
+              <a key={i} href={`/post?id=${_id}`}>
+                <PostElement
+                  title={title}
+                  jobType={jobType}
+                  author={author}
+                  date={createdAt}
+                />
+              </a>
             ))}
-          </div>
-        </div>
-        {searchParams.get("mine") && isCompanyUser() && (
-          <div className="writePostContainer">
-            <a href="/writePost">
-              <div className="writePost">채용 공고 작성</div>
-            </a>
-          </div>
+            <div className="pagenation">
+              <div className="inner">
+                {[...Array(Math.ceil(allPosts.length / 10))].map((_, i) => (
+                  <div
+                    key={i + 1}
+                    className={`num ${page === i + 1 ? "active" : ""}`}
+                    onClick={() => handlePagenation(i + 1)}
+                  >
+                    {i + 1}
+                  </div>
+                ))}
+              </div>
+            </div>
+            {searchParams.get("mine") && isCompanyUser() && (
+              <div className="writePostContainer">
+                <a href="/writePost">
+                  <div className="writePost">채용 공고 작성</div>
+                </a>
+              </div>
+            )}
+          </>
         )}
       </div>
     </StyledBoard>

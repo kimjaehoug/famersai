@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { customAxios } from "../customAxios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 
 const StyledCandidates = styled.div`
   .usersContainer {
@@ -57,6 +58,7 @@ const Candidates = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     customAxios.get("/user").then((res) => {
@@ -72,30 +74,36 @@ const Candidates = () => {
   return (
     <StyledCandidates>
       <div className="usersContainer">
-        {isLoading ? (
-          <h2>Loading...</h2>
-        ) : (
+        {user() ? (
           <>
-            {users.length ? (
-              <>
-                {users.map((user) => {
-                  return (
-                    <div key={user._id} className="candidate">
-                      <h2>{user.name}</h2>
-                      <p>{user.introduction}</p>
-                      <button onClick={() => handleViewUser(user._id)}>
-                        상세 보기
-                      </button>
-                    </div>
-                  );
-                })}
-              </>
+            {isLoading ? (
+              <h2>Loading...</h2>
             ) : (
               <>
-                <h2>등록된 유저가 존재하지 않습니다.</h2>
+                {users.length ? (
+                  <>
+                    {users.map((user) => {
+                      return (
+                        <div key={user._id} className="candidate">
+                          <h2>{user.name}</h2>
+                          <p>{user.introduction}</p>
+                          <button onClick={() => handleViewUser(user._id)}>
+                            상세 보기
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    <h2>등록된 유저가 존재하지 않습니다.</h2>
+                  </>
+                )}
               </>
             )}
           </>
+        ) : (
+          <h2>로그인/회원가입이 필요한 서비스입니다.</h2>
         )}
       </div>
     </StyledCandidates>

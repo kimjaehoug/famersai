@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import logo from "../img/logo.png";
 import Menu from "./Menu";
+import { useAuth } from "../AuthContext";
 
 const HeaderWrapper = styled.div`
   width: 100%;
@@ -12,6 +13,23 @@ const HeaderWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   color: ${({ theme }) => theme.colors.MAIN};
+
+  a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .toggle {
+    background: white;
+    font-size: 20px;
+    border-radius: 10px;
+    margin-left: 3px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `;
 
 const Logo = styled.img`
@@ -23,10 +41,15 @@ const Logo = styled.img`
 `;
 
 const Header = () => {
+  const { isCompanyUser } = useAuth();
+
   return (
     <HeaderWrapper>
       <a href="/">
         <Logo src={logo} />
+        <button className="toggle">
+          {isCompanyUser() ? "기업" : "구직자"}
+        </button>
       </a>
       <Menu />
     </HeaderWrapper>

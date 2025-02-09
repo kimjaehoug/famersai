@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import TextTransition, { presets } from "react-text-transition";
 import { Map } from "../components/Map";
+import { useAuth } from "../AuthContext";
 
 const slideIn = keyframes`
     0% {
@@ -29,9 +30,9 @@ const ContentWrapper = styled.div`
   margin: 0 25px;
   padding: 0;
   overflow: hidden;
-  @media screen and (min-width: 1400px) {
+  @media screen and (min-width: 1000px) {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 30px auto;
   }
 `;
 
@@ -55,7 +56,6 @@ const MapContainer = styled.div`
   max-width: 700px;
   margin: auto;
   gap: 30px;
-  margin-bottom: 100px;
   @media screen and (min-width: 1000px) {
     flex-direction: row;
     align-items: center;
@@ -88,6 +88,7 @@ const MainContainer = styled.div`
   @media screen and (min-width: 768px) {
     flex-direction: row;
     border: none;
+    margin: auto 50px;
   }
 `;
 
@@ -97,7 +98,7 @@ const MainTitle = styled.p`
   padding: 0;
   margin: 60px 0 30px 0;
   @media screen and (min-width: 768px) {
-    margin: 150px 0 150px 20px;
+    margin: 100px 0 150px 20px;
   }
 `;
 
@@ -112,6 +113,7 @@ const MainContent = styled.p`
 `;
 
 const SubContainer = styled.div`
+  margin-top: 100px;
   display: flex;
   flex-direction: column;
   @media screen and (min-width: 768px) {
@@ -164,6 +166,7 @@ const Explain = () => {
   const refs = useRef([]);
   const [index, setIndex] = useState(0);
   const [keyword, setKeyword] = useState();
+  const { isCompanyUser } = useAuth();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -205,39 +208,43 @@ const Explain = () => {
 
   return (
     <ContentWrapper>
-      <MapContainer>
-        <Map />
-        <div className="search">
-          <h1>지역 특구 검색</h1>
-          <div className="searchBar">
-            <input
-              type="text"
-              placeholder="예) 서울 강동구"
-              onChange={handleKeywordChange}
-            />
-            <button className="searchBtn">&#128269;</button>
+      {isCompanyUser() ? (
+        <MapContainer>
+          <Map />
+          <div className="search">
+            <h1>지역 특구 검색</h1>
+            <div className="searchBar">
+              <input
+                type="text"
+                placeholder="예) 서울 강동구"
+                onChange={handleKeywordChange}
+              />
+              <button className="searchBtn">&#128269;</button>
+            </div>
           </div>
-        </div>
-      </MapContainer>
-      <MainContainer>
-        <MainAnimdation
-          ref={(el) => (refs.current[0] = el)}
-          data-index={0}
-          inView={inView[0]}
-        >
-          <MainTitle>
-            오늘의 추천 기업
-            <TextTransition springConfig={presets.wobbly}>
-              {TEXTS[index % TEXTS.length]}
-            </TextTransition>
-          </MainTitle>
-          <MainContent>
-            오작교는 지역 인재와 지방 이전 기업간의 매칭을 도와줍니다.<br></br>
-            <br></br>지역 경제의 적극적인 참여자가 되거나 새로운 커리어 기회를
-            찾아보세요.
-          </MainContent>
-        </MainAnimdation>
-      </MainContainer>
+        </MapContainer>
+      ) : (
+        <MainContainer>
+          <MainAnimdation
+            ref={(el) => (refs.current[0] = el)}
+            data-index={0}
+            inView={inView[0]}
+          >
+            <MainTitle>
+              오늘의 추천 기업
+              <TextTransition springConfig={presets.wobbly}>
+                {TEXTS[index % TEXTS.length]}
+              </TextTransition>
+            </MainTitle>
+            <MainContent>
+              오작교는 지역 인재와 지방 이전 기업간의 매칭을 도와줍니다.
+              <br></br>
+              <br></br>지역 경제의 적극적인 참여자가 되거나 새로운 커리어 기회를
+              찾아보세요.
+            </MainContent>
+          </MainAnimdation>
+        </MainContainer>
+      )}
       <SubContainer>
         <SubWrapper
           ref={(el) => (refs.current[1] = el)}

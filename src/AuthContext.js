@@ -6,10 +6,10 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [_, setCookies] = useCookies(["access_token"]);
 
-  const login = (data, isCompanyUser) => {
+  const login = (data) => {
     setCookies("access_token", data.token);
     let user;
-    if (isCompanyUser) {
+    if (isCompanyUser()) {
       user = data.company;
     } else {
       user = data.user;
@@ -35,8 +35,14 @@ export const AuthProvider = ({ children }) => {
     return localStorage.getItem("isCompanyUser") === "true";
   };
 
+  const setCompanyUser = (bool) => {
+    localStorage.setItem("isCompanyUser", bool);
+  };
+
   return (
-    <AuthContext.Provider value={{ login, logout, user, isCompanyUser }}>
+    <AuthContext.Provider
+      value={{ login, logout, user, isCompanyUser, setCompanyUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

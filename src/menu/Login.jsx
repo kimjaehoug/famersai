@@ -152,13 +152,13 @@ const Login = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [isCompanyUser, setIsCompanyUser] = useState(false);
+  const { isCompanyUser, setCompanyUser } = useAuth();
 
   const handleLogin = () => {
     if (id.length >= 5) {
       if (password.length >= 8) {
         setError(null);
-        const route = isCompanyUser ? "/company" : "/user";
+        const route = isCompanyUser() ? "/company" : "/user";
         customAxios
           .post(`${route}/login`, {
             id,
@@ -167,7 +167,7 @@ const Login = () => {
           .then((res) => {
             console.log(res);
             if (res.status === 200) {
-              login(res.data, isCompanyUser);
+              login(res.data);
               navigate("/");
             }
           })
@@ -194,8 +194,11 @@ const Login = () => {
                 name="radio"
                 type="radio"
                 value="일반 회원"
-                defaultChecked={true}
-                onClick={() => setIsCompanyUser(false)}
+                defaultChecked={!isCompanyUser()}
+                onClick={() => {
+                  setCompanyUser(false);
+                  window.location.reload();
+                }}
               />
               <p>일반 회원</p>
             </label>
@@ -204,7 +207,11 @@ const Login = () => {
                 name="radio"
                 type="radio"
                 value="기업 회원"
-                onClick={() => setIsCompanyUser(true)}
+                defaultChecked={isCompanyUser()}
+                onClick={() => {
+                  setCompanyUser(true);
+                  window.location.reload();
+                }}
               />
               <p>기업 회원</p>
             </label>
@@ -235,7 +242,9 @@ const Login = () => {
           <div className="option">
             <ul>
               <li>
-                <a onClick={() => navigate(`/signup?company=${isCompanyUser}`)}>
+                <a
+                  onClick={() => navigate(`/signup?company=${isCompanyUser()}`)}
+                >
                   회원가입
                 </a>
               </li>
