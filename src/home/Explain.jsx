@@ -3,6 +3,10 @@ import styled, { keyframes } from "styled-components";
 import TextTransition, { presets } from "react-text-transition";
 import { Map } from "../components/Map";
 import { useAuth } from "../AuthContext";
+import seoulImg from "../img/서울.jpeg";
+import gwangjuImg from "../img/광주.jpeg";
+import ulsanImg from "../img/울산.jpeg";
+import jeonjuImg from "../img/전주.jpeg";
 
 const slideIn = keyframes`
     0% {
@@ -27,20 +31,20 @@ const slideDown = keyframes`
 `;
 
 const ContentWrapper = styled.div`
-  margin: 0 25px;
+  margin: 30px 0;
   padding: 0;
   overflow: hidden;
   @media screen and (min-width: 1000px) {
-    max-width: 1200px;
     margin: 30px auto;
   }
 `;
 
-const MainAnimdation = styled.div`
+const MainAnimation = styled.div`
   animation: ${({ inView }) => (inView ? slideDown : "none")} 1s ease-out;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin: auto;
   align-items: center;
   @media screen and (min-width: 768px) {
     flex-direction: row;
@@ -85,20 +89,27 @@ const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   border-bottom: 0.5px solid #8e8d8d;
+  margin: auto;
+  padding: 0 50px;
   @media screen and (min-width: 768px) {
     flex-direction: row;
     border: none;
-    margin: auto 50px;
+  }
+
+  &#cities {
+    height: 700px;
+    margin: 0 0 40px 0;
+    background-image: url(${(props) => props.img});
+    background-position: center;
+    background-size: cover;
   }
 `;
 
 const MainTitle = styled.p`
   font-size: 40px;
-  margin: 0;
-  padding: 0;
-  margin: 60px 0 30px 0;
+  margin: 60px auto 30px;
   @media screen and (min-width: 768px) {
-    margin: 100px 0 150px 20px;
+    margin: auto;
   }
 `;
 
@@ -159,14 +170,15 @@ const Content = styled.p`
   }
 `;
 
-const TEXTS = ["Kakao", "Naver", "전북은행", "국민연금공단"];
-
 const Explain = () => {
   const [inView, setInView] = useState({});
   const refs = useRef([]);
   const [index, setIndex] = useState(0);
   const [keyword, setKeyword] = useState();
   const { isCompanyUser } = useAuth();
+  const COMPANIES = ["Kakao", "Naver", "전북은행", "국민연금공단"];
+  const CITIES = ["서울", "울산", "전주", "광주"];
+  const IMAGES = [seoulImg, ulsanImg, jeonjuImg, gwangjuImg];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -196,7 +208,7 @@ const Explain = () => {
 
   useEffect(() => {
     const intervalId = setInterval(
-      () => setIndex((index) => index + 1),
+      () => setIndex((index) => (index + 1) % COMPANIES.length),
       2000 // every 3 seconds
     );
     return () => clearTimeout(intervalId);
@@ -209,23 +221,47 @@ const Explain = () => {
   return (
     <ContentWrapper>
       {isCompanyUser() ? (
-        <MapContainer>
-          <Map />
-          <div className="search">
-            <h1>지역 특구 검색</h1>
-            <div className="searchBar">
-              <input
-                type="text"
-                placeholder="예) 서울 강동구"
-                onChange={handleKeywordChange}
-              />
-              <button className="searchBtn">&#128269;</button>
+        <>
+          {" "}
+          <MainContainer id="cities" img={IMAGES[index]}>
+            <MainAnimation
+              ref={(el) => (refs.current[0] = el)}
+              data-index={0}
+              inView={inView[0]}
+              style={{ color: "white" }}
+            >
+              <MainTitle>
+                오늘의 추천 특구
+                <TextTransition springConfig={presets.wobbly}>
+                  {CITIES[index]}
+                </TextTransition>
+              </MainTitle>
+              <MainContent>
+                오작교는 지역 인재와 지방 이전 기업간의 매칭을 도와줍니다.
+                <br></br>
+                <br></br>지역 경제의 적극적인 참여자가 되거나 새로운 커리어
+                기회를 찾아보세요.
+              </MainContent>
+            </MainAnimation>
+          </MainContainer>
+          <MapContainer>
+            <Map />
+            <div className="search">
+              <h1>지역 특구 검색</h1>
+              <div className="searchBar">
+                <input
+                  type="text"
+                  placeholder="예) 서울 강동구"
+                  onChange={handleKeywordChange}
+                />
+                <button className="searchBtn">&#128269;</button>
+              </div>
             </div>
-          </div>
-        </MapContainer>
+          </MapContainer>
+        </>
       ) : (
         <MainContainer>
-          <MainAnimdation
+          <MainAnimation
             ref={(el) => (refs.current[0] = el)}
             data-index={0}
             inView={inView[0]}
@@ -233,7 +269,7 @@ const Explain = () => {
             <MainTitle>
               오늘의 추천 기업
               <TextTransition springConfig={presets.wobbly}>
-                {TEXTS[index % TEXTS.length]}
+                {COMPANIES[index]}
               </TextTransition>
             </MainTitle>
             <MainContent>
@@ -242,7 +278,7 @@ const Explain = () => {
               <br></br>지역 경제의 적극적인 참여자가 되거나 새로운 커리어 기회를
               찾아보세요.
             </MainContent>
-          </MainAnimdation>
+          </MainAnimation>
         </MainContainer>
       )}
       <SubContainer>

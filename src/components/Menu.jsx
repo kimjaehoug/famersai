@@ -25,7 +25,7 @@ const MenuWrapper = styled.div`
 
   .menu {
     flex: 1;
-    margin: 0px 10px 0px 10px;
+    margin: 15px 10px 0px 10px;
     max-width: 800px;
     font-size: 20px;
     display: flex;
