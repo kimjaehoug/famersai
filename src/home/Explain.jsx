@@ -102,6 +102,7 @@ const MainContainer = styled.div`
     background-image: url(${(props) => props.img});
     background-position: center;
     background-size: cover;
+    -webkit-transform: translate3d(0, 0, 0);
   }
 `;
 

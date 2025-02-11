@@ -120,6 +120,7 @@ const Board = () => {
     customAxios
       .get(route)
       .then((res) => {
+        console.log(res);
         setAllPosts(res.data.reverse());
         setPage(1);
         setIsLoading(false);
