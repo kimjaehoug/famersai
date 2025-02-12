@@ -30,12 +30,42 @@ const slideDown = keyframes`
     }
 `;
 
+const fadeOut = keyframes`
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+  `;
+
+const fadeIn = keyframes`
+    0% {
+        opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  `;
+
 const ContentWrapper = styled.div`
   margin: 30px 0;
   padding: 0;
   overflow: hidden;
   @media screen and (min-width: 1000px) {
     margin: 30px auto;
+  }
+
+  .options {
+    margin-top: 0;
+    button {
+      font-size: 25px;
+      background-color: white;
+      border-radius: 10px;
+      margin-left: 0px;
+      margin-right: 10px;
+      margin-bottom: 15px;
+    }
   }
 `;
 
@@ -175,10 +205,11 @@ const Explain = () => {
   const [inView, setInView] = useState({});
   const refs = useRef([]);
   const [index, setIndex] = useState(0);
+  const [option, setOption] = useState(0);
   const [keyword, setKeyword] = useState();
   const { isCompanyUser } = useAuth();
   const COMPANIES = ["Kakao", "Naver", "전북은행", "국민연금공단"];
-  const CITIES = ["서울", "울산", "전주", "광주"];
+  const CITIES = ["서울특별시", "울산광역시", "전북 전주시", "광주광역시"];
   const IMAGES = [seoulImg, ulsanImg, jeonjuImg, gwangjuImg];
 
   useEffect(() => {
@@ -246,9 +277,13 @@ const Explain = () => {
             </MainAnimation>
           </MainContainer>
           <MapContainer>
-            <Map />
             <div className="search">
               <h1>지역 특구 검색</h1>
+              <div className="options">
+                <button>A 종류 특구</button>
+                <button>B 종류 특구</button>
+                <button>C 종류 특구</button>
+              </div>
               <div className="searchBar">
                 <input
                   type="text"
@@ -258,6 +293,7 @@ const Explain = () => {
                 <button className="searchBtn">&#128269;</button>
               </div>
             </div>
+            <Map />
           </MapContainer>
         </>
       ) : (
