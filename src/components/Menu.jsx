@@ -6,6 +6,8 @@ const MenuWrapper = styled.div`
   display: flex;
   flex: 1;
   justify-content: flex-end;
+  aling-items: center; /* 요소들을 세로 중앙 정렬 */
+;
   a {
     text-decoration: none;
   }
@@ -24,6 +26,10 @@ const MenuWrapper = styled.div`
   }
 
   .menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-grow: 1;
     flex: 1;
     margin: 15px 10px 0px 10px;
     max-width: 800px;
@@ -104,6 +110,24 @@ const MenuWrapper = styled.div`
     }
   }
 `;
+
+// 새로운 버튼 스타일
+const StyledButton = styled.a`
+  display: flex;
+  align-items: center;
+  justigy-content: center;
+  background-color: ${({ theme }) => theme.colors.MAIN};
+  color: white !important;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  height: 50px;
+  padding: 0px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+`;
+
 
 const Menu = () => {
   const { user, logout, isCompanyUser, setCompanyUser } = useAuth();
@@ -194,9 +218,7 @@ const Menu = () => {
               </h5>
             )}
 
-            <a href="/login">
-              <h5>로그인/회원가입</h5>
-            </a>
+            <StyledButton href="/login">JOIN US</StyledButton>
           </>
         )}
       </div>
@@ -275,9 +297,7 @@ const Menu = () => {
                 </a>
               </>
             ) : (
-              <a href="/login">
-                <h5>로그인/회원가입</h5>
-              </a>
+              <StyledButton href="/login">JOIN US</StyledButton>
             )}
           </div>
         )}
