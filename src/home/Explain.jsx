@@ -8,6 +8,7 @@ import ulsanImg from "../img/울산.jpeg";
 import jeonjuImg from "../img/전주.jpeg";
 import Map from "./Map";
 import regulatoryZoneData from "../data/regulatoryZoneData";
+import { LuSailboat } from "react-icons/lu";
 
 // 페이드인 페이드아웃 애니메이션 (백그라운드 이미지)
 const fadeInOut = keyframes`
@@ -91,7 +92,7 @@ const MainAnimation = styled.div`
 
 // 지도 및 검색 창 컨테이너
 const MapContainer = styled.div`
-  margin-top: 40px;
+  margin-top: 0px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -118,12 +119,11 @@ const MapContainer = styled.div`
     }
 
     h2 {
-      background: rgb(16, 8, 154);
+      background: rgb(11, 0, 222);
       background: linear-gradient(
         90deg,
         rgba(16, 8, 154, 1) 0%,
-        rgba(114, 9, 121, 1) 58%,
-        rgba(164, 12, 148, 1) 100%
+        rgb(99, 198, 255) 100%
       );
     }
   }
@@ -132,7 +132,7 @@ const MapContainer = styled.div`
 // 배경 이미지 컨테이너
 const BackgroundImage = styled.div`
   width: 100%;
-  height: 700px;
+  height: 400px;
   background-image: url(${(props) => props.img});
   background-position: center;
   background-size: cover;
@@ -160,7 +160,7 @@ const MainContainer = styled.div`
     height: 400px;
     margin: 0 0 40px 0;
     background-image: url(${(props) => props.img});
-    background-position: center;
+    background-position: bottom;
     background-size: cover;
     -webkit-transform: translate3d(0, 0, 0);
     box-shadow: 0 -30px 30px 0 white inset;
@@ -333,13 +333,14 @@ const Explain = () => {
             {data && (
               <div className="details">
                 <h2>
-                  <text style={{ color: "yellow" }}>{data?.["지역"]} </text>
-                  <text style={{ color: "white" }}>{data?.["혜택요약"]}</text>
+                  <text style={{ color: "yellow", fontSize: "25px" }}>{data?.["지역"]} </text>
+                  <text style={{ color: "white", fontSize: "20px" }}>{data?.["혜택요약"]}</text>
                 </h2>
                 <p>그림이름: {data?.["그림"]}</p>
+                <ls>
                 {data?.["혜택"].map((el) => (
-                  <text>{`${el} `}</text>
-                ))}
+                  <li>{`${el} `}</li>
+                ))}</ls>
                 <p>세부사업: {data?.["세부사업"]}</p>
               </div>
             )}

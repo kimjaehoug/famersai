@@ -1,10 +1,41 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
 import industryList from "../data/industryList";
 import Map from "../home/Map";
+import dropDownImg from "../img/drop_down.png";
+
+// ✅ 반응형 둥근 패널 스타일 적용
+const PanelContainer = styled.div`
+  background-color: #d9e5ff;
+  border-radius: 50px;
+  padding: 30px;
+  margin: 20px 0;
+  width: 100vw;
+  max-width: 100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  /* 📌 반응형 스타일 */
+  @media (max-width: 1024px) {
+    padding: 20px;
+    border-radius: 40px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    border-radius: 30px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+    border-radius: 20px;
+  }
+`;
 
 const MapContainer = styled.div`
   margin-top: 40px;
@@ -47,27 +78,27 @@ const MapContainer = styled.div`
 
 const StyledConsulting = styled.div`
   .boardContainer {
-    border: 1px solid #e0e0e0;
+    border: none;
     margin: 20px auto;
-    padding: 25px;
+    padding: 0px;
     max-width: 900px;
-    background: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
+    background: transparent;
+    box-shadow: none;
     color: #2c2c2c;
+    font-family: "IBM Plex Sans KR";
     font-size: 16px;
     line-height: 1.6;
 
     .editTitle {
-      font-size: 24px;
-      font-weight: bold;
+      font-family: "IBM Plex Sans KR";
+      font-size: 16px;
+      font-weight: normal;
       border: 1px solid #e0e0e0;
       border-radius: 12px;
       padding: 10px;
-      margin-top: 10px;
-      margin-left: 20px;
+      margin-bottom: 10px;
+      margin-left: 40px;
       width: 93%;
-      margin-bottom: 20px;
       outline: none;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
@@ -76,25 +107,28 @@ const StyledConsulting = styled.div`
       border: 1px solid #e0e0e0;
       border-radius: 12px;
       padding: 10px;
-      margin-left: 20px;
+      margin-left: 40px;
       width: 93%;
       height: 200px;
       resize: vertical;
+      font-family: "IBM Plex Sans KR";
       font-size: 14px;
       margin-bottom: 20px;
       outline: none;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
+    h1, h3 {
       font-size: 27px;
       font-weight: bold;
-      color: #2c2c2c;
+      color: #787878;
       margin-bottom: 30px;
       margin-left: 30px;
+      text-align: center;
     }
 
     p {
+      margin-top: 50px;
       margin-bottom: 20px;
       margin-left: 30px;
       color: #6e6e6e;
@@ -111,15 +145,16 @@ const StyledConsulting = styled.div`
       justify-content: center;
       align-items: center;
       background-color: ${({ theme }) => theme.colors.MAIN};
-      color: white;
+      color: #00106c;
       border: none;
       border-radius: 12px;
       padding: 8px 15px;
-      font-size: 14px;
+      font-family: "Noto Sans KR";
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
       transition: background-color 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 5px 4px rgba(0, 0, 0, 0.1);
     }
 
     button:hover {
@@ -175,7 +210,7 @@ const StyledConsulting = styled.div`
       gap: 10px;
       width: 100%;
       flex-wrap: wrap;
-      margin: 0 20px 20px 20px;
+      margin: 0 20px 20px 40px;
       button {
         height: 40px;
       }
@@ -262,8 +297,14 @@ const Consulting = () => {
                   className="skillSet"
                   value={district}
                   style={{
-                    backgroundColor:
-                      districtType == district ? "" : "lightgrey",
+                    backgroundColor: districtType === district ? "#00106c" : "white",
+                    color: districtType === district ? "white" : "#00106c",
+                    borderRadius: "20px",
+                    padding: "10px 20px",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    boxShadow: "0px 5px 6px rgba(0, 0, 0, 0.1)",
+                    transition: "all 0.3s ease",
                   }}
                   onClick={handleDistrictChange}
                 >
@@ -282,7 +323,14 @@ const Consulting = () => {
                 className="skillSet"
                 value={item}
                 style={{
-                  backgroundColor: industry == item ? "" : "lightgrey",
+                  backgroundColor: industry === item ? "#00106c" : "white",
+                  color: industry === item ? "white" : "#00106c",
+                  borderRadius: "20px",
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  boxShadow: "0px 5px 6px rgba(0, 0, 0, 0.1)", // 그림자 효과
+                  transition: "all 0.3s ease",
                 }}
                 onClick={handleIndustryChange}
               >
@@ -300,7 +348,14 @@ const Consulting = () => {
                 className="skillSet"
                 value={infra}
                 style={{
-                  backgroundColor: infras.includes(infra) ? "" : "lightgrey",
+                  backgroundColor: infras.includes(infra) ? "#00106c" : "white",
+                  color: infras.includes(infra) ? "white": "00106c",
+                  borderRadius: "20px",
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  boxShadow: "0px 5px 6px rgba(0, 0, 0, 0.1)", // 그림자 효과
+                  transition: "all 0.3s ease",
                 }}
                 onClick={handleInfraChange}
               >
@@ -309,12 +364,12 @@ const Consulting = () => {
             );
           })}
         </div>
-        <p>5. 투자 규모를 입력해주세요. (단위: 억원)</p>
+        <p>5. 투자 규모를 작성해주세요. (단위: 억원)</p>
         <input
           className="editTitle"
           placeholder="투자 규모를 입력해주세요. (단위: 억원)"
           onChange={handleEditCompanyNameChange}
-          style={{ fontSize: "20px" }}
+          style={{ fontSize: "16px" }}
         />
         <p>6. 기업에 대한 설명을 작성해주세요.</p>
         <textarea
@@ -323,15 +378,23 @@ const Consulting = () => {
           rows={20}
           onChange={handleExplanationChange}
           placeholder="기업에 대한 설명을 작성해주세요."
+          style={{ fontSize: "16px" }}
         />
-        <div className="buttonContainer">
-          <button onClick={handleRequestConsulting}>컨설팅 요청</button>
-        </div>
         <h3>기업 지역특구 추천 컨설팅 결과 확인하기</h3>
+        <h3 style={{ textAlign: "center"}}></h3>
+        <img 
+        src={dropDownImg} 
+        alt="Dropdown Icon" 
+        style={{ display: "block", margin: "0 auto", width: "100px" }} 
+      />
       </div>
       <MapContainer>
         <div>
-          <h1>규제자유특구</h1>
+          <PanelContainer>
+          <h2 style={{ color: "#00106c", fontSize: "24px", fontWeight: "bold" }}>
+            추천 특구는 <span style={{ backgroundColor: "#00106c", color: "white", padding: "0px 5px", borderRadius: "1px" }}>부산</span>·광주·세종 입니다.
+            </h2>
+          </PanelContainer>
           <Map handleLocationChange={handleLocationChange} />
         </div>
         {data && (
