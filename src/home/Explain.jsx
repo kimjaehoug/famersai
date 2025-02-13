@@ -39,24 +39,6 @@ const slideDown = keyframes`
     }
 `;
 
-const fadeOut = keyframes`
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-  `;
-
-const fadeIn = keyframes`
-    0% {
-        opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  `;
-
 const ContentWrapper = styled.div`
   margin: 30px 0;
   padding: 0;
@@ -151,13 +133,13 @@ const MainContainer = styled.div`
   border-bottom: 0.5px solid #8e8d8d;
   margin: auto;
   padding: 0 50px;
+  overflow: hidden;
   @media screen and (min-width: 768px) {
     flex-direction: row;
     border: none;
   }
 
   &#cities {
-    height: 400px;
     margin: 0 0 40px 0;
     background-image: url(${(props) => props.img});
     background-position: bottom;
@@ -176,7 +158,6 @@ const MainTitle = styled.p`
   }
 `;
 
-
 // 메인 컨텐츠 설명
 const MainContent = styled.p`
   font-size: 20px;
@@ -185,56 +166,6 @@ const MainContent = styled.p`
     margin: 0;
     padding: 0;
     margin: 30px 20px 40px 70px;
-  }
-`;
-
-// 서브 컨텐츠 컨테이너
-const SubContainer = styled.div`
-  margin-top: 100px;
-  display: flex;
-  flex-direction: column;
-  @media screen and (min-width: 768px) {
-    flex-direction: row;
-    border-top: 0.5px solid #8e8d8d;
-    & > div:nth-child(2) {
-      border-left: 0.5px solid #8e8d8d;
-      border-right: 0.5px solid #8e8d8d;
-    }
-  }
-`;
-
-// 서브 컨텐츠 애니메이션
-const SubWrapper = styled.div`
-  animation: ${({ inView }) => (inView ? slideIn : "none")} 1s ease-out;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex: 1;
-  border-bottom: 0.5px solid #8e8d8d;
-  @media screen and (min-width: 768px) {
-    border: none;
-  }
-`;
-
-const SubTitle = styled.p`
-  font: bold 22px inherit;
-  color: #2b2b2b;
-  margin: 40px 0 60px 0;
-  padding: 0;
-  @media screen and (min-width: 768px) {
-    margin: 30px 40px 60px 50px;
-    padding: 0;
-  }
-`;
-
-//서브 컨텐츠 설명
-const Content = styled.p`
-  font: 500 13px inherit;
-  margin-bottom: 40px;
-  @media screen and (min-width: 768px) {
-    margin: 0;
-    padding: 0;
-    margin: 30px 40px 40px 50px;
   }
 `;
 
@@ -304,12 +235,12 @@ const Explain = () => {
         <>
           {" "}
           <MainContainer id="cities">
-            <BackgroundImage key={index} img={IMAGES[index]}/>
+            <BackgroundImage key={index} img={IMAGES[index]} />
             <MainAnimation
               ref={(el) => (refs.current[0] = el)}
               data-index={0}
               inView={inView[0]}
-              style={{ color: "white", position: "relative", zIndex: 1}}
+              style={{ color: "white", position: "relative", zIndex: 1 }}
             >
               <MainTitle>
                 오늘의 추천 특구
@@ -368,7 +299,6 @@ const Explain = () => {
           </MainAnimation>
         </MainContainer>
       )}
-     
     </ContentWrapper>
   );
 };

@@ -1,10 +1,12 @@
 import styled from "styled-components";
 import { useState } from "react";
+import Chart from "react-apexcharts";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
 import industryList from "../data/industryList";
 import Map from "../home/Map";
 import dropDownImg from "../img/drop_down.png";
+import regulatoryZoneData from "../data/regulatoryZoneData";
 
 // ✅ 반응형 둥근 패널 스타일 적용
 const PanelContainer = styled.div`
@@ -36,7 +38,6 @@ const PanelContainer = styled.div`
     border-radius: 20px;
   }
 `;
-
 const MapContainer = styled.div`
   margin-top: 40px;
   display: flex;
@@ -226,8 +227,66 @@ const Consulting = () => {
   const [investmentScale, setInvestmentScale] = useState();
   const [explanation, setExplanation] = useState();
   const { user } = useAuth();
-  const [location, setLocation] = useState();
-  const [data, setData] = useState();
+  const [locations, setLocations] = useState(["충남", "충북", "강원"]);
+  const [data, setData] = useState([
+    {
+      기업명: "B기업",
+      산업군: "바이오",
+      "추천 지역": "충남",
+      "추천 거리": "규제특구 추천에 따른 거리 추천 없음",
+      "추천 규제특구": {
+        지역명: "충남",
+        특구명: "그린 암모니아 활용 수소발전",
+        "현행 규제내용": "암모니아 연료전지 설치 규제",
+        "완화된 규제내용": "암모니아 직공급 연료전지 설치 허용",
+        "유사도 점수": 0.6604,
+      },
+      "투자 규모": 5,
+      "유사도 점수": 0.6604,
+      주거점수: 418783.024,
+      교통점수: 59676.479999999996,
+      문화시설점수: 58.29995,
+      최종점수: 31.601315772857998,
+    },
+    {
+      기업명: "B기업",
+      산업군: "바이오",
+      "추천 지역": "충북",
+      "추천 거리": "규제특구 추천에 따른 거리 추천 없음",
+      "추천 규제특구": {
+        지역명: "충북",
+        특구명: "그린수소",
+        "현행 규제내용": "수소 생산원료 제한",
+        "완화된 규제내용": "바이오가스·암모니아 기반 수소 생산 특례",
+        "유사도 점수": 0.7334,
+      },
+      "투자 규모": 5,
+      "유사도 점수": 0.7334,
+      주거점수: 273724.374,
+      교통점수: 46013.7,
+      문화시설점수: 50.61101,
+      최종점수: 23.453302158633402,
+    },
+    {
+      기업명: "B기업",
+      산업군: "바이오",
+      "추천 지역": "강원",
+      "추천 거리": "규제특구 추천에 따른 거리 추천 없음",
+      "추천 규제특구": {
+        지역명: "강원",
+        특구명: "액화수소산업",
+        "현행 규제내용": "액화수소 인프라 구축 제한",
+        "완화된 규제내용": "액화수소 생산·저장·충전 인프라 구축 특례",
+        "유사도 점수": 0.6408,
+      },
+      "투자 규모": 5,
+      "유사도 점수": 0.6408,
+      주거점수: 245439.47400000002,
+      교통점수: 44136.0,
+      문화시설점수: 62.90396,
+      최종점수: 18.560027259676804,
+    },
+  ]);
 
   const handleRequestConsulting = () => {
     customAxios
@@ -242,7 +301,7 @@ const Consulting = () => {
       })
       .then((res) => {
         console.log(res.data);
-        setData(res.data);
+        setData(res.data)
       })
       .catch((err) => console.log(err));
   };
@@ -271,10 +330,6 @@ const Consulting = () => {
 
   const handleExplanationChange = (e) => {
     setExplanation(e.target.value);
-  };
-
-  const handleLocationChange = (e) => {
-    setLocation(e.target.value);
   };
 
   return (
@@ -392,25 +447,44 @@ const Consulting = () => {
         <div>
           <PanelContainer>
           <h2 style={{ color: "#00106c", fontSize: "24px", fontWeight: "bold" }}>
-            추천 특구는 <span style={{ backgroundColor: "#00106c", color: "white", padding: "0px 5px", borderRadius: "1px" }}>부산</span>·광주·세종 입니다.
+            추천 특구는 <span style={{ backgroundColor: "#00106c", color: "white", padding: "0px 5px", borderRadius: "1px" }}>{locations[0]}</span>·{locations[1]}·{locations[2]} 입니다.
             </h2>
           </PanelContainer>
-          <Map handleLocationChange={handleLocationChange} />
+          <Map locations={locations} />
         </div>
-        {data && (
-          <div className="details">
-            <h2>
-              <text style={{ color: "yellow" }}>{data?.["지역"]} </text>
-              <text style={{ color: "white" }}>{data?.["혜택요약"]}</text>
-            </h2>
-            <p>그림이름: {data?.["그림"]}</p>
-            {data?.["혜택"].map((el) => (
-              <text>{`${el} `}</text>
-            ))}
-            <p>세부사업: {data?.["세부사업"]}</p>
-          </div>
+        {locations.length && (
+          <>
+            {(() => {
+              const el = regulatoryZoneData.find(
+                (el) => el["지역"] == locations[0]
+              );
+              return (
+                <div className="details">
+                  <h2>
+                    <text style={{ color: "yellow" }}>{el["지역"]} </text>
+                    <text style={{ color: "white" }}>{el["혜택요약"]}</text>
+                  </h2>
+                  <p>그림이름: {el["그림"]}</p>
+                  <p>
+                    {el["혜택"].map((el) => (
+                      <li>{`${el} `}</li>
+                    ))}
+                  </p>
+                  <p>세부사업: {el["세부사업"]}</p>
+                </div>
+              );
+            })()}{" "}
+          </>
         )}
       </MapContainer>
+      <div>
+        <Chart
+          options={data.options}
+          series={data.series}
+          type="bar"
+          width="500"
+        />
+      </div>
     </StyledConsulting>
   );
 };
