@@ -9,6 +9,13 @@ import jeonjuImg from "../img/전주.jpeg";
 import Map from "./Map";
 import regulatoryZoneData from "../data/regulatoryZoneData";
 
+// 페이드인 페이드아웃 애니메이션 (백그라운드 이미지)
+const fadeInOut = keyframes`
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
 const slideIn = keyframes`
     0% {
         transform: translateX(-100%);
@@ -82,6 +89,7 @@ const MainAnimation = styled.div`
   }
 `;
 
+// 지도 및 검색 창 컨테이너
 const MapContainer = styled.div`
   margin-top: 40px;
   display: flex;
@@ -121,6 +129,22 @@ const MapContainer = styled.div`
   }
 `;
 
+// 배경 이미지 컨테이너
+const BackgroundImage = styled.div`
+  width: 100%;
+  height: 700px;
+  background-image: url(${(props) => props.img});
+  background-position: center;
+  background-size: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: ${fadeInOut} 4s ease-in-out;
+`;
+
+// 주요 정보 컨테이너
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -143,6 +167,7 @@ const MainContainer = styled.div`
   }
 `;
 
+// 추천 기업 및 지역 특구 타이틀
 const MainTitle = styled.p`
   font-size: 40px;
   margin: 60px auto 30px;
@@ -151,6 +176,8 @@ const MainTitle = styled.p`
   }
 `;
 
+
+// 메인 컨텐츠 설명
 const MainContent = styled.p`
   font-size: 20px;
   margin-bottom: 40px;
@@ -161,6 +188,7 @@ const MainContent = styled.p`
   }
 `;
 
+// 서브 컨텐츠 컨테이너
 const SubContainer = styled.div`
   margin-top: 100px;
   display: flex;
@@ -175,6 +203,7 @@ const SubContainer = styled.div`
   }
 `;
 
+// 서브 컨텐츠 애니메이션
 const SubWrapper = styled.div`
   animation: ${({ inView }) => (inView ? slideIn : "none")} 1s ease-out;
   display: flex;
@@ -198,6 +227,7 @@ const SubTitle = styled.p`
   }
 `;
 
+//서브 컨텐츠 설명
 const Content = styled.p`
   font: 500 13px inherit;
   margin-bottom: 40px;
@@ -208,6 +238,7 @@ const Content = styled.p`
   }
 `;
 
+// UI 구성 요소 및 애니메이션 로직
 const Explain = () => {
   const [inView, setInView] = useState({});
   const refs = useRef([]);
@@ -272,12 +303,13 @@ const Explain = () => {
       {isCompanyUser() ? (
         <>
           {" "}
-          <MainContainer id="cities" img={IMAGES[index]}>
+          <MainContainer id="cities">
+            <BackgroundImage key={index} img={IMAGES[index]}/>
             <MainAnimation
               ref={(el) => (refs.current[0] = el)}
               data-index={0}
               inView={inView[0]}
-              style={{ color: "white" }}
+              style={{ color: "white", position: "relative", zIndex: 1}}
             >
               <MainTitle>
                 오늘의 추천 특구
@@ -335,47 +367,7 @@ const Explain = () => {
           </MainAnimation>
         </MainContainer>
       )}
-      <SubContainer>
-        <SubWrapper
-          ref={(el) => (refs.current[1] = el)}
-          data-index={1}
-          inView={inView[1]}
-        >
-          <SubTitle>
-            수월한<br></br>라이딩
-          </SubTitle>
-          <Content>
-            스마트 AI 기능으로 매일 라이딩이 수월해집니다. ebii가 라이더의
-            스타일과 선호도에 적응하여 라이더에게 최적화도니 여정을 제공합니다!
-          </Content>
-        </SubWrapper>
-        <SubWrapper
-          ref={(el) => (refs.current[2] = el)}
-          data-index={2}
-          inView={inView[2]}
-        >
-          <SubTitle>
-            매끈한<br></br>디자인
-          </SubTitle>
-          <Content>
-            단순함과 깔끔한 라인을 특징으로 하는 미니멀리즘 디자인으로 도시의
-            모든 거리를 스타일리시하게 이동하실 수 있습니다.
-          </Content>
-        </SubWrapper>
-        <SubWrapper
-          ref={(el) => (refs.current[3] = el)}
-          data-index={3}
-          inView={inView[3]}
-        >
-          <SubTitle>
-            걱정 없는<br></br>안전성
-          </SubTitle>
-          <Content>
-            지인들과 모이거나, 출근을 좀 늦게 하거나, 아니면 단순히 시간을
-            보내든, ebii가 라이더를 안전하고 건강하게 모십니다.
-          </Content>
-        </SubWrapper>
-      </SubContainer>
+     
     </ContentWrapper>
   );
 };
