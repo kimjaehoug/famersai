@@ -140,9 +140,14 @@ const Menu = () => {
           <h5>기업 뉴스</h5>
         </a>
         {isCompanyUser() ? (
-          <a href="/candidates">
-            <h5>인재 풀 탐색</h5>
-          </a>
+          <>
+            <a href="/candidates">
+              <h5>인재 풀 탐색</h5>
+            </a>
+            <a href="/consulting">
+              <h5>컨설팅 요청</h5>
+            </a>
+          </>
         ) : (
           <a href="/companies">
             <h5>회사 탐색</h5>
@@ -230,33 +235,20 @@ const Menu = () => {
               <h5>기업 뉴스</h5>
             </a>
             {user() && isCompanyUser() ? (
-              <a href="/candidates">
-                <h5>인재 풀 탐색</h5>
-              </a>
+              <>
+                <a href="/candidates">
+                  <h5>인재 풀 탐색</h5>
+                </a>
+                <a href="/consulting">
+                  <h5>컨설팅 요청</h5>
+                </a>
+              </>
             ) : (
               <a href="/companies">
                 <h5>회사 탐색</h5>
               </a>
             )}
-            {isCompanyUser() ? (
-              <h5
-                onClick={() => {
-                  setCompanyUser(false);
-                  window.location.pathname = "/";
-                }}
-              >
-                오작교(구직)
-              </h5>
-            ) : (
-              <h5
-                onClick={() => {
-                  setCompanyUser(true);
-                  window.location.pathname = "/";
-                }}
-              >
-                오작교(기업)
-              </h5>
-            )}
+
             {user() ? (
               <>
                 {isCompanyUser() ? (
@@ -275,9 +267,30 @@ const Menu = () => {
                 </a>
               </>
             ) : (
-              <a href="/login">
-                <h5>로그인/회원가입</h5>
-              </a>
+              <>
+                {isCompanyUser() ? (
+                  <h5
+                    onClick={() => {
+                      setCompanyUser(false);
+                      window.location.pathname = "/";
+                    }}
+                  >
+                    오작교(구직)
+                  </h5>
+                ) : (
+                  <h5
+                    onClick={() => {
+                      setCompanyUser(true);
+                      window.location.pathname = "/";
+                    }}
+                  >
+                    오작교(기업)
+                  </h5>
+                )}
+                <a href="/login">
+                  <h5>로그인/회원가입</h5>
+                </a>
+              </>
             )}
           </div>
         )}

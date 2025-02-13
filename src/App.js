@@ -23,6 +23,7 @@ import Companies from "./menu/Companies";
 import Company from "./menu/Company";
 import Candidates from "./menu/Candidates";
 import Candidate from "./menu/Candidate";
+import Consulting from "./menu/Consulting";
 
 const router = createBrowserRouter([
   {
@@ -100,6 +101,10 @@ const router = createBrowserRouter([
   {
     path: "candidate",
     element: <Candidate />,
+  },
+  {
+    path: "consulting",
+    element: <Consulting />,
   },
 ]);
 
