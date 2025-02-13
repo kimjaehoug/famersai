@@ -8,6 +8,9 @@ import ulsanImg from "../img/울산.jpeg";
 import jeonjuImg from "../img/전주.jpeg";
 import Map from "./Map";
 import regulatoryZoneData from "../data/regulatoryZoneData";
+import searchImg from "../img/검색바.png";
+import adImg1 from "../img/광고1.png";
+import adImg2 from "../img/광고2.png";
 
 // 페이드인 페이드아웃 애니메이션 (백그라운드 이미지)
 const fadeInOut = keyframes`
@@ -55,6 +58,13 @@ const ContentWrapper = styled.div`
       margin-left: 0px;
       margin-right: 10px;
       margin-bottom: 15px;
+    }
+  }
+
+  .imgContainer {
+    img {
+      width: 100%;
+      object-fit: fill;
     }
   }
 `;
@@ -134,7 +144,6 @@ const MainContainer = styled.div`
   padding: 0 50px;
   overflow: hidden;
   @media screen and (min-width: 768px) {
-    flex-direction: row;
     border: none;
   }
 
@@ -146,6 +155,11 @@ const MainContainer = styled.div`
     -webkit-transform: translate3d(0, 0, 0);
     box-shadow: 0 -30px 30px 0 white inset;
     height: 350px;
+  }
+
+  img {
+    width: 100%;
+    margin: 0;
   }
 `;
 
@@ -258,7 +272,7 @@ const Explain = () => {
           </MainContainer>
           <MapContainer>
             <div>
-              <h1>규제자유특구</h1>
+              <h1>특구정보조회</h1>
               <Map handleLocationChange={handleLocationChange} />
             </div>
             {data && (
@@ -271,7 +285,10 @@ const Explain = () => {
                     {data?.["혜택요약"]}
                   </text>
                 </h2>
-                <p>그림이름: {data?.["그림"]}</p>
+                <img
+                  style={{ width: "100%", objectFit: "contain" }}
+                  src={require(`../img/${data?.["그림"]}.png`)}
+                />
                 <p>
                   {data?.["혜택"].map((el) => (
                     <li key={el}>{`${el} `}</li>
@@ -283,11 +300,13 @@ const Explain = () => {
           </MapContainer>
         </>
       ) : (
-        <MainContainer>
+        <MainContainer id="cities">
+          <BackgroundImage key={index} img={IMAGES[index]} />
           <MainAnimation
             ref={(el) => (refs.current[0] = el)}
             data-index={0}
             inView={inView[0]}
+            style={{ color: "white", position: "relative", zIndex: 1 }}
           >
             <MainTitle>
               오늘의 추천 기업
@@ -304,6 +323,10 @@ const Explain = () => {
           </MainAnimation>
         </MainContainer>
       )}
+      <div className="imgContainer">
+        <img src={adImg1}></img>
+        <img src={adImg2}></img>
+      </div>
     </ContentWrapper>
   );
 };

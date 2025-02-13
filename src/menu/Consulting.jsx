@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
@@ -7,6 +7,7 @@ import industryList from "../data/industryList";
 import Map from "../home/Map";
 import dropDownImg from "../img/drop_down.png";
 import regulatoryZoneData from "../data/regulatoryZoneData";
+import ReactLoading from "react-loading";
 
 // ✅ 반응형 둥근 패널 스타일 적용
 const PanelContainer = styled.div`
@@ -83,8 +84,8 @@ const MapContainer = styled.div`
 const StyledConsulting = styled.div`
   .boardContainer {
     border: none;
-    margin: 20px auto;
-    padding: 0px;
+    margin: 20px auto 0;
+    padding: 0 0 30px 0;
     max-width: 900px;
     background: #f3f7ff;
     padding-top: 50px;
@@ -104,7 +105,7 @@ const StyledConsulting = styled.div`
       padding: 10px;
       margin-bottom: 10px;
       margin-left: 40px;
-      width: 93%;
+      width: calc(97% - 80px);
       outline: none;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
@@ -113,8 +114,7 @@ const StyledConsulting = styled.div`
       border: 1px solid #e0e0e0;
       border-radius: 12px;
       padding: 10px;
-      margin-left: 40px;
-      width: 93%;
+      margin: auto 40px;
       height: 200px;
       resize: vertical;
       font-family: "IBM Plex Sans KR";
@@ -122,6 +122,7 @@ const StyledConsulting = styled.div`
       margin-bottom: 20px;
       outline: none;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+      width: calc(97% - 80px);
     }
 
     h1,
@@ -190,32 +191,10 @@ const StyledConsulting = styled.div`
       border: 2px solid ${({ theme }) => theme.colors.BACK};
     }
 
-    .radio {
-      display: flex;
-      flex-direction: row;
-      justify-content: left;
-      width: 100%;
-      margin: 0 20px;
-      label {
-        display: flex;
-        align-items: center;
-        margin: 0 5px;
-        input {
-          max-width: 15px;
-          box-shadow: none !important;
-          margin: 0 !important;
-        }
-        p {
-          margin: 10px;
-        }
-      }
-    }
-
     .skillSets {
       display: flex;
       flex-direction: row;
       gap: 10px;
-      width: 100%;
       flex-wrap: wrap;
       margin: 0 20px 20px 40px;
       button {
@@ -227,7 +206,7 @@ const StyledConsulting = styled.div`
 
 const Consulting = () => {
   const [companyName, setCompanyName] = useState();
-  const [industry, setIndustry] = useState([]);
+  const [industry, setIndustry] = useState();
   const [infras, setInfras] = useState([]);
   const [investmentScale, setInvestmentScale] = useState();
   const [explanation, setExplanation] = useState();
@@ -236,84 +215,44 @@ const Consulting = () => {
   const [landSize, setLandSize] = useState();
   const [rent, setRent] = useState();
   const { user } = useAuth();
-  const [locations, setLocations] = useState(["충남", "충북", "강원"]);
-  const [data, setData] = useState([
-    {
-      기업명: "B기업",
-      산업군: "바이오",
-      "추천 지역": "충남",
-      "추천 거리": "규제특구 추천에 따른 거리 추천 없음",
-      "추천 규제특구": {
-        지역명: "충남",
-        특구명: "그린 암모니아 활용 수소발전",
-        "현행 규제내용": "암모니아 연료전지 설치 규제",
-        "완화된 규제내용": "암모니아 직공급 연료전지 설치 허용",
-        "유사도 점수": 0.6604,
-      },
-      "투자 규모": 5,
-      "유사도 점수": 0.6604,
-      주거점수: 418783.024,
-      교통점수: 59676.479999999996,
-      문화시설점수: 58.29995,
-      최종점수: 31.601315772857998,
-    },
-    {
-      기업명: "B기업",
-      산업군: "바이오",
-      "추천 지역": "충북",
-      "추천 거리": "규제특구 추천에 따른 거리 추천 없음",
-      "추천 규제특구": {
-        지역명: "충북",
-        특구명: "그린수소",
-        "현행 규제내용": "수소 생산원료 제한",
-        "완화된 규제내용": "바이오가스·암모니아 기반 수소 생산 특례",
-        "유사도 점수": 0.7334,
-      },
-      "투자 규모": 5,
-      "유사도 점수": 0.7334,
-      주거점수: 273724.374,
-      교통점수: 46013.7,
-      문화시설점수: 50.61101,
-      최종점수: 23.453302158633402,
-    },
-    {
-      기업명: "B기업",
-      산업군: "바이오",
-      "추천 지역": "강원",
-      "추천 거리": "규제특구 추천에 따른 거리 추천 없음",
-      "추천 규제특구": {
-        지역명: "강원",
-        특구명: "액화수소산업",
-        "현행 규제내용": "액화수소 인프라 구축 제한",
-        "완화된 규제내용": "액화수소 생산·저장·충전 인프라 구축 특례",
-        "유사도 점수": 0.6408,
-      },
-      "투자 규모": 5,
-      "유사도 점수": 0.6408,
-      주거점수: 245439.47400000002,
-      교통점수: 44136.0,
-      문화시설점수: 62.90396,
-      최종점수: 18.560027259676804,
-    },
-  ]);
+  const [locations, setLocations] = useState([]);
+  const [showLoading, setShowLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [requesting, setRequesting] = useState(false);
+  const [data, setData] = useState([]);
+  const [count, setCount] = useState(false);
+
+  // useEffect(() => {
+  //   window.addEventListener("scroll", () => {
+  //     if (
+  //       window.scrollY + window.innerHeight >=
+  //         document.documentElement.scrollHeight - 1 &&
+  //       !showLoading
+  //     ) {
+  //       handleRequestConsulting();
+  //     }
+  //   });
+  // }, [count]);
 
   const handleRequestConsulting = () => {
+    const a = {
+      companyName,
+      industry,
+      infras,
+      investmentScale,
+      explanation,
+      corpTax,
+      propertyTax,
+      landSize,
+      rent,
+      author: user(),
+    };
     customAxios
-      .post("/consulting", {
-        companyName,
-        industry,
-        infras,
-        investmentScale,
-        explanation,
-        corpTax,
-        propertyTax,
-        landSize,
-        rent,
-        author: user(),
-      })
+      .post("/consulting", a)
       .then((res) => {
-        console.log(res.data);
-        setData(res.data);
+        console.log(res.data.data);
+        setData(res.data.data);
+        setLocations(res.data.data.map((el) => el["추천 지역"]));
       })
       .catch((err) => console.log(err));
   };
@@ -337,23 +276,23 @@ const Consulting = () => {
   };
 
   const handleInvestmentScaleChange = (e) => {
-    setInvestmentScale(e.target.value);
+    setInvestmentScale(Number(e.target.value));
   };
 
   const handleCorpTaxChange = (e) => {
-    setCorpTax(e.target.checked);
+    setCorpTax(Number(e.target.value));
   };
 
   const handlePropertyTaxChange = (e) => {
-    setPropertyTax(e.target.checked);
+    setPropertyTax(Number(e.target.value));
   };
 
   const handleLandSizeChange = (e) => {
-    setLandSize(e.target.value);
+    setLandSize(Number(e.target.value));
   };
 
   const handleRentChange = (e) => {
-    setRent(e.target.value);
+    setRent(Number(e.target.value));
   };
 
   const handleExplanationChange = (e) => {
@@ -369,6 +308,7 @@ const Consulting = () => {
           className="editTitle"
           placeholder="기업명을 입력하세요."
           onChange={handleEditCompanyNameChange}
+          required={true}
         />
         <p>2. 기업의 산업종을 선택해주세요.</p>
         <div className="skillSets">
@@ -438,7 +378,7 @@ const Consulting = () => {
         <input
           className="editTitle"
           placeholder="제산세를 작성해주세요. (단위: 억원)"
-          onChange={handleCorpTaxChange}
+          onChange={handlePropertyTaxChange}
           style={{ fontSize: "16px" }}
         />
         <p>7. 부지크기를 입력해주세요. (단위: 평)</p>
@@ -464,102 +404,217 @@ const Consulting = () => {
           placeholder="기업에 대한 설명을 작성해주세요."
           style={{ fontSize: "16px" }}
         />
-        <h3>기업 지역특구 추천 컨설팅 결과 확인하기</h3>
-        <h3 style={{ textAlign: "center" }}></h3>
-        <img
+        <button
+          style={{ color: "white", fontSize: "25px", margin: "auto" }}
+          onClick={handleRequestConsulting}
+        >
+          기업 지역특구 추천 컨설팅 결과 확인하기
+        </button>
+        {/* <img
           src={dropDownImg}
           alt="Dropdown Icon"
           style={{ display: "block", margin: "0 auto", width: "100px" }}
-        />
-      </div>
-      <PanelContainer>
-        <h2 style={{ color: "#00106c", fontSize: "24px", fontWeight: "bold" }}>
-          추천 특구는{" "}
-          <span
+        /> */}
+        {/* {showLoading && (
+          <PanelContainer
             style={{
-              backgroundColor: "#00106c",
-              color: "white",
-              padding: "0px 5px",
-              borderRadius: "1px",
+              margin: "30px 0 0 0",
+              height: "70px",
+              background: "transparent",
             }}
           >
-            {locations[0]}
-          </span>
-          ·{locations[1]}·{locations[2]} 입니다.
-        </h2>
-      </PanelContainer>
-      <MapContainer>
-        <div>
-          <Map locations={locations} />
-        </div>
-        {locations.length && (
-          <>
-            {(() => {
-              const el = regulatoryZoneData.find(
-                (el) => el["지역"] == locations[0]
-              );
-              return (
-                <div className="details">
-                  <h2>
-                    <text style={{ color: "yellow" }}>{el["지역"]} </text>
-                    <text style={{ color: "white" }}>{el["혜택요약"]}</text>
-                  </h2>
-                  <p>그림이름: {el["그림"]}</p>
-                  <p>
-                    {el["혜택"].map((el) => (
-                      <li>{`${el} `}</li>
-                    ))}
-                  </p>
-                  <p>세부사업: {el["세부사업"]}</p>
-                </div>
-              );
-            })()}
-          </>
-        )}
-      </MapContainer>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "50px",
-          }}
-        >
-          <Chart
-            options={{
-              chart: {
-                id: "basic-bar",
-              },
-              xaxis: {
-                categories: [
-                  data[0]["기업명"],
-                  data[1]["기업명"],
-                  data[2]["기업명"],
-                ],
-              },
-            }}
-            series={[
-              {
-                name: "최종 점수",
-                data: [
-                  Math.floor(data[0]["최종점수"]),
-                  Math.floor(data[1]["최종점수"]),
-                  Math.floor(data[2]["최종점수"]),
-                ],
-              },
-            ]}
-            type="bar"
-            width="500"
-            height="400"
-          />
-          <p style={{ width: "400px" }}>
-            이 그래프는 각 기업의 주거점수, 교통점수, 문화시설점수를 반영한
-            인프라점수를 나타내고 있습니다. 1위는 {data[0]["기업명"]}이며, 2위는{" "}
-            {data[0]["기업명"]}, 3위는 {data[0]["기업명"]}입니다.
-          </p>
-        </div>
+            <ReactLoading
+              type="spinningBubbles"
+              color="gray"
+              height={100}
+              width={100}
+            />
+          </PanelContainer>
+        )} */}
       </div>
+      {data?.length > 0 && (
+        <>
+          <PanelContainer>
+            <h2
+              style={{ color: "#00106c", fontSize: "24px", fontWeight: "bold" }}
+            >
+              추천 특구는{" "}
+              <span
+                style={{
+                  backgroundColor: "#00106c",
+                  color: "white",
+                  padding: "0px 5px",
+                  borderRadius: "1px",
+                }}
+              >
+                {locations[0]}
+              </span>
+              ·{locations[1]}·{locations[2]} 입니다.
+            </h2>
+          </PanelContainer>
+          <MapContainer>
+            <div>
+              <Map locations={locations} />
+            </div>
+            {locations.length && (
+              <>
+                {(() => {
+                  const el = regulatoryZoneData.find(
+                    (el) => el["지역"] == locations[0]
+                  );
+                  return (
+                    <div className="details">
+                      <h2>
+                        <text style={{ color: "yellow" }}>{el["지역"]} </text>
+                        <text style={{ color: "white" }}>{el["혜택요약"]}</text>
+                      </h2>
+                      <img
+                        style={{ width: "100%", objectFit: "contain" }}
+                        src={require(`../img/${el["그림"]}.png`)}
+                      />
+                      <p>
+                        {el["혜택"].map((el) => (
+                          <li>{`${el} `}</li>
+                        ))}
+                      </p>
+                      <p>세부사업: {el["세부사업"]}</p>
+                    </div>
+                  );
+                })()}
+              </>
+            )}
+          </MapContainer>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              gap: "50px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "50px",
+              }}
+            >
+              <Chart
+                options={{
+                  chart: {
+                    id: "basic-bar",
+                  },
+                  xaxis: {
+                    categories: [
+                      data[0]["추천 지역"],
+                      data[1]["추천 지역"],
+                      data[2]["추천 지역"],
+                    ],
+                  },
+                }}
+                series={[
+                  {
+                    name: "최종 점수",
+                    data: [
+                      Math.floor(data[0]["최종점수"]),
+                      Math.floor(data[1]["최종점수"]),
+                      Math.floor(data[2]["최종점수"]),
+                    ],
+                  },
+                ]}
+                type="bar"
+                width="500"
+                height="400"
+              />
+              <p style={{ width: "400px" }}>
+                이 그래프는 각 기업의 주거점수, 교통점수, 문화시설점수를 반영한
+                인프라점수를 나타내고 있습니다. 1위는 {data[0]["추천 지역"]}
+                이며, 2위는 {data[1]["추천 지역"]}, 3위는 {data[2]["추천 지역"]}
+                입니다.
+              </p>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "50px",
+              }}
+            >
+              <Chart
+                options={{
+                  chart: {
+                    id: "basic-bar",
+                  },
+                  xaxis: {
+                    categories: ["절약 세금", "원래 세금"],
+                  },
+                  colors: ["#5281ac"],
+                }}
+                series={[
+                  {
+                    name: "최종 점수",
+                    data: [
+                      Math.floor(data[0]["내는세금"] * 100) / 100,
+                      Math.floor(data[0]["원래세금"] * 100) / 100,
+                    ],
+                  },
+                ]}
+                type="bar"
+                width="500"
+                height="400"
+              />
+              <p style={{ width: "400px" }}>
+                이 그래프는 {data[0]["추천 지역"]} 지역으로 이전 시 세금 감면
+                결과를 나타낸 그래프입니다. 계산 결과, 약{" "}
+                {Math.floor((data[0]["내는세금"] / data[0]["원래세금"]) * 100)}
+                %의 세금을 절약할 수 있습니다.
+              </p>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "50px",
+              }}
+            >
+              <Chart
+                options={{
+                  chart: {
+                    id: "basic-bar",
+                  },
+                  xaxis: {
+                    categories: ["할인 부지 비용", "현재 부지 비용"],
+                  },
+                  colors: ["#a8dadc"],
+                }}
+                series={[
+                  {
+                    name: "최종 점수",
+                    data: [
+                      Math.floor(data[0]["할인부지비용"] * 100) / 100,
+                      Math.floor(data[0]["현재부지비용"] * 100) / 100,
+                    ],
+                  },
+                ]}
+                type="bar"
+                width="500"
+                height="400"
+              />
+              <p style={{ width: "400px" }}>
+                이 그래프는 {data[0]["추천 지역"]} 지역으로 이전 시 부지 비용
+                감면 결과를 나타낸 그래프입니다. 계산 결과, 약{" "}
+                {Math.floor(
+                  (data[0]["할인부지비용"] / data[0]["현재부지비용"]) * 100
+                )}
+                %의 부지 비용을 절약할 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </>
+      )}
     </StyledConsulting>
   );
 };
