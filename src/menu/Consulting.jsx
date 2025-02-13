@@ -3,8 +3,47 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
-import { jobTypes, skillSetList } from "../data";
 import industryList from "../data/industryList";
+import Map from "../home/Map";
+
+const MapContainer = styled.div`
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 80vw;
+  max-width: 700px;
+  margin: auto;
+  gap: 30px;
+  align-items: center;
+  @media screen and (min-width: 1000px) {
+    flex-direction: row;
+    align-items: center;
+    max-width: 1200px;
+  }
+
+  .details {
+    border: 1px solid;
+
+    h2,
+    p {
+      margin: 0;
+      box-sizing: border-box;
+      border: 1px solid;
+      padding: 20px;
+    }
+
+    h2 {
+      background: rgb(16, 8, 154);
+      background: linear-gradient(
+        90deg,
+        rgba(16, 8, 154, 1) 0%,
+        rgba(114, 9, 121, 1) 58%,
+        rgba(164, 12, 148, 1) 100%
+      );
+    }
+  }
+`;
 
 const StyledConsulting = styled.div`
   .boardContainer {
@@ -151,8 +190,9 @@ const Consulting = () => {
   const [infras, setInfras] = useState([]);
   const [investmentScale, setInvestmentScale] = useState();
   const [explanation, setExplanation] = useState();
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const [location, setLocation] = useState();
+  const [data, setData] = useState();
 
   const handleRequestConsulting = () => {
     customAxios
@@ -166,7 +206,8 @@ const Consulting = () => {
         author: user(),
       })
       .then((res) => {
-        console.log(res);
+        console.log(res.data);
+        setData(res.data);
       })
       .catch((err) => console.log(err));
   };
@@ -195,6 +236,10 @@ const Consulting = () => {
 
   const handleExplanationChange = (e) => {
     setExplanation(e.target.value);
+  };
+
+  const handleLocationChange = (e) => {
+    setLocation(e.target.value);
   };
 
   return (
@@ -284,6 +329,25 @@ const Consulting = () => {
         </div>
         <h3>기업 지역특구 추천 컨설팅 결과 확인하기</h3>
       </div>
+      <MapContainer>
+        <div>
+          <h1>규제자유특구</h1>
+          <Map handleLocationChange={handleLocationChange} />
+        </div>
+        {data && (
+          <div className="details">
+            <h2>
+              <text style={{ color: "yellow" }}>{data?.["지역"]} </text>
+              <text style={{ color: "white" }}>{data?.["혜택요약"]}</text>
+            </h2>
+            <p>그림이름: {data?.["그림"]}</p>
+            {data?.["혜택"].map((el) => (
+              <text>{`${el} `}</text>
+            ))}
+            <p>세부사업: {data?.["세부사업"]}</p>
+          </div>
+        )}
+      </MapContainer>
     </StyledConsulting>
   );
 };
