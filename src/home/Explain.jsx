@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import TextTransition, { presets } from "react-text-transition";
-import { Map } from "../components/Map";
 import { useAuth } from "../AuthContext";
 import seoulImg from "../img/서울.jpeg";
 import gwangjuImg from "../img/광주.jpeg";
 import ulsanImg from "../img/울산.jpeg";
 import jeonjuImg from "../img/전주.jpeg";
+import Map from "./Map";
+import regulatoryZoneData from "../data/regulatoryZoneData";
 
 // 페이드인 페이드아웃 애니메이션 (백그라운드 이미지)
 const fadeInOut = keyframes`
@@ -92,33 +93,38 @@ const MainAnimation = styled.div`
 const MapContainer = styled.div`
   margin-top: 40px;
   display: flex;
-  justify-content: center;
   flex-direction: column;
+  justify-content: space-around;
   width: 80vw;
   max-width: 700px;
   margin: auto;
   gap: 30px;
+  align-items: center;
   @media screen and (min-width: 1000px) {
     flex-direction: row;
     align-items: center;
     max-width: 1200px;
   }
-  .search {
-    margin: 0;
-    justify-content: left;
-    input {
-      font-size: 30px;
+
+  .details {
+    border: 1px solid;
+
+    h2,
+    p {
+      margin: 0;
+      box-sizing: border-box;
+      border: 1px solid;
+      padding: 20px;
     }
-    .searchBar {
-      display: flex;
-    }
-    .searchBtn {
-      margin-left: 10px;
-      font-size: 30px;
-      background: white;
-      border-radius: 10px;
-      color: ${({ theme }) => theme.colors.MAIN};
-      border: 3px solid ${({ theme }) => theme.colors.MAIN};
+
+    h2 {
+      background: rgb(16, 8, 154);
+      background: linear-gradient(
+        90deg,
+        rgba(16, 8, 154, 1) 0%,
+        rgba(114, 9, 121, 1) 58%,
+        rgba(164, 12, 148, 1) 100%
+      );
     }
   }
 `;
@@ -151,12 +157,13 @@ const MainContainer = styled.div`
   }
 
   &#cities {
-    height: 700px;
+    height: 400px;
     margin: 0 0 40px 0;
     background-image: url(${(props) => props.img});
     background-position: center;
     background-size: cover;
     -webkit-transform: translate3d(0, 0, 0);
+    box-shadow: 0 -30px 30px 0 white inset;
   }
 `;
 
@@ -236,12 +243,22 @@ const Explain = () => {
   const [inView, setInView] = useState({});
   const refs = useRef([]);
   const [index, setIndex] = useState(0);
-  const [option, setOption] = useState(0);
-  const [keyword, setKeyword] = useState();
+  // const [option, setOption] = useState(0);
+  // const [keyword, setKeyword] = useState();
   const { isCompanyUser } = useAuth();
   const COMPANIES = ["Kakao", "Naver", "전북은행", "국민연금공단"];
   const CITIES = ["서울특별시", "울산광역시", "전북 전주시", "광주광역시"];
   const IMAGES = [seoulImg, ulsanImg, jeonjuImg, gwangjuImg];
+  const [data, setData] = useState();
+
+  const handleLocationChange = (e) => {
+    console.log(e.target.id);
+    for (const data of regulatoryZoneData) {
+      if (data["지역"] == e.target.id) {
+        setData(data);
+      }
+    }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -277,9 +294,9 @@ const Explain = () => {
     return () => clearTimeout(intervalId);
   }, []);
 
-  const handleKeywordChange = (e) => {
-    setKeyword(e.target.value);
-  };
+  // const handleKeywordChange = (e) => {
+  //   setKeyword(e.target.value);
+  // };
 
   return (
     <ContentWrapper>
@@ -309,23 +326,23 @@ const Explain = () => {
             </MainAnimation>
           </MainContainer>
           <MapContainer>
-            <div className="search">
-              <h1>지역 특구 검색</h1>
-              <div className="options">
-                <button>A 종류 특구</button>
-                <button>B 종류 특구</button>
-                <button>C 종류 특구</button>
-              </div>
-              <div className="searchBar">
-                <input
-                  type="text"
-                  placeholder="예) 서울 강동구"
-                  onChange={handleKeywordChange}
-                />
-                <button className="searchBtn">&#128269;</button>
-              </div>
+            <div>
+              <h1>규제자유특구</h1>
+              <Map handleLocationChange={handleLocationChange} />
             </div>
-            <Map />
+            {data && (
+              <div className="details">
+                <h2>
+                  <text style={{ color: "yellow" }}>{data?.["지역"]} </text>
+                  <text style={{ color: "white" }}>{data?.["혜택요약"]}</text>
+                </h2>
+                <p>그림이름: {data?.["그림"]}</p>
+                {data?.["혜택"].map((el) => (
+                  <text>{`${el} `}</text>
+                ))}
+                <p>세부사업: {data?.["세부사업"]}</p>
+              </div>
+            )}
           </MapContainer>
         </>
       ) : (
