@@ -17,7 +17,6 @@ const StyledMap = styled.div`
 `;
 
 const pins = [
-  { name: "서울", loc: [60, 133] },
   { name: "충남", loc: [180, 100] },
   { name: "강원", loc: [45, 275] },
   { name: "세종", loc: [183, 153] },

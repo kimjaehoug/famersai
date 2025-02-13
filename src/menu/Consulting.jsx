@@ -14,7 +14,6 @@ const PanelContainer = styled.div`
   border-radius: 50px;
   padding: 30px;
   margin: 20px 0;
-  width: 100vw;
   max-width: 100%;
   text-align: center;
   display: flex;
@@ -38,16 +37,19 @@ const PanelContainer = styled.div`
     border-radius: 20px;
   }
 `;
+
 const MapContainer = styled.div`
   margin-top: 40px;
   display: flex;
-  flex-direction: column;
   justify-content: space-around;
   width: 80vw;
+  flex-direction: column;
   max-width: 700px;
   margin: auto;
-  gap: 30px;
+  gap: 50px;
   align-items: center;
+  margin-bottom: 50px;
+
   @media screen and (min-width: 1000px) {
     flex-direction: row;
     align-items: center;
@@ -56,6 +58,7 @@ const MapContainer = styled.div`
 
   .details {
     border: 1px solid;
+    max-width: 450px;
 
     h2,
     p {
@@ -83,12 +86,14 @@ const StyledConsulting = styled.div`
     margin: 20px auto;
     padding: 0px;
     max-width: 900px;
-    background: transparent;
+    background: #f3f7ff;
+    padding-top: 50px;
     box-shadow: none;
     color: #2c2c2c;
     font-family: "IBM Plex Sans KR";
     font-size: 16px;
     line-height: 1.6;
+    border-radius: 10px;
 
     .editTitle {
       font-family: "IBM Plex Sans KR";
@@ -119,7 +124,8 @@ const StyledConsulting = styled.div`
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    h1, h3 {
+    h1,
+    h3 {
       font-size: 27px;
       font-weight: bold;
       color: #787878;
@@ -221,11 +227,14 @@ const StyledConsulting = styled.div`
 
 const Consulting = () => {
   const [companyName, setCompanyName] = useState();
-  const [districtType, setDistrictType] = useState();
   const [industry, setIndustry] = useState([]);
   const [infras, setInfras] = useState([]);
   const [investmentScale, setInvestmentScale] = useState();
   const [explanation, setExplanation] = useState();
+  const [corpTax, setCorpTax] = useState();
+  const [propertyTax, setPropertyTax] = useState();
+  const [landSize, setLandSize] = useState();
+  const [rent, setRent] = useState();
   const { user } = useAuth();
   const [locations, setLocations] = useState(["충남", "충북", "강원"]);
   const [data, setData] = useState([
@@ -292,26 +301,25 @@ const Consulting = () => {
     customAxios
       .post("/consulting", {
         companyName,
-        districtType,
         industry,
         infras,
         investmentScale,
         explanation,
+        corpTax,
+        propertyTax,
+        landSize,
+        rent,
         author: user(),
       })
       .then((res) => {
         console.log(res.data);
-        setData(res.data)
+        setData(res.data);
       })
       .catch((err) => console.log(err));
   };
 
   const handleEditCompanyNameChange = (e) => {
     setCompanyName(e.target.value);
-  };
-
-  const handleDistrictChange = (e) => {
-    setDistrictType(e.target.value);
   };
 
   const handleIndustryChange = (e) => {
@@ -328,6 +336,26 @@ const Consulting = () => {
     console.log(infras);
   };
 
+  const handleInvestmentScaleChange = (e) => {
+    setInvestmentScale(e.target.value);
+  };
+
+  const handleCorpTaxChange = (e) => {
+    setCorpTax(e.target.checked);
+  };
+
+  const handlePropertyTaxChange = (e) => {
+    setPropertyTax(e.target.checked);
+  };
+
+  const handleLandSizeChange = (e) => {
+    setLandSize(e.target.value);
+  };
+
+  const handleRentChange = (e) => {
+    setRent(e.target.value);
+  };
+
   const handleExplanationChange = (e) => {
     setExplanation(e.target.value);
   };
@@ -342,34 +370,7 @@ const Consulting = () => {
           placeholder="기업명을 입력하세요."
           onChange={handleEditCompanyNameChange}
         />
-        <p>2. 특구 타입을 정해주세요.</p>
-        <div className="skillSets">
-          {["규제자유특구", "경제기획특구", "기회발전특구"].map(
-            (district, idx) => {
-              return (
-                <button
-                  key={idx + 1}
-                  className="skillSet"
-                  value={district}
-                  style={{
-                    backgroundColor: districtType === district ? "#00106c" : "white",
-                    color: districtType === district ? "white" : "#00106c",
-                    borderRadius: "20px",
-                    padding: "10px 20px",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                    boxShadow: "0px 5px 6px rgba(0, 0, 0, 0.1)",
-                    transition: "all 0.3s ease",
-                  }}
-                  onClick={handleDistrictChange}
-                >
-                  {district}
-                </button>
-              );
-            }
-          )}
-        </div>
-        <p>3. 기업의 산업종을 선택해주세요.</p>
+        <p>2. 기업의 산업종을 선택해주세요.</p>
         <div className="skillSets">
           {industryList.map((item, idx) => {
             return (
@@ -394,7 +395,7 @@ const Consulting = () => {
             );
           })}
         </div>
-        <p>4. 추천받을 지역에서의 고려하고 싶은 인프라를 선택해주세요.</p>
+        <p>3. 추천받을 지역에서의 고려하고 싶은 인프라를 선택해주세요.</p>
         <div className="skillSets">
           {["교통 현황", "주거 현황", "문화시설"].map((infra, idx) => {
             return (
@@ -404,7 +405,7 @@ const Consulting = () => {
                 value={infra}
                 style={{
                   backgroundColor: infras.includes(infra) ? "#00106c" : "white",
-                  color: infras.includes(infra) ? "white": "00106c",
+                  color: infras.includes(infra) ? "white" : "",
                   borderRadius: "20px",
                   padding: "10px 20px",
                   fontSize: "16px",
@@ -419,14 +420,42 @@ const Consulting = () => {
             );
           })}
         </div>
-        <p>5. 투자 규모를 작성해주세요. (단위: 억원)</p>
+        <p>4. 투자 규모를 작성해주세요. (단위: 억원)</p>
         <input
           className="editTitle"
           placeholder="투자 규모를 입력해주세요. (단위: 억원)"
-          onChange={handleEditCompanyNameChange}
+          onChange={handleInvestmentScaleChange}
           style={{ fontSize: "16px" }}
         />
-        <p>6. 기업에 대한 설명을 작성해주세요.</p>
+        <p>5. 법인세를 작성해주세요. (단위: 억원)</p>
+        <input
+          className="editTitle"
+          placeholder="법인세를 작성해주세요. (단위: 억원)"
+          onChange={handleCorpTaxChange}
+          style={{ fontSize: "16px" }}
+        />
+        <p>6. 제산세를 작성해주세요. (단위: 억원)</p>
+        <input
+          className="editTitle"
+          placeholder="제산세를 작성해주세요. (단위: 억원)"
+          onChange={handleCorpTaxChange}
+          style={{ fontSize: "16px" }}
+        />
+        <p>7. 부지크기를 입력해주세요. (단위: 평)</p>
+        <input
+          className="editTitle"
+          placeholder="부지크기를 입력해주세요. (단위: 평)"
+          onChange={handleLandSizeChange}
+          style={{ fontSize: "16px" }}
+        />
+        <p>8. 임대료를 입력해주세요. (단위: 천만원)</p>
+        <input
+          className="editTitle"
+          placeholder="임대료를 입력해주세요. (단위: 천만원)"
+          onChange={handleRentChange}
+          style={{ fontSize: "16px" }}
+        />
+        <p>9. 기업에 대한 설명을 작성해주세요.</p>
         <textarea
           className="editContent"
           defaultValue={explanation}
@@ -436,20 +465,31 @@ const Consulting = () => {
           style={{ fontSize: "16px" }}
         />
         <h3>기업 지역특구 추천 컨설팅 결과 확인하기</h3>
-        <h3 style={{ textAlign: "center"}}></h3>
-        <img 
-        src={dropDownImg} 
-        alt="Dropdown Icon" 
-        style={{ display: "block", margin: "0 auto", width: "100px" }} 
-      />
+        <h3 style={{ textAlign: "center" }}></h3>
+        <img
+          src={dropDownImg}
+          alt="Dropdown Icon"
+          style={{ display: "block", margin: "0 auto", width: "100px" }}
+        />
       </div>
+      <PanelContainer>
+        <h2 style={{ color: "#00106c", fontSize: "24px", fontWeight: "bold" }}>
+          추천 특구는{" "}
+          <span
+            style={{
+              backgroundColor: "#00106c",
+              color: "white",
+              padding: "0px 5px",
+              borderRadius: "1px",
+            }}
+          >
+            {locations[0]}
+          </span>
+          ·{locations[1]}·{locations[2]} 입니다.
+        </h2>
+      </PanelContainer>
       <MapContainer>
         <div>
-          <PanelContainer>
-          <h2 style={{ color: "#00106c", fontSize: "24px", fontWeight: "bold" }}>
-            추천 특구는 <span style={{ backgroundColor: "#00106c", color: "white", padding: "0px 5px", borderRadius: "1px" }}>{locations[0]}</span>·{locations[1]}·{locations[2]} 입니다.
-            </h2>
-          </PanelContainer>
           <Map locations={locations} />
         </div>
         {locations.length && (
@@ -473,17 +513,52 @@ const Consulting = () => {
                   <p>세부사업: {el["세부사업"]}</p>
                 </div>
               );
-            })()}{" "}
+            })()}
           </>
         )}
       </MapContainer>
-      <div>
-        <Chart
-          options={data.options}
-          series={data.series}
-          type="bar"
-          width="500"
-        />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "50px",
+          }}
+        >
+          <Chart
+            options={{
+              chart: {
+                id: "basic-bar",
+              },
+              xaxis: {
+                categories: [
+                  data[0]["기업명"],
+                  data[1]["기업명"],
+                  data[2]["기업명"],
+                ],
+              },
+            }}
+            series={[
+              {
+                name: "최종 점수",
+                data: [
+                  Math.floor(data[0]["최종점수"]),
+                  Math.floor(data[1]["최종점수"]),
+                  Math.floor(data[2]["최종점수"]),
+                ],
+              },
+            ]}
+            type="bar"
+            width="500"
+            height="400"
+          />
+          <p style={{ width: "400px" }}>
+            이 그래프는 각 기업의 주거점수, 교통점수, 문화시설점수를 반영한
+            인프라점수를 나타내고 있습니다. 1위는 {data[0]["기업명"]}이며, 2위는{" "}
+            {data[0]["기업명"]}, 3위는 {data[0]["기업명"]}입니다.
+          </p>
+        </div>
       </div>
     </StyledConsulting>
   );
