@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import mapImg from "../img/map.png";
 import pinImg from "../img/pin.png";
-import { useState } from "react";
 
 const StyledMap = styled.div`
   background-image: url(${(props) => props.img});
@@ -21,7 +20,7 @@ const pins = [
   { name: "서울", loc: [60, 133] },
   { name: "충남", loc: [180, 100] },
   { name: "강원", loc: [45, 275] },
-  { name: "세종", loc: [185, 153] },
+  { name: "세종", loc: [183, 153] },
   { name: "충북", loc: [145, 203] },
   { name: "대전", loc: [212, 170] },
   { name: "전북", loc: [280, 133] },
@@ -35,18 +34,39 @@ const pins = [
   { name: "울산", loc: [320, 370] },
 ];
 
-const Map = ({ handleLocationChange }) => {
+const Map = ({ handleLocationChange, locations }) => {
   return (
     <StyledMap img={mapImg}>
-      {pins.map((pin) => (
-        <img
-          key={pin.name}
-          id={pin.name}
-          src={pinImg}
-          style={{ top: `${pin.loc[0]}px`, left: `${pin.loc[1]}px` }}
-          onClick={handleLocationChange}
-        />
-      ))}
+      {locations ? (
+        <>
+          {(() => {
+            return locations.map((location) => {
+              const pin = pins.find((pin) => pin.name == location);
+              return (
+                <img
+                  key={pin.name}
+                  id={pin.name}
+                  src={pinImg}
+                  style={{ top: `${pin.loc[0]}px`, left: `${pin.loc[1]}px` }}
+                  onClick={handleLocationChange}
+                />
+              );
+            });
+          })()}
+        </>
+      ) : (
+        <>
+          {pins.map((pin) => (
+            <img
+              key={pin.name}
+              id={pin.name}
+              src={pinImg}
+              style={{ top: `${pin.loc[0]}px`, left: `${pin.loc[1]}px` }}
+              onClick={handleLocationChange}
+            />
+          ))}
+        </>
+      )}
     </StyledMap>
   );
 };
