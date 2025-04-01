@@ -36,8 +36,8 @@ const Logo = styled.img`
   padding: 0;
   margin-top: 10px;
   margin-left: 20px;
-  height: auto;
-  width: 220px;
+  height: 80px;
+  width: 180px;
 `;
 
 const Header = () => {
@@ -47,9 +47,6 @@ const Header = () => {
     <HeaderWrapper>
       <a href="/">
         <Logo src={logo} />
-        <button className="toggle">
-          {isCompanyUser() ? "기업" : "구직자"}
-        </button>
       </a>
       <Menu />
     </HeaderWrapper>

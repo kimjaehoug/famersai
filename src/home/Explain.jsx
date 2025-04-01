@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import TextTransition, { presets } from "react-text-transition";
-import { useAuth } from "../AuthContext";
+import { Link } from "react-router-dom";
+
 import seoulImg from "../img/서울.jpeg";
 import gwangjuImg from "../img/광주.jpeg";
 import ulsanImg from "../img/울산.jpeg";
 import jeonjuImg from "../img/전주.jpeg";
-import Map from "./Map";
-import regulatoryZoneData from "../data/regulatoryZoneData";
-import searchImg from "../img/검색바.png";
 import adImg1 from "../img/광고1.png";
 import adImg2 from "../img/광고2.png";
 
-// 페이드인 페이드아웃 애니메이션 (백그라운드 이미지)
 const fadeInOut = keyframes`
   0% { opacity: 0; }
   50% { opacity: 1; }
@@ -20,313 +17,303 @@ const fadeInOut = keyframes`
 `;
 
 const slideIn = keyframes`
-    0% {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0);
-        opacity: 1;
-    }
-`;
-
-const slideDown = keyframes`
-    0% {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 `;
 
 const ContentWrapper = styled.div`
-  margin: 30px 0;
+  margin: 10px 0;
   padding: 0;
+  overflow-x: hidden;
+  @media screen and (min-width: 1000px) {
+    margin: 10px auto;
+  }
+`;
+
+const MainContainer = styled.div`
+  position: relative;
+  height: 400px;
   overflow: hidden;
-  @media screen and (min-width: 1000px) {
-    margin: 30px auto;
-  }
-
-  .options {
-    margin-top: 0;
-    button {
-      font-size: 25px;
-      background-color: white;
-      border-radius: 10px;
-      margin-left: 0px;
-      margin-right: 10px;
-      margin-bottom: 15px;
-    }
-  }
-
-  .imgContainer {
-    img {
-      width: 100%;
-      object-fit: fill;
-    }
-  }
 `;
 
-const MainAnimation = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: auto;
-  align-items: center;
-  @media screen and (min-width: 768px) {
-    flex-direction: row;
-  }
-`;
-
-// 지도 및 검색 창 컨테이너
-const MapContainer = styled.div`
-  margin-top: 0px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 80vw;
-  max-width: 700px;
-  margin: auto;
-  gap: 50px;
-  align-items: center;
-  @media screen and (min-width: 1000px) {
-    flex-direction: row;
-    align-items: center;
-    max-width: 1200px;
-  }
-
-  .details {
-    border: 1px solid;
-    max-width: 450px;
-
-    h2,
-    p {
-      margin: 0;
-      box-sizing: border-box;
-      border: 1px solid;
-      padding: 20px;
-    }
-
-    h2 {
-      background: rgb(11, 0, 222);
-      background: linear-gradient(
-        90deg,
-        rgba(16, 8, 154, 1) 0%,
-        rgb(99, 198, 255) 100%
-      );
-    }
-  }
-`;
-
-// 배경 이미지 컨테이너
 const BackgroundImage = styled.div`
   width: 100%;
-  height: 400px;
-  background-image: url(${(props) => props.img});
+  height: 80%;
+  background-image: linear-gradient(to top, rgba(255, 255, 255, 1), transparent 20%), url(${(props) => props.img});
   background-position: center;
   background-size: cover;
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  animation: ${fadeInOut} 4s ease-in-out;
+  animation: ${fadeInOut} 8s ease-in-out infinite;
 `;
 
-// 주요 정보 컨테이너
-const MainContainer = styled.div`
+const MainAnimation = styled.div`
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  border-bottom: 0.5px solid #8e8d8d;
-  margin: auto;
-  padding: 0 50px;
-  overflow: hidden;
-  @media screen and (min-width: 768px) {
-    border: none;
-  }
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+  color: white;
+`;
 
-  &#cities {
-    margin: 0 0 40px 0;
-    background-image: url(${(props) => props.img});
-    background-position: bottom;
-    background-size: cover;
-    -webkit-transform: translate3d(0, 0, 0);
-    box-shadow: 0 -30px 30px 0 white inset;
-    height: 350px;
+const MainTitle = styled.h1`
+  font-size: 40px;
+  margin: 0;
+`;
+
+const MainContent = styled.p`
+  font-size: 20px;
+  margin: 20px 0;
+  text-align: center;
+`;
+
+const GuideText = styled.p`
+  text-align: center;
+  font-size: 24px;
+  color: #0056b3;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin: 20px 0 30px 0;
+`;
+
+const SearchBarContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 50px;
+  padding: 5px;
+  width: 95%;
+  max-width: 1000px;
+  margin: 0 auto 30px auto;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 50px 0 0 50px;
+  outline: none;
+  background-color: transparent;
+`;
+
+const SearchButton = styled.button`
+  padding: 15px;
+  font-size: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0 50px 50px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+
+  &:hover {
+    background-color: #0056b3;
   }
+`;
+
+const NewsSection = styled.div`
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-align: center;
+  span {
+    color: #5a2ec6;
+  }
+`;
+
+const SlideControls = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  button {
+    background: #eee;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    cursor: pointer;
+    &:hover {
+      background: #ccc;
+    }
+    &:disabled {
+      background: #ddd;
+      cursor: not-allowed;
+    }
+  }
+`;
+
+const NewsCardContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  overflow: visible;
+  animation: ${slideIn} 3s ease;
+`;
+
+const NewsCard = styled.div`
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex: 0 0 300px;
+  overflow: hidden;
+  text-align: center;
 
   img {
     width: 100%;
-    margin: 0;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  p {
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    min-height: 60px;
   }
 `;
 
-// 추천 기업 및 지역 특구 타이틀
-const MainTitle = styled.p`
-  font-size: 40px;
-  margin: 60px auto 30px;
-  @media screen and (min-width: 768px) {
-    margin: auto;
+const AdContainer = styled.div`
+  margin-top: 40px;
+  img {
+    width: 100%;
+    object-fit: contain;
   }
 `;
 
-// 메인 컨텐츠 설명
-const MainContent = styled.p`
-  font-size: 20px;
-  margin-bottom: 40px;
-  @media screen and (min-width: 768px) {
-    margin: 0;
-    padding: 0;
-    margin: 30px 20px 40px 70px;
-  }
-`;
+const farmingNews = [
+  { headline: "AI를 활용한 스마트 농업", image: seoulImg },
+  { headline: "유기농법의 장점", image: gwangjuImg },
+  { headline: "작물 병해충 관리", image: ulsanImg },
+  { headline: "지속 가능한 농업 실천", image: jeonjuImg },
+];
 
-// UI 구성 요소 및 애니메이션 로직
+const dummyLocalNews = [
+  { title: "키위 질 좋은 꽃가루 생산이 중요", imageUrl: "https://images.unsplash.com/photo-1607957142870-45d5ce40db4e" },
+  { title: "봄철 꼭 등검은말벌 여왕벌 방제 하세요", imageUrl: "https://images.unsplash.com/photo-1526318472351-bc6f9fca0404" },
+  { title: "수박, 참외 수정할 때 꿀벌 부족하면 '뒤영벌' 쓰세요", imageUrl: "https://images.unsplash.com/photo-1582281298058-0c63d736a4e3" },
+  { title: "QR코드로 농약 안전지침 확인 가능", imageUrl: "https://images.unsplash.com/photo-1615396703785-06cd9d28b8a4" },
+  { title: "토양 관리, 이제는 AI 분석으로!", imageUrl: "https://images.unsplash.com/photo-1605810230434-f42adfd0c49b" },
+];
+
 const Explain = () => {
-  const [inView, setInView] = useState({});
-  const refs = useRef([]);
   const [index, setIndex] = useState(0);
-  // const [option, setOption] = useState(0);
-  // const [keyword, setKeyword] = useState();
-  const { isCompanyUser } = useAuth();
-  const COMPANIES = ["Kakao", "Naver", "전북은행", "국민연금공단"];
-  const CITIES = ["서울특별시", "울산광역시", "전북 전주시", "광주광역시"];
-  const IMAGES = [seoulImg, ulsanImg, jeonjuImg, gwangjuImg];
-  const [data, setData] = useState();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [localNews, setLocalNews] = useState([]);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const visibleCount = 3;
 
-  const handleLocationChange = (e) => {
-    console.log(e.target.id);
-    for (const data of regulatoryZoneData) {
-      if (data["지역"] == e.target.id) {
-        setData(data);
-      }
-    }
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % farmingNews.length);
+    }, 8000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    setLocalNews(dummyLocalNews);
+  }, []);
+
+  useEffect(() => {
+    const autoSlide = setInterval(() => {
+      setSlideIndex((prev) =>
+        prev + 1 >= localNews.length - visibleCount + 1 ? 0 : prev + 1
+      );
+    }, 8000);
+    return () => clearInterval(autoSlide);
+  }, [localNews]);
+
+  const handlePrev = () => {
+    setSlideIndex((prev) => Math.max(prev - 1, 0));
   };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setInView((prev) => ({
-              ...prev,
-              [entry.target.dataset.index]: true,
-            }));
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.5 }
+  const handleNext = () => {
+    setSlideIndex((prev) =>
+      Math.min(prev + 1, localNews.length - visibleCount)
     );
-
-    refs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      if (refs.current)
-        refs.current.forEach((ref) => ref && observer.unobserve(ref));
-    };
-  }, []);
-
-  useEffect(() => {
-    const intervalId = setInterval(
-      () => setIndex((index) => (index + 1) % COMPANIES.length),
-      4000
-    );
-    return () => clearTimeout(intervalId);
-  }, []);
-
-  // const handleKeywordChange = (e) => {
-  //   setKeyword(e.target.value);
-  // };
+  };
 
   return (
     <ContentWrapper>
-      {isCompanyUser() ? (
-        <>
-          {" "}
-          <MainContainer id="cities">
-            <BackgroundImage key={index} img={IMAGES[index]} />
-            <MainAnimation
-              ref={(el) => (refs.current[0] = el)}
-              data-index={0}
-              inView={inView[0]}
-              style={{ color: "white", position: "relative", zIndex: 1 }}
-            >
-              <MainTitle>
-                오늘의 추천 특구
-                <TextTransition springConfig={presets.wobbly}>
-                  {CITIES[index]}
-                </TextTransition>
-              </MainTitle>
-              <MainContent>
-                오작교는 지역 인재와 지방 이전 기업간의 매칭을 도와줍니다.
-                <br></br>
-                <br></br>지역 경제의 적극적인 참여자가 되거나 새로운 커리어
-                기회를 찾아보세요.
-              </MainContent>
-            </MainAnimation>
-          </MainContainer>
-          <MapContainer>
-            <div>
-              <h1>특구정보조회</h1>
-              <Map handleLocationChange={handleLocationChange} />
-            </div>
-            {data && (
-              <div className="details">
-                <h2>
-                  <text style={{ color: "yellow", fontSize: "25px" }}>
-                    {data?.["지역"]}{" "}
-                  </text>
-                  <text style={{ color: "white", fontSize: "20px" }}>
-                    {data?.["혜택요약"]}
-                  </text>
-                </h2>
-                <img
-                  style={{ width: "100%", objectFit: "contain" }}
-                  src={require(`../img/${data?.["그림"]}.png`)}
-                />
-                <p>
-                  {data?.["혜택"].map((el) => (
-                    <li key={el}>{`${el} `}</li>
-                  ))}
-                </p>
-                <p>세부사업: {data?.["세부사업"]}</p>
-              </div>
-            )}
-          </MapContainer>
-        </>
-      ) : (
-        <MainContainer id="cities">
-          <BackgroundImage key={index} img={IMAGES[index]} />
-          <MainAnimation
-            ref={(el) => (refs.current[0] = el)}
-            data-index={0}
-            inView={inView[0]}
-            style={{ color: "white", position: "relative", zIndex: 1 }}
-          >
-            <MainTitle>
-              오늘의 추천 기업
-              <TextTransition springConfig={presets.wobbly}>
-                {COMPANIES[index]}
-              </TextTransition>
-            </MainTitle>
-            <MainContent>
-              오작교는 지역 인재와 지방 이전 기업간의 매칭을 도와줍니다.
-              <br></br>
-              <br></br>지역 경제의 적극적인 참여자가 되거나 새로운 커리어 기회를
-              찾아보세요.
-            </MainContent>
-          </MainAnimation>
-        </MainContainer>
-      )}
-      <div className="imgContainer">
-        <img src={adImg1}></img>
-        <img src={adImg2}></img>
-      </div>
+      <MainContainer>
+        <BackgroundImage img={farmingNews[index].image} />
+        <MainAnimation>
+          <MainTitle>
+            <TextTransition springConfig={presets.wobbly}>
+              {farmingNews[index].headline}
+            </TextTransition>
+          </MainTitle>
+          <MainContent>
+            최신 농사 뉴스와 정보를 확인하세요.
+            <br />
+            Famers와 함께 스마트 농업을 시작해 보세요.
+          </MainContent>
+        </MainAnimation>
+      </MainContainer>
+
+      <GuideText>AI로 스마트 농사 정보를 확인하세요.</GuideText>
+
+      <SearchBarContainer>
+        <SearchInput
+          type="text"
+          placeholder="검색어를 입력하세요"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Link to={`/chatbot?query=${searchQuery}`}>
+          <SearchButton>🔍</SearchButton>
+        </Link>
+      </SearchBarContainer>
+
+      <NewsSection>
+        <SectionTitle>
+          이달의 <span>농업기술</span>
+        </SectionTitle>
+        <SlideControls>
+          <button onClick={handlePrev} disabled={slideIndex === 0}>◀</button>
+          <button onClick={handleNext} disabled={slideIndex + visibleCount >= localNews.length}>▶</button>
+        </SlideControls>
+
+        <NewsCardContainer>
+          {localNews
+            .slice(slideIndex, slideIndex + visibleCount)
+            .map((news, idx) => (
+              <NewsCard key={idx}>
+                <img src={news.imageUrl} alt={`뉴스 이미지 ${idx + 1}`} />
+                <p>{news.title}</p>
+              </NewsCard>
+            ))}
+        </NewsCardContainer>
+      </NewsSection>
+
+      <AdContainer>
+        <img src={adImg1} alt="광고1" />
+        <img src={adImg2} alt="광고2" />
+      </AdContainer>
     </ContentWrapper>
   );
 };

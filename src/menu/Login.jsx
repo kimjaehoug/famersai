@@ -122,50 +122,26 @@ const StyledLogin = styled.div`
         }
       }
     }
-
-    .radio {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-around;
-      margin: auto;
-      width: 90%;
-      label {
-        display: flex;
-        align-items: center;
-        width: 50%;
-        input {
-          max-width: 15px;
-          box-shadow: none !important;
-          margin: 0 !important;
-        }
-        p {
-          margin: 10px;
-        }
-      }
-    }
   }
 `;
 
 const Login = () => {
-  const [id, setId] = useState();
+  const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { isCompanyUser, setCompanyUser } = useAuth();
 
   const handleLogin = () => {
     if (id.length >= 5) {
       if (password.length >= 8) {
         setError(null);
-        const route = isCompanyUser() ? "/company" : "/user";
         customAxios
-          .post(`${route}/login`, {
+          .post("/user/login", {
             id,
             password,
           })
           .then((res) => {
-            console.log(res);
             if (res.status === 200) {
               login(res.data);
               navigate("/");
@@ -188,39 +164,11 @@ const Login = () => {
       <div className="login">
         <h2>로그인</h2>
         <form id="login" action="/login" method="post">
-          <form className="radio">
-            <label>
-              <input
-                name="radio"
-                type="radio"
-                value="일반 회원"
-                defaultChecked={!isCompanyUser()}
-                onClick={() => {
-                  setCompanyUser(false);
-                  window.location.reload();
-                }}
-              />
-              <p>일반 회원</p>
-            </label>
-            <label>
-              <input
-                name="radio"
-                type="radio"
-                value="기업 회원"
-                defaultChecked={isCompanyUser()}
-                onClick={() => {
-                  setCompanyUser(true);
-                  window.location.reload();
-                }}
-              />
-              <p>기업 회원</p>
-            </label>
-          </form>
           <div>
             <input
               id="id"
               name="id"
-              type="id"
+              type="text"
               placeholder="아이디"
               required
               onChange={(e) => setId(e.target.value)}
@@ -242,11 +190,7 @@ const Login = () => {
           <div className="option">
             <ul>
               <li>
-                <a
-                  onClick={() => navigate(`/signup?company=${isCompanyUser()}`)}
-                >
-                  회원가입
-                </a>
+                <a onClick={() => navigate("/signup")}>회원가입</a>
               </li>
             </ul>
           </div>

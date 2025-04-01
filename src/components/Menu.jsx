@@ -6,8 +6,7 @@ const MenuWrapper = styled.div`
   display: flex;
   flex: 1;
   justify-content: flex-end;
-  aling-items: center; /* 요소들을 세로 중앙 정렬 */
-;
+  align-items: center; /* 오타 수정: aling-items -> align-items */
   a {
     text-decoration: none;
   }
@@ -34,10 +33,7 @@ const MenuWrapper = styled.div`
     margin: 15px 10px 0px 10px;
     max-width: 800px;
     font-size: 20px;
-    display: flex;
     flex-direction: row;
-    ${"" /* color: #f54458; */}
-    justify-content: space-around;
 
     .username {
       position: relative;
@@ -64,14 +60,13 @@ const MenuWrapper = styled.div`
   .menuDropdown {
     width: 50px;
     height: 50px;
-    background-color: white;
+    background-color: ${({ theme }) => theme.colors.MAIN};
     font-size: 50px;
     margin-right: 25px;
     padding: 0;
     color: white;
     position: relative;
     border-radius: 10px;
-    background-color: ${({ theme }) => theme.colors.MAIN};
 
     p {
       margin-top: -10px;
@@ -111,11 +106,10 @@ const MenuWrapper = styled.div`
   }
 `;
 
-// 새로운 버튼 스타일
 const StyledButton = styled.a`
   display: flex;
   align-items: center;
-  justigy-content: center;
+  justify-content: center; /* 오타 수정: justigy-content -> justify-content */
   background-color: ${({ theme }) => theme.colors.MAIN};
   color: white !important;
   font-size: 18px;
@@ -128,11 +122,10 @@ const StyledButton = styled.a`
   transition: background-color 0.3s ease;
 `;
 
-
 const Menu = () => {
-  const { user, logout, isCompanyUser, setCompanyUser } = useAuth();
+  const { user, logout } = useAuth(); // isCompanyUser, setCompanyUser 제거
   const [showLogout, setShowLogout] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(true);
+  const [showDropdown, setShowDropdown] = useState(false); // 초기값 false로 수정
 
   useEffect(() => {
     setShowDropdown(false);
@@ -141,147 +134,62 @@ const Menu = () => {
   return (
     <MenuWrapper>
       <div className="menu">
+        <a href="/">
+          <h5>홈</h5>
+        </a>
+        <a href="/myfarm">
+          <h5>내 농장</h5>
+        </a>
         <a href="/board">
-          <h5>{isCompanyUser() && "전체 "}채용 공고</h5>
+          <h5>커뮤니티</h5>
         </a>
-
-        {isCompanyUser() ? (
-          <a href="/board?mine=true">
-            <h5>나의 채용 공고</h5>
-          </a>
-        ) : (
-          <>
-            <a href="/resumes">
-              <h5>이력서 관리</h5>
-            </a>
-            <a href="/appliedJobs">
-              <h5>지원 현황</h5>
-            </a>
-          </>
-        )}
-
-        <a href="/news">
-          <h5>기업 뉴스</h5>
+        <a href="/market">
+          <h5>시장 정보</h5>
         </a>
-        {isCompanyUser() ? (
-          <>
-            <a href="/candidates">
-              <h5>인재 풀 탐색</h5>
-            </a>
-            <a href="/consulting">
-              <h5>컨설팅 요청</h5>
-            </a>
-          </>
-        ) : (
-          <a href="/companies">
-            <h5>회사 탐색</h5>
-          </a>
-        )}
         {user() ? (
-          <>
-            <h5 className="username" onClick={() => setShowLogout(!showLogout)}>
-              {user().name}님
-              {showLogout && (
-                <div className="infoDropdown">
-                  {isCompanyUser() ? (
-                    <a href="/companyMyPage">
-                      <h5 id="mypage">Company Page</h5>
-                    </a>
-                  ) : (
-                    <a href="/mypage">
-                      <h5 id="mypage">My Page</h5>
-                    </a>
-                  )}
-                  <a href="/login">
-                    <h5 id="logout" onClick={logout}>
-                      Logout
-                    </h5>
-                  </a>
-                </div>
-              )}
-            </h5>
-          </>
-        ) : (
-          <>
-            {isCompanyUser() ? (
-              <h5
-                onClick={() => {
-                  setCompanyUser(false);
-                  window.location.pathname = "/";
-                }}
-              >
-                오작교(구직)
-              </h5>
-            ) : (
-              <h5
-                onClick={() => {
-                  setCompanyUser(true);
-                  window.location.pathname = "/";
-                }}
-              >
-                오작교(기업)
-              </h5>
+          <h5 className="username" onClick={() => setShowLogout(!showLogout)}>
+            {user().name}님
+            {showLogout && (
+              <div className="infoDropdown">
+                <a href="/mypage">
+                  <h5 id="mypage">My Page</h5>
+                </a>
+                <a href="/login">
+                  <h5 id="logout" onClick={logout}>
+                    Logout
+                  </h5>
+                </a>
+              </div>
             )}
-
-            <StyledButton href="/login">JOIN US</StyledButton>
-          </>
+          </h5>
+        ) : (
+          <StyledButton href="/login">JOIN US</StyledButton>
         )}
       </div>
       <button
         className="menuDropdown"
         onClick={() => setShowDropdown(!showDropdown)}
       >
-        <p>&#9776;</p>
+        <p>☰</p>
         {showDropdown && (
           <div className="dropdown">
+            <a href="/">
+              <h5>홈</h5>
+            </a>
+            <a href="/myfarm">
+              <h5>내 농장</h5>
+            </a>
             <a href="/board">
-              <h5>{isCompanyUser() && "전체 "}채용 공고</h5>
+              <h5>커뮤니티</h5>
             </a>
-
-            {user() && isCompanyUser() ? (
-              <a href="/board?mine=true">
-                <h5>나의 채용 공고</h5>
-              </a>
-            ) : (
-              <>
-                <a href="/resumes">
-                  <h5>이력서 관리</h5>
-                </a>
-                <a href="/appliedJobs">
-                  <h5>지원 현황</h5>
-                </a>
-              </>
-            )}
-
-            <a href="/news">
-              <h5>기업 뉴스</h5>
+            <a href="/market">
+              <h5>시장 정보</h5>
             </a>
-            {user() && isCompanyUser() ? (
-              <>
-                <a href="/candidates">
-                  <h5>인재 풀 탐색</h5>
-                </a>
-                <a href="/consulting">
-                  <h5>컨설팅 요청</h5>
-                </a>
-              </>
-            ) : (
-              <a href="/companies">
-                <h5>회사 탐색</h5>
-              </a>
-            )}
-
             {user() ? (
               <>
-                {isCompanyUser() ? (
-                  <a href="/companyMyPage">
-                    <h5 id="mypage">Company Page</h5>
-                  </a>
-                ) : (
-                  <a href="/mypage">
-                    <h5 id="mypage">My Page</h5>
-                  </a>
-                )}
+                <a href="/mypage">
+                  <h5 id="mypage">My Page</h5>
+                </a>
                 <a href="/login">
                   <h5 id="logout" onClick={logout}>
                     Logout
@@ -289,30 +197,9 @@ const Menu = () => {
                 </a>
               </>
             ) : (
-              <>
-                {isCompanyUser() ? (
-                  <h5
-                    onClick={() => {
-                      setCompanyUser(false);
-                      window.location.pathname = "/";
-                    }}
-                  >
-                    오작교(구직)
-                  </h5>
-                ) : (
-                  <h5
-                    onClick={() => {
-                      setCompanyUser(true);
-                      window.location.pathname = "/";
-                    }}
-                  >
-                    오작교(기업)
-                  </h5>
-                )}
-                <a href="/login">
-                  <h5>로그인/회원가입</h5>
-                </a>
-              </>
+              <a href="/login">
+                <h5>로그인/회원가입</h5>
+              </a>
             )}
           </div>
         )}

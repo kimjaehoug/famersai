@@ -17,6 +17,7 @@ import MyPage from "./menu/MyPage";
 import CompanyMyPage from "./menu/CompanyMyPage";
 import Resumes from "./menu/Resumes";
 import Resume from "./menu/Resume";
+import MyFarm from "./menu/MyFarm";
 import AppliedJobs from "./menu/AppliedJobs";
 import AppliedJob from "./menu/AppliedJob";
 import Companies from "./menu/Companies";
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
   {
     path: "resumes",
     element: <Resumes />,
+  },
+  {
+    path: "myfarm",
+    element: <MyFarm />
   },
   {
     path: "resume",
