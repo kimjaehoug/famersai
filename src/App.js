@@ -25,6 +25,7 @@ import Company from "./menu/Company";
 import Candidates from "./menu/Candidates";
 import Candidate from "./menu/Candidate";
 import Consulting from "./menu/Consulting";
+import Selling from "./menu/Selling";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
   {
     path: "about",
     element: <About />,
+  },
+  {
+    path: "Selling",
+    element: <Selling />,
   },
   {
     path: "products",

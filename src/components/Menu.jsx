@@ -143,7 +143,7 @@ const Menu = () => {
         <a href="/board">
           <h5>커뮤니티</h5>
         </a>
-        <a href="/market">
+        <a href="/Selling">
           <h5>시장 정보</h5>
         </a>
         {user() ? (
@@ -182,7 +182,7 @@ const Menu = () => {
             <a href="/board">
               <h5>커뮤니티</h5>
             </a>
-            <a href="/market">
+            <a href="/Selling">
               <h5>시장 정보</h5>
             </a>
             {user() ? (

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { ToastContainer, toast } from "react-toastify";
 import { useAuth } from "../AuthContext";
-import { skillSetList } from "../data";
 
 const StyledSignup = styled.div`
   @import url("https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css");
