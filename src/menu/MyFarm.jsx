@@ -7,6 +7,40 @@ import { customAxios } from "../customAxios";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; // 캘린더 기본 스타일
 
+// 파일 상단에 선언해두면 전체에서 재사용 가능!
+const sanitizeAIResponse = (text) => {
+  if (!text) return "";
+
+  let cleaned = text;
+
+  // 1. thought:로 시작하는 줄 제거
+  cleaned = cleaned.replace(/^thought:.*$/gim, "");
+
+  // 2. <thought> ... </thought> 태그 제거
+  cleaned = cleaned.replace(/<thought[^>]*>[\s\S]*?<\/thought>/gi, "");
+
+  // 3. <think> ... </think> 태그 제거
+  cleaned = cleaned.replace(/<think[^>]*>[\s\S]*?<\/think>/gi, "");
+
+  // 4. <tool> 태그 제거
+  cleaned = cleaned.replace(/<tool[^>]*>[\s\S]*?<\/tool>/gi, "");
+
+  // 5. 기타 HTML/XML 태그 제거
+  cleaned = cleaned.replace(/<[^>]+>/g, "");
+
+  // 6. JSON 블럭 제거 (단순 대응)
+  cleaned = cleaned.replace(/\{[^}]+\}/g, "");
+
+  // 7. 양쪽 공백 및 빈 줄 제거
+  cleaned = cleaned
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line !== "")
+    .join("\n");
+
+  return cleaned.trim();
+};
+
 const MyFarmWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -273,6 +307,7 @@ const Message = styled.div`
   border-radius: 15px;
   max-width: 70%;
   word-wrap: break-word;
+  white-space: pre-wrap; /* ✅ 줄바꿈 문자 처리 */
 
   &.user {
     align-self: flex-end;
@@ -403,6 +438,26 @@ const handleSaveNote = () => {
   );
   }
 
+  useEffect(() => {
+    if (!userId) return;
+  
+    customAxios
+      .get(`/aichat/getChat?userId=${userId}`)
+      .then((res) => {
+        const history = res.data.history || [];
+  
+        const loadedMessages = history.flatMap(chat => [
+          { text: chat.question, sender: "user" },
+          { text: chat.answer, sender: "ai" }
+        ]);
+  
+        setMessages((prev) => [...prev, ...loadedMessages]);
+      })
+      .catch((err) => {
+        console.error("📛 채팅 기록 불러오기 실패:", err);
+      });
+  }, [userId]);
+
   console.log(user);
    // 로그인된 사용자 ID (가정)
    useEffect(() => {
@@ -414,8 +469,28 @@ const handleSaveNote = () => {
       .catch((err) => console.error("[오류] 농장 데이터 불러오기 실패:", err));
   }, []);
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!userId) return;
+  
+    customAxios
+      .get(`/aichat/getChat?userId=${userId}`)
+      .then((res) => {
+        let history = res.data.history || [];
+  
+        // ✅ created_at 기준 오름차순 정렬 (가장 오래된 → 최신 순)
+        history.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  
+        // ✅ 중복 없이 메시지 초기화 (prev 제거!)
+        const loadedMessages = history.flatMap(chat => [
+          { text: chat.question, sender: "user", created_at: chat.created_at },
+          { text: chat.answer, sender: "ai", created_at: chat.created_at }
+        ]);
+  
+        setMessages(loadedMessages);  // 💡 prev 제거!
+      })
+      .catch((err) => {
+        console.error("📛 채팅 기록 불러오기 실패:", err);
+      });
+  }, [userId]);
   const handleDeleteFarm = (farm) => {
     setSelectedFarm_m(farm);
     setRemoveModalVisible(true);
@@ -481,13 +556,31 @@ const handleSaveEdit = () => {
     }
   };
 
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      setMessages((prev) => [...prev, { text: inputValue, sender: "user" }]);
-      setInputValue("");
-      setTimeout(() => {
-        setMessages((prev) => [...prev, { text: `AI 응답: ${inputValue}`, sender: "ai" }]);
-      }, 500);
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+  
+    const userMessage = { text: inputValue, sender: "user" };
+    setMessages((prev) => [...prev, userMessage]); // 유저 메시지 추가
+    setInputValue("");
+  
+    try {
+      const res = await customAxios.post("/aichat/ask", {
+        question: inputValue,
+        userId: user()?.id // 사용자 질문
+      });
+      const cleaned = sanitizeAIResponse(res.data.answer);
+      const aiMessage = {
+        text: res.data.answer, // AI 응답
+        sender: "ai",
+      };
+  
+      setMessages((prev) => [...prev, aiMessage]); // AI 메시지 추가
+    } catch (err) {
+      console.error("AI 응답 실패:", err);
+      setMessages((prev) => [
+        ...prev,
+        { text: "⚠️ AI 응답에 실패했습니다. 다시 시도해주세요.", sender: "ai" },
+      ]);
     }
   };
 
