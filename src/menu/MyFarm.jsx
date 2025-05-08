@@ -269,10 +269,15 @@ const ModalContent = styled.div`
     }
   }
 `;
+const ChatMessagesWrapper = styled.div`
+  flex: 1;
+  overflow-y: auto;  // ✅ 스크롤은 여기만!
+  margin-bottom: 10px;
+`;
 
 const FarmJournalContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   padding: 40px 20px;
   width: 100%;
@@ -280,7 +285,25 @@ const FarmJournalContainer = styled.div`
   position: relative;
   z-index: 10;  /* 추가 */
 `;
-
+const JournalLeft = styled.div`
+  flex: 1.2;
+  margin-right: 20px;
+`;
+const JournalRight = styled.div`
+  flex: 1;
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+  height: fit-content;
+  min-height: 500px;         // ✅ 최소 높이 지정
+  max-height: 700px;         // ✅ 너무 커지지 않도록 제한
+  border-left: 1px solid #ddd;
+  padding-left: 20px;
+  z-index: 5;
+  background: white;
+  display: flex;
+  flex-direction: column;
+`;
 const ChatbotContainer = styled.div`
   flex: 1;
   display: flex;
@@ -355,6 +378,18 @@ const ChatInput = styled.div`
     }
   }
 `;
+
+const ScrollableChatContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+  max-height: 700px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+`;
+
 const textareaStyle = {
   width: "100%",
   height: "100px",
@@ -395,6 +430,9 @@ const MyFarm = () => {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const userId = user()?.id;
+  const [farmJournalMessages, setFarmJournalMessages] = useState([]);
+  const [farmJournalInput, setFarmJournalInput] = useState("");
+  const farmJournalEndRef = useRef(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [selectedFarm_m, setSelectedFarm_m] = useState(null);
@@ -424,15 +462,47 @@ const handleDateChange = async (date) => {
         date: key
       }
     });
-    const { note: serverNote, pestNote: serverPestNote } = res.data || {};
+    const { note: serverNote, pestNote: serverPestNote, chat: chatData = [] } = res.data || {};
     setNote(serverNote || "");
     setPestNote(serverPestNote || "");
+
+    const loadedJounalChat = chatData.map((entry) => [
+      {text: entry.question, sender: "user"},
+      {text: entry.answer, sender: "ai"}
+    ]).flat(); 
+    setFarmJournalMessages(loadedJounalChat);
   } catch (err) {
     console.error("📛 일지 정보 가져오기 실패:", err);
-    setNote("");      // 정보가 없으면 빈 문자열
-    setPestNote("");
+    setNote(""); setPestNote(""); setFarmJournalMessages([]);
   }
 };
+
+
+const handleFarmJournalSendMessage = async () => {
+  if (!farmJournalInput.trim()) return;
+
+  const newUserMsg = { text: farmJournalInput, sender: "user" };
+  setFarmJournalMessages((prev) => [...prev, newUserMsg]);
+  setFarmJournalInput("");
+
+  try {
+    const res = await customAxios.post("/aichat/journalAsk", {
+      userId,
+      farmName: selectedFarmId,
+      date: formatDateKST(selectedDate),
+      question: farmJournalInput,
+    });
+    const aiMsg = { text: res.data.answer, sender: "ai" };
+    setFarmJournalMessages((prev) => [...prev, aiMsg]);
+  } catch (err) {
+    console.error("농장 일지용 채팅 실패:", err);
+    setFarmJournalMessages((prev) => [
+      ...prev,
+      { text: "⚠️ AI 응답 실패", sender: "ai" }
+    ]);
+  }
+};
+
 
 
 const formatDateKST = (dateObj) => {
@@ -803,6 +873,7 @@ const handleSaveEdit = () => {
         console.log(selectedFarm);
         return (
           <FarmJournalContainer>
+        <JournalLeft>
   <h2>{selectedFarm ? `${selectedFarm.name}의 농장 일지` : "농장 일지"}</h2>
 
   {/* 📅 달력 (상단 고정) */}
@@ -955,6 +1026,35 @@ const handleSaveEdit = () => {
       )}
     </div>
   )}
+  </JournalLeft>
+  <JournalRight>
+    <h3 style={{ marginBottom: "10px", paddingLeft: "10px" }}>
+    📅 {formatDateKST(selectedDate)} - AI 일자별 채팅
+  </h3>
+   <ScrollableChatContainer>
+  <ChatMessagesWrapper>
+    <ChatMessages>
+      {farmJournalMessages.map((msg, idx) => (
+        <Message key={idx} className={msg.sender}>
+          {msg.text}
+        </Message>
+      ))}
+      <div ref={farmJournalEndRef} />
+    </ChatMessages>
+  </ChatMessagesWrapper>
+  
+  <ChatInput>
+    <input
+      type="text"
+      value={farmJournalInput}
+      onChange={(e) => setFarmJournalInput(e.target.value)}
+      placeholder="AI에게 질문해보세요!"
+      onKeyPress={(e) => e.key === "Enter" && handleFarmJournalSendMessage()}
+    />
+    <button onClick={handleFarmJournalSendMessage}>전송</button>
+  </ChatInput>
+</ScrollableChatContainer>
+  </JournalRight>
 </FarmJournalContainer>
         );
       case "chatbot":
