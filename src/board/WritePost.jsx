@@ -1,252 +1,175 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { customAxios } from "../customAxios";
 import { useAuth } from "../AuthContext";
-import { jobTypes, skillSetList } from "../data";
 
 const StyledPost = styled.div`
   .boardContainer {
-    border: 1px solid #e0e0e0;
     margin: 20px auto;
     padding: 25px;
     max-width: 900px;
     background: #ffffff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
-    color: #2c2c2c;
-    font-size: 16px;
-    line-height: 1.6;
-
-    .editTitle {
-      font-size: 24px;
-      font-weight: bold;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 10px;
-      margin-top: 10px;
-      margin-left: 20px;
-      width: 93%;
-      margin-bottom: 20px;
-      outline: none;
-      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .editContent {
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 10px;
-      margin-left: 20px;
-      width: 93%;
-      height: 200px;
-      resize: vertical;
-      font-size: 14px;
-      margin-bottom: 20px;
-      outline: none;
-      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
 
     h1 {
-      font-size: 27px;
+      font-size: 24px;
       font-weight: bold;
-      color: #2c2c2c;
-      margin-bottom: 30px;
-      margin-left: 30px;
+      margin-bottom: 20px;
+      color: #2e7d32; /* 진한 초록 */
     }
 
-    p {
-      margin-bottom: 20px;
-      margin-left: 30px;
-      color: #6e6e6e;
+    input,
+    textarea,
+    select {
+      width: 100%;
+      margin-bottom: 15px;
+      box-sizing: border-box; /* ✅ 이 줄 추가 */
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1px solid #c8e6c9; /* 연한 초록 테두리 */
+      border-radius: 8px;
+      outline: none;
+      background: #FFFFFF;
+
+      &:focus {
+        border-color: #81c784; /* 활성화 초록 */
+        box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.3);
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      height: 200px;
     }
 
     .buttonContainer {
       display: flex;
+      justify-content: center;
       gap: 10px;
-      justify-content: center;
-    }
 
-    button {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: ${({ theme }) => theme.colors.MAIN};
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 8px 15px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
 
-    button:hover {
-      background-color: ${({ theme }) => theme.colors.SIDE};
-    }
+      .submit {
+        background-color: #43a047;  /* 짙은 그린 */
+        color: white;
 
-    button:active {
-      background-color: ${({ theme }) => theme.colors.BACK};
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-    }
-
-    .listButton {
-      background-color: white;
-      color: ${({ theme }) => theme.colors.MAIN};
-      border: 2px solid ${({ theme }) => theme.colors.MAIN};
-    }
-
-    .listButton:hover {
-      background-color: white;
-      color: ${({ theme }) => theme.colors.SIDE};
-      border: 2px solid ${({ theme }) => theme.colors.SIDE};
-    }
-
-    .listButton:active {
-      color: ${({ theme }) => theme.colors.BACK};
-      border: 2px solid ${({ theme }) => theme.colors.BACK};
-    }
-
-    .radio {
-      display: flex;
-      flex-direction: row;
-      justify-content: left;
-      width: 100%;
-      margin: 0 20px;
-      label {
-        display: flex;
-        align-items: center;
-        margin: 0 5px;
-        input {
-          max-width: 15px;
-          box-shadow: none !important;
-          margin: 0 !important;
-        }
-        p {
-          margin: 10px;
+        &:hover {
+          background-color: #388e3c;
         }
       }
-    }
 
-    .skillSets {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      width: 100%;
-      flex-wrap: wrap;
-      margin: 0 20px 20px 20px;
-      button {
-        height: 40px;
+      .cancel {
+        background-color: #c8e6c9; /* 연한 그린 */
+        color: #2e7d32;
+
+        &:hover {
+          background-color: #a5d6a7;
+        }
       }
     }
   }
 `;
 
 const WritePost = () => {
-  const [jobType, setJobType] = useState(jobTypes[0]);
-  const [title, setTitle] = useState();
-  const [skillSets, setSkillSets] = useState([]);
-  const [content, setContent] = useState();
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const userId = user()?.id;
+  const navigate = useNavigate();
 
-  const handleEditFinish = () => {
-    customAxios
-      .post("/jobPost", {
-        jobType,
-        title,
-        skillSets,
-        content,
-        author: user(),
-      })
-      .then((res) => {
-        console.log(res);
-        handleBackToBoard();
-      })
-      .catch((err) => console.log(err));
-  };
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [file, setFile] = useState(null);
+  const [farmList, setFarmList] = useState([]);
+  const [selectedFarm, setSelectedFarm] = useState("");
 
-  const handleEditTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-
-  const handleEditContentChange = (e) => {
-    setContent(e.target.value);
-  };
-
-  const handleBackToBoard = () => {
-    navigate("/board");
-  };
-
-  const handleSkillSetChange = (e) => {
-    if (skillSets.includes(e.target.value)) {
-      const newSkillSets = skillSets.filter((set) => set !== e.target.value);
-      setSkillSets(newSkillSets);
-    } else {
-      setSkillSets([...skillSets, e.target.value]);
+  // 농장 목록 불러오기
+  useEffect(() => {
+    if (userId) {
+      customAxios
+        .get(`/farm/farms?userId=${userId}`)
+        .then((res) => setFarmList(res.data))
+        .catch((err) => console.error("농장 목록 불러오기 실패:", err));
     }
-    console.log(skillSets);
+  }, [userId]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!title || !content || !selectedFarm) {
+      alert("제목, 내용, 농장 선택은 필수입니다.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("author", JSON.stringify(user()));
+    formData.append("farmName", selectedFarm);
+    if (file) {
+      formData.append("file", file);
+    }
+
+    try {
+      await customAxios.post("/communityPost", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      alert("게시글이 등록되었습니다.");
+      navigate("/board");
+    } catch (err) {
+      console.error("게시글 등록 실패:", err);
+      alert("업로드 실패");
+    }
   };
 
   return (
     <StyledPost>
       <div className="boardContainer">
-        <form className="radio">
-          {jobTypes.map((jobType, idx) => {
-            return (
-              <label key={idx + 1}>
-                <input
-                  name="radio"
-                  type="radio"
-                  value={jobType}
-                  defaultChecked={!idx}
-                  onClick={() => setJobType(jobType)}
-                />
-                <p>{jobType}</p>
-              </label>
-            );
-          })}
+        <h1>게시글 작성</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="제목을 입력하세요"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <textarea
+            placeholder="내용을 입력하세요"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            required
+          />
+          <select
+            value={selectedFarm}
+            onChange={(e) => setSelectedFarm(e.target.value)}
+            required
+          >
+            <option value="">📍 농장 선택</option>
+            {farmList.map((farm) => (
+              <option key={farm.name} value={farm.name}>
+                {farm.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+            accept="image/*, .pdf"
+          />
+          <div className="buttonContainer">
+            <button type="submit" className="submit">등록</button>
+            <button type="button" className="cancel" onClick={() => navigate("/board")}>취소</button>
+          </div>
         </form>
-        <input
-          className="editTitle"
-          defaultValue={title}
-          placeholder="채용 공고 제목"
-          onChange={handleEditTitleChange}
-        />
-        <div className="skillSets">
-          {skillSetList.map((skillSet, idx) => {
-            return (
-              <button
-                key={idx + 1}
-                className="skillSet"
-                value={skillSet}
-                style={{
-                  backgroundColor: skillSets.includes(skillSet)
-                    ? ""
-                    : "lightgrey",
-                }}
-                onClick={handleSkillSetChange}
-              >
-                {skillSet}
-              </button>
-            );
-          })}
-        </div>
-        <textarea
-          className="editContent"
-          defaultValue={content}
-          rows={20}
-          onChange={handleEditContentChange}
-          placeholder="채용 공고 관련 상세 내용"
-        />
-        <div className="buttonContainer">
-          <button onClick={handleEditFinish}>채용 공고 등록</button>
-
-          <button className="listButton" onClick={handleBackToBoard}>
-            취소
-          </button>
-        </div>
       </div>
     </StyledPost>
   );

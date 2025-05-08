@@ -295,8 +295,8 @@ const JournalRight = styled.div`
   top: 20px;
   align-self: flex-start;
   height: fit-content;
-  min-height: 500px;         // ✅ 최소 높이 지정
-  max-height: 700px;         // ✅ 너무 커지지 않도록 제한
+  min-height: 600px;         // ✅ 최소 높이 지정
+  max-height: 800px;         // ✅ 너무 커지지 않도록 제한
   border-left: 1px solid #ddd;
   padding-left: 20px;
   z-index: 5;
@@ -382,8 +382,8 @@ const ChatInput = styled.div`
 const ScrollableChatContainer = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 500px;
-  max-height: 700px;
+  min-height: 600px;
+  max-height: 800px;
   padding: 10px;
   background-color: #fff;
   border: 1px solid #ccc;
