@@ -1,6 +1,7 @@
 // 전체 기능이 포함된 MyFarm 컴포넌트 (채팅 + 팝업 + 탭 전환)
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../AuthContext";
+import axios from "axios";
 import styled from "styled-components";
 import userEvent from "@testing-library/user-event";
 import { customAxios } from "../customAxios";
@@ -44,7 +45,7 @@ const sanitizeAIResponse = (text) => {
 const MyFarmWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   font-family: Arial, sans-serif;
 `;
 
@@ -276,12 +277,15 @@ const FarmJournalContainer = styled.div`
   padding: 40px 20px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  z-index: 10;  /* 추가 */
 `;
 
 const ChatbotContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  height:100vh;
   background: #fff;
 `;
 
@@ -407,21 +411,63 @@ const [dailyNotes, setDailyNotes] = useState({}); // 날짜별 일지 저장
 const [note, setNote] = useState("");
 const [pestNote, setPestNote] = useState("");
 
-// 날짜 클릭 시
-const handleDateChange = (date) => {
+const handleDateChange = async (date) => {
   setSelectedDate(date);
-  const key = date.toISOString().split("T")[0];
-  setNote(dailyNotes[key] || "");
+  const key = formatDateKST(date); 
+  console.log("날짜데이터:", key); 
+
+  try {
+    const res = await customAxios.get(`/farmJournal`, {
+      params: {
+        userId: userId,
+        farmName: selectedFarmId,
+        date: key
+      }
+    });
+    const { note: serverNote, pestNote: serverPestNote } = res.data || {};
+    setNote(serverNote || "");
+    setPestNote(serverPestNote || "");
+  } catch (err) {
+    console.error("📛 일지 정보 가져오기 실패:", err);
+    setNote("");      // 정보가 없으면 빈 문자열
+    setPestNote("");
+  }
 };
 
+
+const formatDateKST = (dateObj) => {
+  const offsetMs = dateObj.getTime() + (9 * 60 * 60 * 1000); // KST +9시간 적용
+  const kst = new Date(offsetMs);
+  return kst.toISOString().split("T")[0]; // YYYY-MM-DD
+};
 // 저장 버튼
 const handleSaveNote = () => {
-  console.log("저장할 메모:", {
-    date: selectedDate,
-    note,
-    pestNote,
-  });
-  // 서버로 저장 요청 로직 작성 가능
+  console.log("💾 저장 버튼 클릭됨");
+
+  try {
+    const dateStr = formatDateKST(selectedDate);
+    const payload = {
+      userId: userId,
+      farmName: selectedFarmId,
+      date: dateStr,
+      note,
+      pestNote,
+    };
+
+    console.log("📦 payload:", payload);
+
+    customAxios.post("/farmJournal/commitData", payload)
+      .then((res) => {
+        console.log("✅ 저장 성공", res);
+      })
+      .catch((err) => {
+        console.error("❌ 저장 실패", err);
+      });
+
+    console.log("📌 axios.post 호출 완료");
+  } catch (e) {
+    console.error("💥 try-catch에서 예외 발생:", e);
+  }
 };
 
 
@@ -475,7 +521,7 @@ const handleSaveNote = () => {
       .get(`/aichat/getChat?userId=${userId}`)
       .then((res) => {
         let history = res.data.history || [];
-  
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
         // ✅ created_at 기준 오름차순 정렬 (가장 오래된 → 최신 순)
         history.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
   
@@ -496,12 +542,14 @@ const handleSaveNote = () => {
     setRemoveModalVisible(true);
   }
   const handleRemove = (farm) => {
+    console.log("삭제팜 이름:",farm);
     if (window.confirm(`${farm} 농장을 삭제하시겠습니까?`)) {
       customAxios
-        .delete(`/farm/delete?userId=${user.id}&name=${encodeURIComponent(farm)}`)
+        .delete(`/farm/delete?userId=${userId}&name=${encodeURIComponent(farm)}`)
         .then(() => fetchFarms()) // 삭제 후 갱신
         .catch((err) => console.error("삭제 실패:", err));
     }
+    setRemoveModalVisible(false);
   };
   const handleEditFarm = (farm) => {
     setSelectedFarm_m(farm);         // 어떤 농장을 수정할지 지정
@@ -687,7 +735,7 @@ const handleSaveEdit = () => {
       <h3>농장 삭제</h3>
       <h2> 정말 삭제하시겠습니까?</h2>
       <div className="button-group">
-        <button onClick={handleRemove}>삭제</button>
+      <button onClick={() => handleRemove(selectedFarm_m)}>삭제</button>
         <button onClick={handleCloseModal}>취소</button>
       </div>
     </ModalContent>
@@ -867,7 +915,11 @@ const handleSaveEdit = () => {
             />
           </div>
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{   display: "flex",
+  gap: "10px",
+  position: "relative",
+  zIndex: 20,              // 더 높게
+  pointerEvents: "auto", }}>
             <button
               style={{
                 padding: "10px 20px",
@@ -877,7 +929,11 @@ const handleSaveEdit = () => {
                 borderRadius: "8px",
                 cursor: "pointer",
               }}
-              onClick={handleSaveNote}
+              type="button"
+              onClick={() => {
+                console.log("💾 저장 버튼 클릭됨");
+                handleSaveNote();
+              }}
             >
               저장
             </button>
