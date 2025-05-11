@@ -1,17 +1,17 @@
-// ✅ Chart.js 컴포넌트 안전 적용 버전 with 날짜 필터 + 가격 분포 히스토그램 적용
+// ✅ Chart.js 컴포넌트 안전 적용 버전 with 날짜 필터 + 가격 분포 히스토그램 + 예측 색상 분리 (최근 14일 + 기간 필터 유지)
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useAuth } from "../AuthContext";
 import { customAxios } from "../customAxios";
 import axios from "axios";
 import SafeLineChart from "../components/SafeLineChart";
-import SafeBarChart from "../components/SafeBarChart"; // ✅ 추가
+import SafeBarChart from "../components/SafeBarChart";
 
 import {
   Chart as ChartJS,
   LineElement,
   PointElement,
-  BarElement, // ✅ 추가
+  BarElement,
   LinearScale,
   CategoryScale,
   Tooltip,
@@ -20,7 +20,7 @@ import {
 ChartJS.register(
   LineElement,
   PointElement,
-  BarElement, // ✅ 추가
+  BarElement,
   LinearScale,
   CategoryScale,
   Tooltip,
@@ -157,7 +157,54 @@ const Selling = () => {
         );
       }
 
-      if (activeTab !== "가격 분포") {
+      if (activeTab === "예측" && res.data.datasets?.[0]?.data?.length > 0) {
+  const baseDataset = res.data.datasets[0];
+  const allLabels = res.data.labels.map((d) =>
+    new Date(d).toISOString().split("T")[0]
+  );
+  const allData = baseDataset.data;
+
+  // ✅ 필터링 대상 범위 결정
+  let days = 30;
+  if (period === "14일") days = 14;
+  else if (period === "7일") days = 7;
+  else if (period === "전체") days = allLabels.length;
+
+  const filteredLabels = allLabels.slice(-days);
+  const filteredData = allData.slice(-days);
+
+  // ✅ 최근 14일 분리 기준
+  const predictionStartIndex = Math.max(0, filteredLabels.length - 14);
+
+  // ✅ 실측 + 예측 분리
+  const realData = filteredData.map((v, idx) =>
+    idx < predictionStartIndex ? v : null
+  );
+  const predictData = filteredData.map((v, idx) =>
+    idx >= predictionStartIndex ? v : null
+  );
+
+  formatted = {
+    labels: filteredLabels,
+    datasets: [
+      {
+        label: "실제 가격",
+        data: realData,
+        borderColor: "#3b82f6",
+        backgroundColor: "#93c5fd",
+        tension: 0.4,
+      },
+      {
+        label: "예측 가격 (최근 14일)",
+        data: predictData,
+        borderColor: "#22c55e",
+        backgroundColor: "#bbf7d0",
+        borderDash: [5, 5],
+        tension: 0.4,
+      },
+    ],
+  };
+} else if (activeTab !== "가격 분포") {
         formatted = filterByPeriod(formatted.labels, formatted.datasets);
       }
 
@@ -227,37 +274,37 @@ const Selling = () => {
       </TabNav>
 
       <ChartWrapper style={{ height: "400px", position: "relative" }}>
-  {chartData ? (
-    activeTab === "가격 분포" ? (
-      <SafeBarChart
-        data={chartData}
-        options={{
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: true },
-          },
-          scales: {
-            x: {
-              title: { display: true, text: "가격 구간" },
-            },
-            y: {
-              title: { display: true, text: "Count" },
-              beginAtZero: true,
-            },
-          },
-        }}
-      />
-    ) : (
-      <SafeLineChart
-        data={chartData}
-        options={{ responsive: true, maintainAspectRatio: false }}
-      />
-    )
-  ) : (
-    <p>데이터 로딩 중...</p>
-  )}
-</ChartWrapper>
+        {chartData ? (
+          activeTab === "가격 분포" ? (
+            <SafeBarChart
+              data={chartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: true },
+                },
+                scales: {
+                  x: {
+                    title: { display: true, text: "가격 구간" },
+                  },
+                  y: {
+                    title: { display: true, text: "Count" },
+                    beginAtZero: true,
+                  },
+                },
+              }}
+            />
+          ) : (
+            <SafeLineChart
+              data={chartData}
+              options={{ responsive: true, maintainAspectRatio: false }}
+            />
+          )
+        ) : (
+          <p>데이터 로딩 중...</p>
+        )}
+      </ChartWrapper>
     </Container>
   );
 };
