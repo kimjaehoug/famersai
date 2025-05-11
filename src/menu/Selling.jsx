@@ -27,6 +27,7 @@ ChartJS.register(
   Legend
 );
 
+// 스타일
 const Container = styled.div`
   padding: 2rem;
   font-family: "Pretendard", sans-serif;
@@ -103,13 +104,19 @@ const Selling = () => {
   const [farms, setFarms] = useState([]);
   const [selectedFarm, setSelectedFarm] = useState(null);
   const [selectedRegion, setSelectedRegion] = useState(otherRegions[0]);
+  const [selectedSubregion, setSelectedSubregion] = useState(regionMap[otherRegions[0]][0]);
   const [selectedCrop, setSelectedCrop] = useState(otherCrops[0]);
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [chartData, setChartData] = useState(null);
   const [period, setPeriod] = useState("30일");
 
+  // 내 농장 데이터 불러오기 (원래 로직 유지)
   useEffect(() => {
     if (mode === "owned" && userId) {
+      customAxios.get(`/farm/farms?userId=${userId}`).then((res) => {
+        setFarms(res.data);
+        if (res.data.length > 0) setSelectedFarm(res.data[0].name);
+      });
       customAxios.get(`/farm/farms?userId=${userId}`).then((res) => {
         setFarms(res.data);
         if (res.data.length > 0) setSelectedFarm(res.data[0].name);
@@ -185,7 +192,10 @@ const Selling = () => {
                 <TabButton
                   key={region}
                   active={selectedRegion === region}
-                  onClick={() => setSelectedRegion(region)}
+                  onClick={() => {
+                    setSelectedRegion(region);
+                    setSelectedSubregion(regionMap[region]?.[0] || null);
+                  }}
                 >
                   {region}
                 </TabButton>
