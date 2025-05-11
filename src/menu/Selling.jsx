@@ -1,35 +1,52 @@
+// ✅ Chart.js 컴포넌트 안전 적용 버전 with 날짜 필터 + 가격 분포 히스토그램 적용
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Line } from "react-chartjs-2";
 import { useAuth } from "../AuthContext";
 import { customAxios } from "../customAxios";
 import axios from "axios";
-<link href="https://fonts.googleapis.com/css2?family=Cafe24+Ssurround&display=swap" rel="stylesheet"></link>
+import SafeLineChart from "../components/SafeLineChart";
+import SafeBarChart from "../components/SafeBarChart"; // ✅ 추가
+
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  BarElement, // ✅ 추가
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+ChartJS.register(
+  LineElement,
+  PointElement,
+  BarElement, // ✅ 추가
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Legend
+);
 
 const Container = styled.div`
   padding: 2rem;
   font-family: "Pretendard", sans-serif;
 `;
-
 const TopRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 `;
-
 const CropTabs = styled.div`
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
 `;
-
 const Title = styled.h2`
   font-family: "Cafe24 Ssurround", sans-serif;
   font-size: 2rem;
   margin-bottom: 1rem;
 `;
-
 const ModeButton = styled.button`
   background-color: #e5e7eb;
   color: #333;
@@ -42,7 +59,6 @@ const ModeButton = styled.button`
     background-color: #d1d5db;
   }
 `;
-
 const TabButton = styled.button`
   padding: 0.5rem 1rem;
   border: none;
@@ -52,14 +68,12 @@ const TabButton = styled.button`
   cursor: pointer;
   font-weight: 500;
 `;
-
 const TabNav = styled.div`
   display: flex;
   gap: 1rem;
   border-bottom: 2px solid #ddd;
   margin: 1.5rem 0 1rem;
 `;
-
 const Tab = styled.div`
   padding: 0.5rem 1rem;
   cursor: pointer;
@@ -67,7 +81,6 @@ const Tab = styled.div`
   color: ${({ active }) => (active ? "#2563eb" : "#555")};
   font-weight: ${({ active }) => (active ? "bold" : "normal")};
 `;
-
 const ChartWrapper = styled.div`
   background: #fff;
   border: 1px solid #ddd;
@@ -75,43 +88,82 @@ const ChartWrapper = styled.div`
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   min-height: 300px;
+  position: relative;
 `;
 
-const otherRegions = ["강원", "서울", "경기", "세종", "충북","전남","전북"];
+const otherRegions = ["강원", "서울", "경기", "세종", "충북", "전남", "전북"];
 const otherCrops = ["감자", "고구마", "배", "사과"];
 const tabs = ["요일별 평균 가격", "일일 가격 증감율", "가격 분포", "이동 평균", "예측"];
+const periods = ["7일", "14일", "30일", "전체"];
 
 const Selling = () => {
   const { user } = useAuth();
   const userId = user()?.id;
-
-  const [mode, setMode] = useState("owned"); // 'owned' | 'other'
+  const [mode, setMode] = useState("owned");
   const [farms, setFarms] = useState([]);
   const [selectedFarm, setSelectedFarm] = useState(null);
   const [selectedRegion, setSelectedRegion] = useState(otherRegions[0]);
   const [selectedCrop, setSelectedCrop] = useState(otherCrops[0]);
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [chartData, setChartData] = useState(null);
+  const [period, setPeriod] = useState("30일");
 
   useEffect(() => {
     if (mode === "owned" && userId) {
-      customAxios.get(`/farm/farms?userId=${userId}`)
-        .then(res => {
-          setFarms(res.data);
-          if (res.data.length > 0) setSelectedFarm(res.data[0].name);
-        });
+      customAxios.get(`/farm/farms?userId=${userId}`).then((res) => {
+        setFarms(res.data);
+        if (res.data.length > 0) setSelectedFarm(res.data[0].name);
+      });
     }
   }, [mode, userId]);
 
+  const tabToEndpoint = {
+    "요일별 평균 가격": "/api/average-by-weekday",
+    "일일 가격 증감율": "/api/daily-change",
+    "가격 분포": "/api/distribution",
+    "이동 평균": "/api/moving-average",
+    "예측": "/api/prediction",
+  };
+
+  const filterByPeriod = (labels, datasets) => {
+    let days = 30;
+    if (period === "14일") days = 14;
+    else if (period === "7일") days = 7;
+    else if (period === "전체") return { labels, datasets };
+    return {
+      labels: labels.slice(-days),
+      datasets: datasets.map((ds) => ({ ...ds, data: ds.data.slice(-days) })),
+    };
+  };
+
   useEffect(() => {
-    if (mode === "owned" && selectedFarm) {
-      axios.get(`/api/farm-eda?farmName=${encodeURIComponent(selectedFarm)}&tab=${encodeURIComponent(activeTab)}`)
-        .then(res => setChartData(res.data));
-    } else if (mode === "other") {
-      axios.get(`/api/market-eda?region=${selectedRegion}&crop=${selectedCrop}&tab=${activeTab}`)
-        .then(res => setChartData(res.data));
-    }
-  }, [mode, selectedFarm, selectedRegion, selectedCrop, activeTab]);
+    const baseUrl = tabToEndpoint[activeTab];
+    if (!baseUrl) return;
+
+    const params =
+      mode === "owned"
+        ? `?farmName=${encodeURIComponent(selectedFarm)}`
+        : `?region=${encodeURIComponent(selectedRegion)}&crop=${encodeURIComponent(selectedCrop)}`;
+
+    const fullUrl = `${baseUrl}${params}`;
+
+    axios.get(fullUrl).then((res) => {
+      let formatted = res.data;
+      const isDate = (val) => !isNaN(new Date(val).getTime());
+
+      if (activeTab !== "가격 분포" && formatted.labels && isDate(formatted.labels[0])) {
+        formatted.labels = formatted.labels.map((dateStr) =>
+          new Date(dateStr).toISOString().split("T")[0]
+        );
+      }
+
+      if (activeTab !== "가격 분포") {
+        formatted = filterByPeriod(formatted.labels, formatted.datasets);
+      }
+
+      setChartData(formatted);
+    });
+  }, [activeTab, selectedRegion, selectedCrop, selectedFarm, mode, period]);
 
   return (
     <Container>
@@ -139,34 +191,13 @@ const Selling = () => {
                 </TabButton>
               ))}
         </CropTabs>
-        <ModeButton onClick={() => setMode(mode === "owned" ? "other" : "owned")}>
+        <ModeButton onClick={() => setMode(mode === "owned" ? "other" : "owned")}>  
           {mode === "owned" ? "📍 타 지역/작물 보기" : "🌾 내 농장 보기"}
         </ModeButton>
       </TopRow>
 
-      {mode === "owned" && selectedFarm && (
-        <div style={{
-          marginBottom: "1rem",
-          background: "#f9fafb",
-          padding: "1rem",
-          borderRadius: "10px",
-          border: "1px solid #e2e8f0"
-        }}>
-          {(() => {
-            const info = farms.find(f => f.name === selectedFarm);
-            return info ? (
-              <>
-                <strong>{info.name} 농장 정보</strong><br />
-                지역: <strong>{info.address}</strong><br />
-                작물: <strong>{info.crop}</strong>
-              </>
-            ) : null;
-          })()}
-        </div>
-      )}
-
       {mode === "other" && (
-        <CropTabs style={{ marginTop: "-0.5rem" }}>
+        <CropTabs>
           {otherCrops.map((crop) => (
             <TabButton
               key={crop}
@@ -179,6 +210,14 @@ const Selling = () => {
         </CropTabs>
       )}
 
+      <CropTabs style={{ marginTop: "1rem" }}>
+        {periods.map((p) => (
+          <TabButton key={p} active={period === p} onClick={() => setPeriod(p)}>
+            {p}
+          </TabButton>
+        ))}
+      </CropTabs>
+
       <TabNav>
         {tabs.map((tab) => (
           <Tab key={tab} active={activeTab === tab} onClick={() => setActiveTab(tab)}>
@@ -187,9 +226,38 @@ const Selling = () => {
         ))}
       </TabNav>
 
-      <ChartWrapper>
-        {chartData ? <Line data={chartData} /> : <p>데이터 로딩 중...</p>}
-      </ChartWrapper>
+      <ChartWrapper style={{ height: "400px", position: "relative" }}>
+  {chartData ? (
+    activeTab === "가격 분포" ? (
+      <SafeBarChart
+        data={chartData}
+        options={{
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true },
+          },
+          scales: {
+            x: {
+              title: { display: true, text: "가격 구간" },
+            },
+            y: {
+              title: { display: true, text: "Count" },
+              beginAtZero: true,
+            },
+          },
+        }}
+      />
+    ) : (
+      <SafeLineChart
+        data={chartData}
+        options={{ responsive: true, maintainAspectRatio: false }}
+      />
+    )
+  ) : (
+    <p>데이터 로딩 중...</p>
+  )}
+</ChartWrapper>
     </Container>
   );
 };
