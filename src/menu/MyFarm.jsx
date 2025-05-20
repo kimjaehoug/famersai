@@ -516,9 +516,12 @@ const handleSaveNote = () => {
 
   try {
     const dateStr = formatDateKST(selectedDate);
+    const selectedFarmObj = farmList.find((f) => f.name === selectedFarmId);
+    const crop = selectedFarmObj?.crop || "";
     const payload = {
       userId: userId,
       farmName: selectedFarmId,
+      crop, 
       date: dateStr,
       note,
       pestNote,
