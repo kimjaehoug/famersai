@@ -93,7 +93,7 @@ const ChartWrapper = styled.div`
 
 const otherRegions = ["강원", "서울", "경기", "세종", "충북", "전남", "전북"];
 const otherCrops = ["감자", "고구마", "배", "사과"];
-const tabs = ["요일별 평균 가격", "일일 가격 증감율", "가격 분포", "이동 평균", "예측"];
+const tabs = [ "일일 가격 증감율", "가격 분포", "이동 평균", "예측"];
 const periods = ["7일", "14일", "30일", "전체"];
 
 const Selling = () => {
@@ -118,7 +118,6 @@ const Selling = () => {
   }, [mode, userId]);
 
   const tabToEndpoint = {
-    "요일별 평균 가격": "/api/average-by-weekday",
     "일일 가격 증감율": "/api/daily-change",
     "가격 분포": "/api/distribution",
     "이동 평균": "/api/moving-average",
