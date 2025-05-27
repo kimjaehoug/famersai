@@ -6,6 +6,7 @@ import styled from "styled-components";
 import userEvent from "@testing-library/user-event";
 import { customAxios } from "../customAxios";
 import Calendar from 'react-calendar';
+import {useSearchParams} from "react-router-dom";
 import 'react-calendar/dist/Calendar.css'; // 캘린더 기본 스타일
 
 // 파일 상단에 선언해두면 전체에서 재사용 가능!
@@ -442,12 +443,20 @@ const MyFarm = () => {
   ]);
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef(null);
+  const [queryParams] = useSearchParams();
 
   // 추가할 상태
 const [selectedDate, setSelectedDate] = useState(new Date());
 const [dailyNotes, setDailyNotes] = useState({}); // 날짜별 일지 저장
 const [note, setNote] = useState("");
 const [pestNote, setPestNote] = useState("");
+const [recommendation, setRecommendation] = useState("");
+
+useEffect(() => {
+  const query = queryParams.get("query");
+  setInputValue(query);
+
+}, [queryParams]);
 
 const handleDateChange = async (date) => {
   setSelectedDate(date);
@@ -462,18 +471,13 @@ const handleDateChange = async (date) => {
         date: key
       }
     });
-    const { note: serverNote, pestNote: serverPestNote, chat: chatData = [] } = res.data || {};
+    const { note: serverNote, pestNote: serverPestNote, recommendation: recommendations } = res.data || {};
     setNote(serverNote || "");
     setPestNote(serverPestNote || "");
-
-    const loadedJounalChat = chatData.map((entry) => [
-      {text: entry.question, sender: "user"},
-      {text: entry.answer, sender: "ai"}
-    ]).flat(); 
-    setFarmJournalMessages(loadedJounalChat);
+    setRecommendation(recommendations || "");
   } catch (err) {
     console.error("📛 일지 정보 가져오기 실패:", err);
-    setNote(""); setPestNote(""); setFarmJournalMessages([]);
+    setNote(""); setPestNote(""); setRecommendation("");
   }
 };
 
@@ -931,7 +935,7 @@ const handleSaveEdit = () => {
               minHeight: "60px", 
               border: "1px solid #ddd" 
             }}>
-              {pestNote || "AI 추천이 없습니다."}
+              {recommendation || "AI 추천이 없습니다."}
             </p>
           </div>
           <button

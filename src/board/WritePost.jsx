@@ -90,6 +90,14 @@ const WritePost = () => {
   const [file, setFile] = useState(null);
   const [farmList, setFarmList] = useState([]);
   const [selectedFarm, setSelectedFarm] = useState("");
+  const [selectPost , setSelectedPost] = useState("");
+
+
+
+    const postLists = [
+      { label: "뉴스",link: "news" },
+      { label: "자유게시판",link: "free" },
+    ];
 
   // 농장 목록 불러오기
   useEffect(() => {
@@ -101,35 +109,31 @@ const WritePost = () => {
     }
   }, [userId]);
 
+
+  
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!title || !content || !selectedFarm) {
-      alert("제목, 내용, 농장 선택은 필수입니다.");
-      return;
-    }
+  if (!title || !content) {
+    alert("제목과 내용을 입력하세요.");
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("author", JSON.stringify(user()));
-    formData.append("farmName", selectedFarm);
-    if (file) {
-      formData.append("file", file);
-    }
-
-    try {
-      await customAxios.post("/communityPost", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("게시글이 등록되었습니다.");
-      navigate("/board");
-    } catch (err) {
-      console.error("게시글 등록 실패:", err);
-      alert("업로드 실패");
-    }
-  };
-
+  try {
+    await customAxios.post("/posts/add", {
+      title,
+      content,
+      author_id: user().id,
+      author_name: user().name,
+      category: selectPost
+    });
+    alert("게시글이 등록되었습니다.");
+    navigate("/board");
+  } catch (err) {
+    console.error("❌ 게시글 등록 실패:", err);
+    alert("업로드 실패");
+  }
+};
   return (
     <StyledPost>
       <div className="boardContainer">
@@ -159,6 +163,19 @@ const WritePost = () => {
                 {farm.name}
               </option>
             ))}
+          </select>
+
+          <select
+            value = {selectPost}
+            onChange={(e) => setSelectedPost(e.target.value)}
+            required
+          >
+            <option value="">📍 게시판 선택</option>
+              {postLists.map((post) => (
+                <option key={post.name} value={post.name}>
+                  {post.name}
+                </option>
+              ))}
           </select>
           <input
             type="file"

@@ -108,6 +108,18 @@ const Selling = () => {
   const [chartData, setChartData] = useState(null);
   const [period, setPeriod] = useState("30일");
 
+  // 전체 → 약칭 지역명 매핑
+const regionAbbreviationMap = {
+  "서울특별시": "서울",
+  "경기도": "경기",
+  "강원도": "강원",
+  "세종특별자치시": "세종",
+  "충청북도": "충북",
+  "전라북도": "전북",
+  "전라남도": "전남",
+  // 필요 시 추가
+};
+
   useEffect(() => {
     if (mode === "owned" && userId) {
       customAxios.get(`/farm/farms?userId=${userId}`).then((res) => {
@@ -116,6 +128,18 @@ const Selling = () => {
       });
     }
   }, [mode, userId]);
+
+  useEffect(() => {
+  if (mode === "owned" && selectedFarm && farms.length > 0) {
+    const selected = farms.find((farm) => farm.name === selectedFarm);
+    if (selected) {
+      const fullRegion = selected.address;
+      const regionShort = regionAbbreviationMap[fullRegion] || fullRegion;
+      setSelectedRegion(regionShort);         // 예: "전라북도" → "전북"
+      setSelectedCrop(selected.crop);         // 예: "감자"
+    }
+  }
+}, [selectedFarm, farms, mode]);
 
   const tabToEndpoint = {
     "일일 가격 증감율": "/api/daily-change",
@@ -140,9 +164,9 @@ const Selling = () => {
     if (!baseUrl) return;
 
     const params =
-      mode === "owned"
-        ? `?farmName=${encodeURIComponent(selectedFarm)}`
-        : `?region=${encodeURIComponent(selectedRegion)}&crop=${encodeURIComponent(selectedCrop)}`;
+  mode === "owned"
+    ? `?region=${encodeURIComponent(selectedRegion)}&crop=${encodeURIComponent(selectedCrop)}`
+    : `?region=${encodeURIComponent(selectedRegion)}&crop=${encodeURIComponent(selectedCrop)}`;
 
     const fullUrl = `${baseUrl}${params}`;
 
