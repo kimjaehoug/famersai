@@ -95,10 +95,10 @@ const WritePost = () => {
 
 
     const postLists = [
-      { label: "뉴스",link: "news" },
-      { label: "자유게시판",link: "free" },
+      { name: "뉴스",link: "news" },
+      { name: "자유",link: "free" },
     ];
-
+    
   // 농장 목록 불러오기
   useEffect(() => {
     if (userId) {
@@ -125,7 +125,7 @@ const WritePost = () => {
       content,
       author_id: user().id,
       author_name: user().name,
-      category: selectPost
+      category: selectPost,
     });
     alert("게시글이 등록되었습니다.");
     navigate("/board");
@@ -171,9 +171,9 @@ const WritePost = () => {
             required
           >
             <option value="">📍 게시판 선택</option>
-              {postLists.map((post) => (
-                <option key={post.name} value={post.name}>
-                  {post.name}
+              {postLists.map((postlists) => (
+                <option key={postlists.name} value={postlists.link}>
+                  {postlists.name}
                 </option>
               ))}
           </select>

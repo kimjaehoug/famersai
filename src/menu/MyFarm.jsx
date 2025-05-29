@@ -514,6 +514,21 @@ const formatDateKST = (dateObj) => {
   const kst = new Date(offsetMs);
   return kst.toISOString().split("T")[0]; // YYYY-MM-DD
 };
+
+const getCleanRecommendation = (text) => {
+  if (!text) return "";
+
+  const closingTag = "</thought>";
+  const idx = text.indexOf(closingTag);
+
+  // </thought>가 포함되어 있으면 그 뒤의 내용만 반환
+  if (idx !== -1) {
+    return text.slice(idx + closingTag.length).trim();
+  }
+
+  // 없으면 원본 그대로
+  return text;
+};
 // 저장 버튼
 const handleSaveNote = () => {
   console.log("💾 저장 버튼 클릭됨");
@@ -536,6 +551,7 @@ const handleSaveNote = () => {
     customAxios.post("/farmJournal/commitData", payload)
       .then((res) => {
         console.log("✅ 저장 성공", res);
+        setIsEditing(false)
       })
       .catch((err) => {
         console.error("❌ 저장 실패", err);
@@ -935,7 +951,7 @@ const handleSaveEdit = () => {
               minHeight: "60px", 
               border: "1px solid #ddd" 
             }}>
-              {recommendation || "AI 추천이 없습니다."}
+              {getCleanRecommendation(recommendation) || "AI 추천이 없습니다."}
             </p>
           </div>
           <button
