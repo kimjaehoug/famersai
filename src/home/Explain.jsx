@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiLogIn, FiChevronRight } from "react-icons/fi";
 import eventimg from "../img/bbbbbb.png";
+import {useAuth} from "../AuthContext";
+import {customAxios} from "../customAxios";
 import searchBg from "../img/image.png";
 import {
   MdOutlineWork,
@@ -672,7 +674,9 @@ const InfoCard = styled.div`
 
 /* ───── 메인 컴포넌트 ───── */
 export default function EmploymentHome() {
-
+    const {user,logout} = useAuth();
+    const userId = user()?.id;
+    const currentUser = user();
     const navigate = useNavigate();
     const [query, setQuery] = useState("");
   /* Quick 메뉴 */
@@ -902,16 +906,36 @@ const guides = [
     </SearchArea>
 
     {/* ▶ 로그인 혜택 박스 */}
-    <BenefitCard>
-      <h4><span>Farmers에 로그인</span> 하시면<br/>아래 서비스를 이용할 수 있어요.</h4>
-      <ul>
-        <li>농작물 챗봇</li>
-        <li>농업 활동 추천</li>
-        <li>농작물 예측 서비스</li>
-        <li>커뮤니티 서비스</li>
-      </ul>
-      <button><FiLogIn/> 로그인</button>
-    </BenefitCard>
+    {currentUser ? (
+  <BenefitCard>
+    <h4><span>{currentUser.name}</span>님 환영합니다!</h4>
+    <ul>
+      <li>예측 서비스 이용 가능</li>
+      <li>AI 추천 정보 제공</li>
+      <li>개인화된 농장 정보 제공</li>
+      <li>커뮤니티 참여 가능</li>
+    </ul>
+    <button type="button" onClick={() => {
+    logout();                // 1. 로그아웃 처리 (토큰 삭제 등)
+    window.location.reload(); // 2. 페이지 강제 새로고침
+  }}>
+      로그아웃
+    </button>
+  </BenefitCard>
+) : (
+  <BenefitCard>
+    <h4><span>Farmers에 로그인</span> 하시면<br />아래 서비스를 이용할 수 있어요.</h4>
+    <ul>
+      <li>농작물 챗봇</li>
+      <li>농업 활동 추천</li>
+      <li>농작물 예측 서비스</li>
+      <li>커뮤니티 서비스</li>
+    </ul>
+    <button type="button" onClick={() => navigate("/login")}>
+      <FiLogIn /> 로그인
+    </button>
+  </BenefitCard>
+)}
   </SearchRow>
 </SearchWrap>
 

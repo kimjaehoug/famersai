@@ -107,6 +107,7 @@ const Selling = () => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [chartData, setChartData] = useState(null);
   const [period, setPeriod] = useState("30일");
+  
 
   // 전체 → 약칭 지역명 매핑
 const regionAbbreviationMap = {
